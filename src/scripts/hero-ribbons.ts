@@ -38,14 +38,15 @@ interface Rig {
 }
 
 const TAU = Math.PI * 2;
-const LOOP_S = 24;
-const RAMP_S = 3.2; // amplitude and clock wake up together from the static art
+const LOOP_S = 12;
+const STRENGTH = 1.5; // shape drift multiplier: clearly alive at first glance, still behind the headline
+const RAMP_S = 1.2; // amplitude and clock wake up together from the static art
 const LAG_S = 0.72; // tinted shapes trail their ribbon by this much
 const ECHO_GAIN = 0.82;
 const TUNED_SCALE = 1.025; // screen px per SVG unit at 1440 x 900, where the waves were tuned
 const MIN_ART_PX = 228; // left art width at a 1200 px viewport; narrower strips stay static
 const MIN_FRAME_MS = 9.5; // 120/144 Hz displays draw every other frame
-const IDLE_MS = 2 * LOOP_S * 1000; // two quiet loops without input, then ease to a stop
+const IDLE_MS = 48_000; // no input for this long, then ease to a stop
 const WAKE_TAU_S = 0.4; // playback rate eases in and out with this time constant
 const STORAGE_KEY = 'motion'; // site-wide: 'paused' when the visitor paused motion
 
@@ -238,7 +239,8 @@ export function startHeroRibbons(root: HTMLElement): () => void {
 
   const fitOf = (el: HTMLElement, viewBoxWidth: number) => {
     const scale = Math.max(el.clientWidth / viewBoxWidth, el.clientHeight / 640);
-    return scale ? Math.min(1, TUNED_SCALE / scale) : 1;
+    // Square root: wide screens get calmer, but stay clearly animated (0.79 at 1920, 0.63 at 2560).
+    return scale ? Math.min(1, Math.sqrt(TUNED_SCALE / scale)) : 1;
   };
   const measureFit = () => {
     state.fit = { left: fitOf(artLeft, 400), right: fitOf(artRight, 260) };
@@ -248,7 +250,7 @@ export function startHeroRibbons(root: HTMLElement): () => void {
   function render() {
     const u = (state.t % LOOP_S) / LOOP_S;
     const k = smoothstep(clamp01(state.ramp / RAMP_S));
-    for (const { rig, el } of paths) el.setAttribute('d', buildPath(rig, u, k * state.fit[rig.side]));
+    for (const { rig, el } of paths) el.setAttribute('d', buildPath(rig, u, k * STRENGTH * state.fit[rig.side]));
     for (const g of gradients) {
       const s = k * wave(u, g.w);
       g.el.setAttribute('x1', String(round(g.base[0] + g.ux * s)));
