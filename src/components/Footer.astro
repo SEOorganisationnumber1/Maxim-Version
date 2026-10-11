@@ -1,0 +1,103 @@
+---
+import Logo from './Logo.astro';
+import { footerNav, services, site } from '../data/site';
+---
+
+<footer class="footer">
+  <div class="footer__inner">
+    <div class="footer__cols">
+      <div class="footer__brand">
+        <Logo id="logo-f" class="footer__logo" />
+        <p>{site.tagline}</p>
+      </div>
+      <nav aria-label="Footer" class="footer__nav">
+        <span class="eyebrow footer__head">Pages</span>
+        {footerNav.map((item) => <><a href={item.href}>{item.label}</a>{'\n'}</>)}
+      </nav>
+      <div class="footer__list">
+        <span class="eyebrow footer__head">We do</span>
+        {services.map((s) => <><span>{s}</span>{'\n'}</>)}
+      </div>
+      <div class="footer__list">
+        <span class="eyebrow footer__head">Get in touch</span>
+        <span>{site.email}</span>
+        <span>{site.social}</span>
+        <span>{site.location}</span>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© {site.year} {site.name}</span>
+      <span>{services.join(' · ')}</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background: var(--ink);
+    color: var(--white);
+  }
+  .footer__inner {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: 64px var(--gutter) 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+  }
+  .footer__cols {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+    gap: 40px;
+  }
+  .footer__brand {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .footer__brand :global(.footer__logo),
+  .footer__brand :global(.footer__logo:hover) {
+    color: var(--white);
+  }
+  .footer__brand p {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--footer-text);
+  }
+  .footer__head {
+    color: var(--cyan);
+    padding-bottom: 8px;
+  }
+  .footer__nav {
+    display: flex;
+    flex-direction: column;
+  }
+  .footer__nav a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .footer__list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .footer__list > span:not(.footer__head) {
+    font-size: 15px;
+    color: var(--footer-text);
+  }
+  .footer__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px;
+    border-top: 1px solid var(--footer-line);
+    padding-top: 24px;
+    font-size: 14px;
+    color: var(--footer-text);
+  }
+</style>

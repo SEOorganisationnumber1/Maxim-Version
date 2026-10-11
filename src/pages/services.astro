@@ -1,0 +1,655 @@
+---
+import Base from '../layouts/Base.astro';
+import CtaBand from '../components/CtaBand.astro';
+import Icon from '../components/Icon.astro';
+import type { Service } from '../data/site';
+
+type ServiceBlock = { name: Service; description: string; deliverables: string[] };
+type StackRow = { label: string; tools: string[] };
+type Plan = { name: string; summary: string; period: string; featured: boolean; items: string[] };
+type Faq = { question: string; answer: string };
+
+const jumpLinks = [
+  { href: '#services', label: 'What we do' },
+  { href: '#stack', label: 'Stack & tools' },
+  { href: '#pricing', label: 'Pricing' },
+  { href: '#faq', label: 'FAQ' },
+];
+
+const serviceBlocks: ServiceBlock[] = [
+  {
+    name: 'Design',
+    description:
+      'Brand and interface design in Figma. A system of components, not a pile of pages, so the build is fast and every new page stays on-brand.',
+    deliverables: [
+      'Brand identity and visual direction',
+      'UI and UX for sites and web apps',
+      'A design system with reusable components',
+      'Developer-ready handoff',
+    ],
+  },
+  {
+    name: 'Web Development',
+    description:
+      'Sites and web apps on modern frameworks. Server-rendered, typed and fast by default. Core Web Vitals are a build requirement, not an afterthought.',
+    deliverables: [
+      'Marketing sites, landing pages and web apps',
+      'Server-side rendering and static generation for speed',
+      'A headless CMS your team can edit',
+      'Analytics, tracking and performance budgets built in',
+    ],
+  },
+  {
+    name: 'SEO',
+    description:
+      'Search Engine Optimization. We go after the queries that bring buyers, not just visitors, and we fix the technical problems that keep good pages from ranking.',
+    deliverables: [
+      'Technical audit and fixes: crawl, index, speed',
+      'Keyword and search-intent mapping',
+      'On-page content and internal linking',
+      'Authority building with relevant links',
+    ],
+  },
+  {
+    name: 'GEO',
+    description:
+      'Generative Engine Optimization. We structure your site and content so ChatGPT, Gemini and Perplexity can read, trust and cite your brand.',
+    deliverables: [
+      'An audit of how AI engines describe your brand today',
+      'Entity-rich content that is easy to cite',
+      'Structured data and an llms.txt file',
+      'Tracking of mentions and citations in AI answers',
+    ],
+  },
+  {
+    name: 'AEO',
+    description:
+      'Answer Engine Optimization. Clear, structured answers that win featured snippets, AI Overviews and voice results.',
+    deliverables: [
+      'Research into the questions people actually ask',
+      'Answer-first page structure',
+      'FAQ, HowTo and product schema',
+      'Targeting for snippets, AI Overviews and voice',
+    ],
+  },
+];
+
+const stack: StackRow[] = [
+  { label: 'Design', tools: ['Figma', 'Design tokens', 'Component libraries'] },
+  {
+    label: 'Build',
+    tools: ['Next.js', 'Astro', 'TypeScript', 'Tailwind CSS', 'Headless CMS'],
+  },
+  {
+    label: 'Search',
+    tools: ['Google Search Console', 'Ahrefs', 'Screaming Frog', 'Schema.org markup'],
+  },
+  {
+    label: 'AI visibility',
+    tools: ['llms.txt', 'Structured answers', 'Citation tracking: ChatGPT, Gemini, Perplexity'],
+  },
+  { label: 'Measure', tools: ['GA4', 'Looker Studio', 'Form and call tracking'] },
+];
+
+const plans: Plan[] = [
+  {
+    name: 'Launch',
+    summary: 'Design and build. A new site, ready to rank from day one.',
+    period: 'one-time',
+    featured: false,
+    items: [
+      'Brand and UI design in Figma',
+      'Site built on a modern framework',
+      'Technical SEO foundations: schema, sitemaps, Core Web Vitals',
+      'Analytics and lead tracking set up',
+      'Handover and training for your team',
+    ],
+  },
+  {
+    name: 'Growth',
+    summary: 'SEO, GEO and AEO, run every month on the site you have.',
+    period: 'per month',
+    featured: true,
+    items: [
+      'Technical SEO audit and fixes',
+      'Search-intent content plan and production',
+      'GEO: structured, citable content for AI engines',
+      'AEO: snippet and AI Overview targeting',
+      'Monthly report on rankings, citations and leads',
+    ],
+  },
+  {
+    name: 'Full stack',
+    summary: 'Everything, as one ongoing team for design, code and search.',
+    period: 'per month',
+    featured: false,
+    items: [
+      'Everything in Launch and Growth',
+      'Ongoing design and development',
+      'Conversion testing on key pages',
+      'A shared roadmap, reviewed every month',
+      'Priority support',
+    ],
+  },
+];
+
+const faqs: Faq[] = [
+  {
+    question: 'What is the difference between SEO, GEO and AEO?',
+    answer:
+      'SEO gets your pages ranked in classic search results. AEO shapes your content so a search engine can lift a direct answer from it: featured snippets, AI Overviews, voice. GEO makes your brand readable and citable for generative engines such as ChatGPT, Gemini and Perplexity. All three share one foundation: a fast, well-structured site with content people actually want.',
+  },
+  {
+    question: 'How long until we see results?',
+    answer:
+      'Technical fixes usually show within weeks. Rankings and AI citations build over months, and the pace depends on your market and where you start. We report every month so you see the direction early.',
+  },
+  {
+    question: 'Do we need a new website to start?',
+    answer:
+      'No. We begin with an audit of the site you have. If it can be fixed, we fix it. We only recommend a rebuild when the current stack is what holds your rankings back.',
+  },
+  {
+    question: 'How do you define a qualified lead?',
+    answer:
+      'With you, before we start. We agree on who counts as a fit (industry, size, intent), set up tracking for forms and calls, and report on those leads, not on raw traffic.',
+  },
+  {
+    question: 'Can you work with our in-house team?',
+    answer:
+      'Yes. We can own the whole project, or plug into your designers, developers or content team and cover only the gaps.',
+  },
+];
+
+const faqPageJsonLd: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((faq) => ({
+    '@type': 'Question',
+    name: faq.question,
+    acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+  })),
+};
+
+const pad2 = (n: number): string => String(n).padStart(2, '0');
+---
+
+<Base
+  title="Services"
+  current="/services"
+  description="Design, web development, SEO, GEO and AEO built as one. One team designs the site, builds it, and makes sure people and AI engines can find it."
+  jsonLd={[faqPageJsonLd]}
+>
+  <section class="hero bg-paper border-bottom">
+    <div class="hero__art" aria-hidden="true">
+      <svg viewBox="0 0 480 460" preserveAspectRatio="xMinYMid slice" fill="none">
+        <defs>
+          <linearGradient
+            id="top-a"
+            x1="480"
+            y1="0"
+            x2="60"
+            y2="460"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop offset="0" stop-color="#22D3DD"></stop>
+            <stop offset="0.5" stop-color="#2F8CF6"></stop>
+            <stop offset="1" stop-color="#5B4FE9"></stop>
+          </linearGradient>
+        </defs>
+        <path d="M520 -20 C 340 0, 200 120, 300 230 C 380 320, 280 440, 520 500 Z" fill="#E4EEFF"
+        ></path>
+        <path
+          d="M540 40 C 360 40, 220 140, 320 240 C 400 320, 330 420, 540 480"
+          stroke="url(#top-a)"
+          stroke-width="72"
+          stroke-linecap="round"></path>
+      </svg>
+    </div>
+    <div class="container hero__inner">
+      <h1 class="h1 hero__title">
+        Design, code and search. <span class="highlight">Built as one.</span>
+      </h1>
+      <p class="lede hero__lede">
+        One team designs the site, builds it, and makes sure people and AI engines can find it. No
+        handoffs between agencies, no lost context.
+      </p>
+      <nav aria-label="On this page" class="jump">
+        {
+          jumpLinks.map((link) => (
+            <a href={link.href} class="jump__link">
+              {link.label}
+            </a>
+          ))
+        }
+      </nav>
+    </div>
+  </section>
+
+  <section id="services" class="anchor bg-white">
+    <div class="container services__inner">
+      {
+        serviceBlocks.map((service, i) => (
+          <article class="service">
+            <div class="service__col">
+              <span class="num">{pad2(i + 1)}</span>
+              <h2 class="service__title">{service.name}</h2>
+              <p class="service__text">{service.description}</p>
+            </div>
+            <div class="service__col">
+              <h3 class="service__label">What you get</h3>
+              <ul class="service__list">
+                {service.deliverables.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <section id="stack" class="anchor bg-paper border-top">
+    <div class="container stack__inner">
+      <div class="section-head">
+        <h2 class="h2">A modern stack, chosen for speed.</h2>
+        <p class="section-head__text">
+          Every tool here earns its place by saving time or improving results. When something
+          better appears, we switch.
+        </p>
+      </div>
+      <dl class="stack">
+        {
+          stack.map((row) => (
+            <div class="stack__row">
+              <dt class="stack__label">{row.label}</dt>
+              <dd class="stack__tools">
+                {row.tools.map((tool) => (
+                  <>
+                    <span class="chip">{tool}</span>{'\n'}
+                  </>
+                ))}
+              </dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  <section id="pricing" class="anchor bg-white border-top">
+    <div class="container pricing__inner">
+      <div class="section-head">
+        <h2 class="h2">Three ways to work with us.</h2>
+      </div>
+      <div class="plans">
+        {
+          plans.map((plan) => (
+            <div class:list={['plan', { 'plan--featured': plan.featured }]}>
+              <div class="plan__head">
+                <h3 class="plan__name">{plan.name}</h3>
+                <p class="plan__summary">{plan.summary}</p>
+              </div>
+              <p class="plan__price">
+                <span class="plan__amount">[€ PRICE]</span>
+                <span class="plan__period">{plan.period}</span>
+              </p>
+              <ul class="plan__list">
+                {plan.items.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+              <a
+                href="/contact"
+                class:list={['btn', 'btn--sm', 'plan__cta', plan.featured ? 'btn--primary' : 'btn--outline']}
+              >
+                Ask about {plan.name}
+              </a>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section id="faq" class="anchor bg-white border-top">
+    <div class="container faq__inner">
+      <div class="section-head section-head--wide">
+        <h2 class="h2">Questions we hear first.</h2>
+      </div>
+      <div class="faq">
+        {
+          faqs.map((faq, i) => (
+            <details name="faq" class="faq__item" open={i === 0}>
+              <summary class="faq__summary">
+                <h3 class="faq__question">{faq.question}</h3>
+                <Icon name="plus" size={24} strokeWidth={2.4} />
+              </summary>
+              <p class="faq__answer">{faq.answer}</p>
+            </details>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <CtaBand
+    title="Not sure which one fits?"
+    text="Tell us where you are. We will point you to the smallest scope that gets results."
+    tone="ink"
+    pad="full"
+    borderTop
+  />
+</Base>
+
+<style>
+  /* Anchored sections: keep the top edge off the viewport edge after a jump. */
+  .anchor {
+    scroll-margin-top: 16px;
+  }
+
+  /* ---------- Hero ---------- */
+
+  .hero {
+    position: relative;
+    overflow: hidden;
+  }
+  .hero__art {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: max(0px, calc(100% - 900px));
+    max-width: 480px;
+  }
+  .hero__art svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .hero__inner {
+    position: relative;
+    padding-top: 88px;
+    padding-bottom: 56px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .hero__title {
+    max-width: 820px;
+  }
+  .hero__lede {
+    max-width: 640px;
+  }
+
+  .jump {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-top: 8px;
+  }
+  .jump__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 16px;
+    border: 1.5px solid var(--ink);
+    border-radius: 6px;
+    background: var(--white);
+    font-weight: 700;
+    font-size: 15px;
+    text-decoration: none;
+  }
+
+  /* ---------- Services ---------- */
+
+  .services__inner {
+    padding-top: 48px;
+    padding-bottom: 96px;
+    display: flex;
+    flex-direction: column;
+  }
+  .service {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px 64px;
+    padding: 48px 0;
+    border-bottom: 1.5px solid var(--ink);
+  }
+  .service:last-child {
+    border-bottom: 0;
+  }
+  .service__col {
+    flex: 1 1 380px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .service__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2rem, 3.4vw, 3rem);
+    line-height: 1.08;
+  }
+  .service__text {
+    margin: 0;
+    max-width: 520px;
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+  .service__label {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .service__list {
+    margin: 0;
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 17px;
+    line-height: 1.5;
+  }
+
+  /* ---------- Shared section head ---------- */
+
+  .section-head {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 760px;
+  }
+  /* The FAQ heading wrapper has no width cap in the design. */
+  .section-head--wide {
+    max-width: none;
+  }
+  .section-head__text {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+
+  /* ---------- Stack ---------- */
+
+  .stack__inner {
+    padding-top: 96px;
+    padding-bottom: 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+  }
+  .stack {
+    margin: 0;
+    border-bottom: 1.5px solid var(--ink);
+  }
+  .stack__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 32px;
+    padding: 20px 0;
+    border-top: 1.5px solid var(--ink);
+  }
+  .stack__label {
+    flex: 0 0 200px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--teal-ink);
+  }
+  .stack__tools {
+    flex: 1 1 320px;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* ---------- Pricing ---------- */
+
+  .pricing__inner {
+    padding-top: 96px;
+    padding-bottom: 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+  }
+  .plans {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+    gap: 24px;
+    align-items: stretch;
+  }
+  .plan {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    background: var(--white);
+    border: 1.5px solid var(--ink);
+    border-radius: 20px;
+    padding: 32px;
+  }
+  .plan--featured {
+    background: var(--tint-cyan);
+  }
+  .plan__head {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .plan__name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 1.1;
+  }
+  .plan__summary {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+  .plan__price {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .plan__amount {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 40px;
+    line-height: 1;
+  }
+  .plan__period {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink-2);
+  }
+  .plan__list {
+    flex: 1 1 auto;
+    margin: 0;
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  /* The design's plan buttons inherit the root line-height (1.5), not .btn's 1.2. */
+  .plan__cta {
+    line-height: 1.5;
+  }
+
+  /* ---------- FAQ ---------- */
+
+  .faq__inner {
+    max-width: 1000px;
+    padding-top: 96px;
+    padding-bottom: 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+  .faq {
+    border-bottom: 1.5px solid var(--ink);
+  }
+  .faq__item {
+    border-top: 1.5px solid var(--ink);
+  }
+  .faq__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    min-height: 72px;
+    padding: 16px 0;
+    list-style: none;
+    text-align: left;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.125rem, 1.8vw, 1.5rem);
+    line-height: 1.25;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .faq__summary::-webkit-details-marker {
+    display: none;
+  }
+  .faq__summary::marker {
+    content: '';
+  }
+  .faq__question {
+    margin: 0;
+    font: inherit;
+  }
+  .faq__summary :global(svg) {
+    flex: none;
+    transition: transform 0.2s;
+  }
+  .faq__item[open] > .faq__summary :global(svg) {
+    transform: rotate(45deg);
+  }
+  .faq__answer {
+    margin: 0;
+    padding: 0 0 28px;
+    max-width: 800px;
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-2);
+  }
+</style>

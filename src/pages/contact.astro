@@ -1,0 +1,562 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { services, site } from '../data/site';
+
+const steps = [
+  'We read your brief and look at your site.',
+  'You get a short reply with what we would fix first.',
+  'If it fits, we scope the work together on a call.',
+];
+---
+
+<Base
+  title="Contact"
+  current="/contact"
+  description="Tell us what you want to rank for. Send a short brief and we reply with what we would fix first."
+>
+  <section class="bg-paper">
+    <div class="container contact">
+      <div class="intro">
+        <h1 class="intro__title">
+          Tell us what you want to <span class="highlight">rank for.</span>
+        </h1>
+        <p class="lede intro__lede">
+          A few lines are enough. The more you share about your site and goals, the more specific our
+          first reply will be.
+        </p>
+
+        <div class="next">
+          <h2 class="next__title">What happens next</h2>
+          <ol class="next__list">
+            {
+              steps.map((step, i) => (
+                <li>
+                  <span class="num">{String(i + 1).padStart(2, '0')}</span>
+                  <span class="next__text">{step}</span>
+                </li>
+              ))
+            }
+          </ol>
+        </div>
+
+        <p class="intro__email">Prefer email? Write to <strong>{site.email}</strong></p>
+
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 520 150"
+          preserveAspectRatio="xMidYMid slice"
+          fill="none"
+          class="intro__art"
+        >
+          <defs>
+            <linearGradient id="side-a" x1="0" y1="0" x2="520" y2="150" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="#22D3DD"></stop>
+              <stop offset="0.55" stop-color="#2F8CF6"></stop>
+              <stop offset="1" stop-color="#5B4FE9"></stop>
+            </linearGradient>
+          </defs>
+          <path
+            d="M30 110 C 110 10, 200 150, 290 80 C 360 30, 420 40, 490 90"
+            stroke="url(#side-a)"
+            stroke-width="44"
+            stroke-linecap="round"></path>
+        </svg>
+      </div>
+
+      <div class="panel">
+        <div class="success" role="status" data-contact-success hidden>
+          <span class="success__icon" aria-hidden="true">
+            <Icon name="check" size={28} strokeWidth={2.6} />
+          </span>
+          <h2 class="success__title" tabindex="-1" data-success-title>Brief received.</h2>
+          <p class="success__text">
+            Thanks, <span data-sent-name></span>. We will reply to <span data-sent-email></span> within {site.responseTime}.
+          </p>
+          <div class="success__actions">
+            <a href="/work" class="btn btn--primary btn--sm">See the work meanwhile</a>
+            <button type="button" class="btn btn--outline btn--sm" data-contact-reset>
+              Send another brief
+            </button>
+          </div>
+        </div>
+
+        {/* The script sends the brief (see PUBLIC_CONTACT_ENDPOINT). method="post" only keeps
+            the fields out of the URL if the script never runs; there is no plain-HTML send path. */}
+        <form class="form" method="post" novalidate data-contact-form>
+          <div class="form__pair">
+            <div class="field">
+              <label for="c-name" class="field__label">Name</label>
+              <input
+                id="c-name"
+                name="name"
+                type="text"
+                autocomplete="name"
+                aria-required="true"
+                aria-invalid="false"
+                class="field__control"
+              />
+              <p id="c-name-error" class="field__error" role="alert" hidden>Please enter your name.</p>
+            </div>
+            <div class="field">
+              <label for="c-email" class="field__label">Work email</label>
+              <input
+                id="c-email"
+                name="email"
+                type="email"
+                autocomplete="email"
+                aria-required="true"
+                aria-invalid="false"
+                class="field__control"
+              />
+              <p id="c-email-error" class="field__error" role="alert" hidden>
+                Please enter a valid email address.
+              </p>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="c-site" class="field__label">
+              Website <span class="field__hint">(optional)</span>
+            </label>
+            <input
+              id="c-site"
+              name="website"
+              type="text"
+              inputmode="url"
+              autocomplete="url"
+              placeholder="yourdomain.com"
+              class="field__control"
+            />
+          </div>
+
+          <fieldset class="needs">
+            <legend class="needs__legend">What do you need?</legend>
+            <div class="needs__list">
+              {
+                services.map((service) => (
+                  <button type="button" class="toggle" aria-pressed="false" data-need={service}>
+                    {service}
+                  </button>
+                ))
+              }
+            </div>
+          </fieldset>
+
+          <div class="field">
+            <label for="c-when" class="field__label">When do you want to start?</label>
+            <select id="c-when" name="timeline" class="field__control">
+              <option value="asap">As soon as possible</option>
+              <option value="1-3">In 1 to 3 months</option>
+              <option value="exploring">Just exploring</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="c-msg" class="field__label">What should we know?</label>
+            <textarea
+              id="c-msg"
+              name="message"
+              rows="5"
+              placeholder="What you sell, who you want to reach, what you have tried so far."
+              class="field__control field__control--area"></textarea>
+          </div>
+
+          {/* Honeypot: bots that fill it get a fake success. display:none (not a 1px clip) so
+              browser autofill, which skips non-rendered fields, never fills it for a real visitor. */}
+          <div class="honeypot" aria-hidden="true">
+            <label for="c-hp">Leave this field empty</label>
+            <input id="c-hp" name="company" type="text" tabindex="-1" autocomplete="off" />
+          </div>
+
+          <p class="field__error" role="alert" data-send-error hidden>
+            Something went wrong sending your brief. Please try again, or email us at {site.email}.
+          </p>
+
+          <button type="submit" class="btn btn--primary btn--lg form__submit" data-contact-submit>
+            <span data-submit-label>Send brief</span><Icon name="arrow-right" />
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  [hidden] {
+    display: none !important;
+  }
+
+  .contact {
+    padding-top: 88px;
+    padding-bottom: 96px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 48px 64px;
+  }
+
+  /* ---------- Left column ---------- */
+
+  .intro {
+    flex: 1 1 380px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .intro__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+  .intro__lede {
+    max-width: 520px;
+  }
+
+  .next {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-top: 8px;
+  }
+  .next__title {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .next__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1.5px solid var(--ink);
+  }
+  .next__list li {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    padding: 16px 0;
+    border-top: 1.5px solid var(--ink);
+  }
+  .next__text {
+    font-size: 17px;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+
+  .intro__email {
+    margin: 0;
+    font-size: 16px;
+    color: var(--ink-2);
+  }
+  .intro__email strong {
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .intro__art {
+    display: block;
+    width: 100%;
+    height: 150px;
+  }
+
+  /* ---------- Right column ---------- */
+
+  .panel {
+    flex: 1.2 1 440px;
+    background: var(--white);
+    border: 1.5px solid var(--ink);
+    border-radius: 20px;
+    padding: clamp(20px, 4%, 40px);
+  }
+
+  .success {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 24px 0;
+  }
+  .success__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--cyan);
+    color: var(--ink);
+  }
+  .success__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2rem, 3.4vw, 2.75rem);
+    line-height: 1.08;
+  }
+  .success__title:focus {
+    outline: none;
+  }
+  .success__text {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+  .success__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-top: 8px;
+  }
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+  .form__pair {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+    gap: 22px 16px;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .field__label {
+    font-weight: 700;
+    font-size: 15px;
+  }
+  .field__hint {
+    font-weight: 500;
+    color: var(--ink-2);
+  }
+  .field__control {
+    width: 100%;
+    min-height: 48px;
+    padding: 0 14px;
+    border: 1.5px solid var(--ink);
+    border-radius: 8px;
+    background: var(--white);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 16px;
+  }
+  .field__control[aria-invalid='true'] {
+    border-color: var(--error);
+  }
+  .field__control--area {
+    min-height: 140px;
+    padding: 12px 14px;
+    line-height: 1.5;
+    resize: vertical;
+  }
+  .field__error {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--error);
+  }
+
+  .needs {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+  }
+  .needs__legend {
+    padding: 0;
+    margin-bottom: 8px;
+    font-weight: 700;
+    font-size: 15px;
+  }
+  .needs__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .honeypot {
+    display: none;
+  }
+
+  .form__submit:disabled {
+    cursor: progress;
+    opacity: 0.75;
+  }
+</style>
+
+<script>
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const ENDPOINT = String(import.meta.env.PUBLIC_CONTACT_ENDPOINT ?? '').trim();
+
+  type Field = {
+    input: HTMLInputElement;
+    error: HTMLElement;
+    isValid: (value: string) => boolean;
+  };
+
+  const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
+  const success = document.querySelector<HTMLElement>('[data-contact-success]');
+
+  if (form && success) initContact(form, success);
+
+  function initContact(form: HTMLFormElement, success: HTMLElement) {
+    const $ = <T extends Element>(root: ParentNode, selector: string): T => {
+      const el = root.querySelector<T>(selector);
+      if (!el) throw new Error(`Contact form: missing ${selector}`);
+      return el;
+    };
+
+    const nameInput = $<HTMLInputElement>(form, '#c-name');
+    const emailInput = $<HTMLInputElement>(form, '#c-email');
+    const siteInput = $<HTMLInputElement>(form, '#c-site');
+    const whenSelect = $<HTMLSelectElement>(form, '#c-when');
+    const messageInput = $<HTMLTextAreaElement>(form, '#c-msg');
+    const honeypot = $<HTMLInputElement>(form, '#c-hp');
+    const sendError = $<HTMLElement>(form, '[data-send-error]');
+    const submitButton = $<HTMLButtonElement>(form, '[data-contact-submit]');
+    const submitLabel = $<HTMLElement>(form, '[data-submit-label]');
+    const toggles = Array.from(form.querySelectorAll<HTMLButtonElement>('[data-need]'));
+
+    const successTitle = $<HTMLElement>(success, '[data-success-title]');
+    const sentName = $<HTMLElement>(success, '[data-sent-name]');
+    const sentEmail = $<HTMLElement>(success, '[data-sent-email]');
+    const resetButton = $<HTMLButtonElement>(success, '[data-contact-reset]');
+
+    const idleLabel = submitLabel.textContent ?? 'Send brief';
+
+    const fields: Field[] = [
+      {
+        input: nameInput,
+        error: $<HTMLElement>(form, '#c-name-error'),
+        isValid: (value) => value.trim().length > 0,
+      },
+      {
+        input: emailInput,
+        error: $<HTMLElement>(form, '#c-email-error'),
+        isValid: (value) => EMAIL_RE.test(value.trim()),
+      },
+    ];
+
+    let sending = false;
+
+    function setInvalid(field: Field, invalid: boolean) {
+      field.input.setAttribute('aria-invalid', String(invalid));
+      if (invalid) field.input.setAttribute('aria-describedby', field.error.id);
+      else field.input.removeAttribute('aria-describedby');
+      field.error.hidden = !invalid;
+    }
+
+    function setSending(on: boolean) {
+      sending = on;
+      submitButton.disabled = on;
+      submitLabel.textContent = on ? 'Sending…' : idleLabel;
+    }
+
+    function showSuccess(name: string, email: string) {
+      sentName.textContent = name;
+      sentEmail.textContent = email;
+      form.hidden = true;
+      success.hidden = false;
+      successTitle.focus();
+    }
+
+    // Once a field has been flagged, clear its error as soon as the value is fixed.
+    for (const field of fields) {
+      field.input.addEventListener('input', () => {
+        if (field.input.getAttribute('aria-invalid') === 'true' && field.isValid(field.input.value)) {
+          setInvalid(field, false);
+        }
+      });
+    }
+
+    for (const toggle of toggles) {
+      toggle.addEventListener('click', () => {
+        const pressed = toggle.getAttribute('aria-pressed') === 'true';
+        toggle.setAttribute('aria-pressed', String(!pressed));
+      });
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (sending) return;
+
+      sendError.hidden = true;
+
+      const invalid = fields.filter((field) => !field.isValid(field.input.value));
+      for (const field of fields) setInvalid(field, invalid.includes(field));
+      if (invalid.length > 0) {
+        invalid[0].input.focus();
+        return;
+      }
+
+      const payload = {
+        name: nameInput.value.trim(),
+        email: emailInput.value.trim(),
+        website: siteInput.value.trim(),
+        needs: toggles
+          .filter((toggle) => toggle.getAttribute('aria-pressed') === 'true')
+          .map((toggle) => toggle.dataset.need ?? ''),
+        timeline: whenSelect.value,
+        message: messageInput.value.trim(),
+      };
+
+      // Bots fill the honeypot: pretend it worked and send nothing.
+      if (honeypot.value.trim() !== '') {
+        showSuccess(payload.name, payload.email);
+        return;
+      }
+
+      if (!ENDPOINT) {
+        console.info(
+          '[contact] PUBLIC_CONTACT_ENDPOINT is not set: demo mode, the brief was not sent.',
+          payload,
+        );
+        showSuccess(payload.name, payload.email);
+        return;
+      }
+
+      setSending(true);
+      try {
+        const response = await fetch(ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!response.ok) throw new Error(`Contact endpoint answered ${response.status}`);
+        setSending(false);
+        showSuccess(payload.name, payload.email);
+      } catch (error) {
+        console.error('[contact] Sending the brief failed.', error);
+        setSending(false);
+        sendError.hidden = false;
+        // Disabling the button can drop focus; put it back so keyboard users can retry.
+        if (!document.activeElement || document.activeElement === document.body) {
+          submitButton.focus();
+        }
+      }
+    });
+
+    resetButton.addEventListener('click', () => {
+      form.reset();
+      for (const toggle of toggles) toggle.setAttribute('aria-pressed', 'false');
+      for (const field of fields) setInvalid(field, false);
+      sendError.hidden = true;
+      setSending(false);
+      success.hidden = true;
+      form.hidden = false;
+      nameInput.focus();
+    });
+  }
+</script>

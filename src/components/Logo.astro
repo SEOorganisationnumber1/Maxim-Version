@@ -1,0 +1,45 @@
+---
+import { site } from '../data/site';
+
+interface Props {
+  /** Unique gradient id; the header and footer both render a logo. */
+  id: string;
+  class?: string;
+}
+
+const { id, class: className } = Astro.props;
+---
+
+<a href="/" class:list={['logo', className]}>
+  <svg aria-hidden="true" width="30" height="30" viewBox="0 0 30 30" fill="none">
+    <defs>
+      <linearGradient id={id} x1="0" y1="0" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#22D3DD"></stop>
+        <stop offset="0.55" stop-color="#2F8CF6"></stop>
+        <stop offset="1" stop-color="#5B4FE9"></stop>
+      </linearGradient>
+    </defs>
+    <path
+      d="M6 8 C 14 2, 26 8, 18 15 C 10 22, 20 28, 25 22"
+      stroke={`url(#${id})`}
+      stroke-width="6"
+      stroke-linecap="round"></path>
+  </svg>
+  <span>{site.name}</span>
+</a>
+
+<style>
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 20px;
+    text-decoration: none;
+  }
+  .logo svg {
+    flex: none;
+  }
+</style>

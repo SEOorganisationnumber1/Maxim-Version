@@ -1,0 +1,123 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  title: string;
+  text?: string;
+  /**
+   * 'ink' = dark copy and a dark button (most pages).
+   * 'white' = white copy and a white button (Home).
+   */
+  tone?: 'ink' | 'white';
+  /** 'full' pads 96px above and below; 'bottom' only below (when it follows a section on paper). */
+  pad?: 'full' | 'bottom';
+  borderTop?: boolean;
+  /** Optional second, outlined button, e.g. "More work". */
+  secondary?: { href: string; label: string };
+}
+
+const {
+  title,
+  text = 'Send a short brief. We reply with what we would fix first.',
+  tone = 'ink',
+  pad = 'full',
+  borderTop = false,
+  secondary,
+} = Astro.props;
+---
+
+<section class:list={['cta', `cta--${pad}`, { 'border-top': borderTop }]}>
+  <div class:list={['cta__band', `cta__band--${tone}`]}>
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 600 300"
+      preserveAspectRatio="xMaxYMid slice"
+      fill="none"
+      class="cta__art"
+    >
+      <path
+        d="M120 340 C 200 180, 340 300, 420 160 C 480 60, 560 40, 680 80"
+        stroke="#FFFFFF"
+        stroke-opacity="0.35"
+        stroke-width="80"
+        stroke-linecap="round"></path>
+    </svg>
+    <div class="cta__copy">
+      <h2>{title}</h2>
+      <p>{text}</p>
+    </div>
+    <div class="cta__actions">
+      <a href="/contact" class:list={['btn', 'btn--lg', tone === 'white' ? 'btn--light' : 'btn--dark']}>
+        Start a project<Icon name="arrow-right" />
+      </a>
+      {
+        secondary && (
+          <a href={secondary.href} class="btn btn--lg btn--outline">
+            {secondary.label}
+          </a>
+        )
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta {
+    background: var(--paper);
+    padding: 96px var(--gutter);
+  }
+  .cta--bottom {
+    padding-top: 0;
+  }
+  .cta__band {
+    position: relative;
+    overflow: hidden;
+    max-width: 1192px;
+    margin: 0 auto;
+    background: var(--cyan);
+    border-radius: 24px;
+    padding: 64px clamp(24px, 5%, 72px);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+  }
+  .cta__art {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 60%;
+    height: 100%;
+  }
+  .cta__copy {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 660px;
+  }
+  .cta__copy h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(2rem, 3.8vw, 3.25rem);
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+  }
+  .cta__copy p {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.6;
+    font-weight: 500;
+  }
+  .cta__band--white .cta__copy {
+    color: var(--white);
+  }
+  .cta__actions {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+</style>

@@ -1,0 +1,37 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+---
+
+<Base title="Page not found" description="This page does not exist." noindex>
+  <section class="bg-paper">
+    <div class="container not-found">
+      <h1 class="h1">This page <span class="highlight">moved on.</span></h1>
+      <p class="lede">The link may be old, or the address has a typo. These are a better place to start.</p>
+      <div class="not-found__actions">
+        <a href="/" class="btn btn--primary">Back to home<Icon name="arrow-right" /></a>
+        <a href="/work" class="btn btn--outline">See the work</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .not-found {
+    padding-top: 120px;
+    padding-bottom: 144px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
+  .not-found .lede {
+    max-width: 620px;
+  }
+  .not-found__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-top: 8px;
+  }
+</style>

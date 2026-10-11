@@ -1,0 +1,282 @@
+---
+import Base from '../layouts/Base.astro';
+import CtaBand from '../components/CtaBand.astro';
+
+const facts = [
+  { value: '[YEAR]', label: 'founded' },
+  { value: '[X]', label: 'people on the team' },
+  { value: '[X]+', label: 'projects shipped' },
+  { value: '[X]', label: 'markets served' },
+];
+
+const rules = [
+  {
+    title: 'Modern or nothing',
+    text: 'Current frameworks and current search behaviour. No legacy playbooks.',
+  },
+  {
+    title: 'Efficient by design',
+    text: 'Reusable systems, automation for the repetitive parts, people for the judgment calls.',
+  },
+  {
+    title: 'Leads over likes',
+    text: 'Traffic is a means. We report on enquiries from people who can buy.',
+  },
+  {
+    title: 'Show the numbers',
+    text: 'Every month you see what we did, what it changed and what comes next.',
+  },
+];
+
+// Placeholder team: one tinted photo well per person.
+const team: { tint: 'cyan' | 'blue' | 'violet' }[] = [
+  { tint: 'cyan' },
+  { tint: 'blue' },
+  { tint: 'violet' },
+  { tint: 'cyan' },
+];
+---
+
+<Base
+  title="Company"
+  current="/company"
+  description="A search-first studio for design, code and growth. We exist for one outcome: more of the right people finding you and getting in touch."
+>
+  <section class="hero bg-paper">
+    <div class="hero__art" aria-hidden="true">
+      <svg viewBox="0 0 440 520" preserveAspectRatio="xMinYMid slice" fill="none">
+        <defs>
+          <linearGradient id="top-a" x1="440" y1="0" x2="60" y2="520" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#22D3DD"></stop>
+            <stop offset="0.5" stop-color="#2F8CF6"></stop>
+            <stop offset="1" stop-color="#5B4FE9"></stop>
+          </linearGradient>
+        </defs>
+        <path d="M480 -30 C 300 0, 160 120, 260 250 C 340 350, 220 460, 480 560 Z" fill="#DFF6F9"></path>
+        <path
+          d="M500 30 C 320 40, 190 150, 290 260 C 370 350, 280 460, 500 530"
+          stroke="url(#top-a)"
+          stroke-width="76"
+          stroke-linecap="round"></path>
+      </svg>
+    </div>
+    <div class="container hero__inner">
+      <h1 class="h1 hero__title">
+        A search-first studio for design, code and <span class="highlight">growth.</span>
+      </h1>
+      <p class="lede hero__lede">
+        We exist for one outcome: more of the right people finding you and getting in touch.
+      </p>
+    </div>
+  </section>
+
+  <section aria-label="Facts" class="bg-white border-top border-bottom">
+    <dl class="stats">
+      {
+        facts.map((fact) => (
+          <div>
+            <dt>{fact.label}</dt>
+            <dd>{fact.value}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </section>
+
+  <section class="bg-paper">
+    <div class="container story">
+      <div class="story__head">
+        <h2 class="h2">Most agencies sell hours. We sell outcomes.</h2>
+      </div>
+      <div class="story__body">
+        <p>
+          Design, development and search sit in one team here, on purpose. A site that looks good but
+          cannot be found is a cost. A site that ranks but does not convert is a leak. We build for
+          both from the first sketch.
+        </p>
+        <p>
+          We also keep our methods current. Search changes every quarter, and a growing share of it
+          now happens inside AI assistants. We test what works today, keep what performs and drop
+          the rest.
+        </p>
+        <p>
+          That is the whole model: modern tools, short feedback loops, and a report every month that
+          shows what moved.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-white border-top">
+    <div class="container block block--rules">
+      <div class="block__head">
+        <h2 class="h2">Four rules we do not bend.</h2>
+      </div>
+      <ol class="rule-grid">
+        {
+          rules.map((rule, i) => (
+            <li>
+              <span class="num">{String(i + 1).padStart(2, '0')}</span>
+              <h3>{rule.title}</h3>
+              <p>{rule.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="bg-paper border-top">
+    <div class="container block block--team">
+      <div class="block__head">
+        <h2 class="h2">The people who do the work.</h2>
+      </div>
+      <ul class="team">
+        {
+          team.map((member) => (
+            <li class="team__member">
+              <div class:list={['team__photo', `team__photo--${member.tint}`]}>
+                <span class="ph-tag">[PHOTO]</span>
+              </div>
+              <div class="team__meta">
+                <span class="team__name">[NAME]</span>
+                <span class="team__role">[ROLE]</span>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <CtaBand title="Work with a team that reports in leads." borderTop pad="full" />
+</Base>
+
+<style>
+  /* ---------- Hero ---------- */
+
+  .hero {
+    position: relative;
+    overflow: hidden;
+  }
+  .hero__art {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: max(0px, calc(100% - 960px));
+    max-width: 440px;
+  }
+  .hero__art svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .hero__inner {
+    position: relative;
+    padding-top: 88px;
+    padding-bottom: 72px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .hero__title {
+    max-width: 880px;
+  }
+  .hero__lede {
+    max-width: 640px;
+  }
+
+  /* ---------- Story ---------- */
+
+  .story {
+    padding-top: 96px;
+    padding-bottom: 96px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px 64px;
+  }
+  .story__head {
+    flex: 1 1 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .story__body {
+    flex: 1.4 1 440px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    font-size: 18px;
+    line-height: 1.65;
+    color: var(--ink-2);
+  }
+  .story__body p {
+    margin: 0;
+  }
+
+  /* ---------- Rules and team ---------- */
+
+  .block {
+    padding-top: 96px;
+    padding-bottom: 96px;
+    display: flex;
+    flex-direction: column;
+  }
+  .block--rules {
+    gap: 56px;
+  }
+  .block--team {
+    gap: 48px;
+  }
+  .block__head {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 760px;
+  }
+
+  .team {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+    gap: 24px;
+  }
+  .team__member {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .team__photo {
+    aspect-ratio: 4 / 5;
+    border: 1.5px solid var(--ink);
+    border-radius: 16px;
+    display: flex;
+    align-items: flex-end;
+    padding: 16px;
+  }
+  .team__photo--cyan {
+    background: var(--tint-cyan);
+  }
+  .team__photo--blue {
+    background: var(--tint-blue);
+  }
+  .team__photo--violet {
+    background: var(--tint-violet);
+  }
+  .team__meta {
+    display: flex;
+    flex-direction: column;
+  }
+  .team__name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 22px;
+  }
+  .team__role {
+    font-size: 15px;
+    color: var(--ink-2);
+  }
+</style>

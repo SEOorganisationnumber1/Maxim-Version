@@ -1,0 +1,367 @@
+---
+import Base from '../../layouts/Base.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import Icon from '../../components/Icon.astro';
+import { site } from '../../data/site';
+import { projects, projectUrl, serviceLine, type Project } from '../../data/projects';
+
+export function getStaticPaths() {
+  return projects.map((project) => ({
+    params: { slug: project.slug },
+    props: { project },
+  }));
+}
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+const cs = project.caseStudy;
+
+const title = `Case study: ${project.name}`;
+const description = `${title}. ${project.clientLine} by ${site.name}: the challenge, what we did and the results.`;
+
+const meta = [
+  { label: 'Services', value: serviceLine(project.services) },
+  { label: 'Industry', value: cs.industry },
+  { label: 'Timeline', value: cs.timeline },
+  { label: 'Year', value: cs.year },
+];
+
+const article: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: title,
+  description,
+  about: project.services.map((name) => ({ '@type': 'Thing', name })),
+  publisher: { '@type': 'Organization', name: site.name },
+};
+if (Astro.site) {
+  const url = new URL(projectUrl(project), Astro.site).href;
+  article.url = url;
+  article.mainEntityOfPage = url;
+}
+---
+
+<Base
+  title={title}
+  description={description}
+  current="/work"
+  ogType="article"
+  jsonLd={[article]}
+  noindex={project.placeholder}
+>
+  <section class="bg-paper">
+    <div class="container intro">
+      <a href="/work" class="back"><Icon name="arrow-left" />All work</a>
+      <h1 class="title">{project.name}</h1>
+      <p class="summary">{cs.intro}</p>
+      <dl class="meta">
+        {
+          meta.map((item) => (
+            <div>
+              <dt class="eyebrow">{item.label}</dt>
+              <dd>{item.value}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  <section class="bg-paper hero">
+    <div class="hero__well">
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 1200 480"
+        preserveAspectRatio="xMidYMid slice"
+        fill="none"
+        class="hero__art"
+      >
+        <defs>
+          <linearGradient id="shot-a" x1="0" y1="0" x2="1200" y2="480" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#22D3DD"></stop>
+            <stop offset="0.55" stop-color="#2F8CF6"></stop>
+            <stop offset="1" stop-color="#5B4FE9"></stop>
+          </linearGradient>
+        </defs>
+        <path
+          d="M-60 380 C 160 180, 320 520, 520 330 C 700 160, 760 60, 960 150 C 1100 210, 1140 330, 1280 280"
+          stroke="url(#shot-a)"
+          stroke-width="96"
+          stroke-linecap="round"></path>
+      </svg>
+      <span class="ph-tag">[HERO SCREENSHOT OF THE LIVE SITE]</span>
+    </div>
+  </section>
+
+  <section aria-label="Results" class="bg-white border-top">
+    <dl class="container results">
+      {
+        cs.results.map((r) => (
+          <div>
+            <dt>{r.label}</dt>
+            <dd>{r.value}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </section>
+
+  <section class="bg-white">
+    <div class="container story">
+      <div class="story__row">
+        <h2 class="story__h2">The challenge</h2>
+        <p class="story__text">{cs.challenge}</p>
+      </div>
+      <div class="story__row story__row--rule">
+        <h2 class="story__h2">What we did</h2>
+        <div class="story__work">
+          {
+            project.services.map((service) => (
+              <div class="story__item">
+                <h3>{service}</h3>
+                {cs.work[service] && <p class="story__copy">{cs.work[service]}</p>}
+              </div>
+            ))
+          }
+        </div>
+      </div>
+      <div class="story__row story__row--rule">
+        <h2 class="story__h2">The outcome</h2>
+        <p class="story__text">{cs.outcome}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-paper border-top">
+    <figure class="quote">
+      <blockquote>{cs.quote}</blockquote>
+      <figcaption>
+        <span aria-hidden="true" class="quote__avatar"></span>
+        <span class="quote__who">
+          <span class="quote__name">{cs.quoteName}</span>
+          <span class="quote__role">{cs.quoteRole}, {project.name}</span>
+        </span>
+      </figcaption>
+    </figure>
+  </section>
+
+  <CtaBand
+    title="Want numbers like these?"
+    pad="bottom"
+    secondary={{ href: '/work', label: 'More work' }}
+  />
+</Base>
+
+<style>
+  /* ---------- Intro ---------- */
+  .intro {
+    padding-top: 40px;
+    padding-bottom: 56px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    align-self: flex-start;
+    font-weight: 700;
+    font-size: 15px;
+  }
+  .title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(2.75rem, 7vw, 6rem);
+    line-height: 1;
+    letter-spacing: -0.025em;
+  }
+  .summary {
+    margin: 0;
+    max-width: 760px;
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.25rem, 2.2vw, 1.75rem);
+    line-height: 1.35;
+    text-wrap: pretty;
+  }
+  .meta {
+    margin: 16px 0 0;
+    padding: 24px 0 0;
+    border-top: 1.5px solid var(--ink);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+    gap: 24px;
+  }
+  .meta > div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .meta dt {
+    color: var(--ink-2);
+  }
+  .meta dd {
+    margin: 0;
+    font-weight: 700;
+    font-size: 17px;
+  }
+
+  /* ---------- Hero screenshot ---------- */
+  .hero {
+    padding: 0 var(--gutter) 96px;
+  }
+  .hero__well {
+    position: relative;
+    overflow: hidden;
+    max-width: 1192px;
+    margin: 0 auto;
+    min-height: 480px;
+    border: 1.5px solid var(--ink);
+    border-radius: 24px;
+    background: var(--tint-cyan);
+    display: flex;
+    align-items: flex-end;
+    padding: 24px;
+  }
+  .hero__art {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* ---------- Results ---------- */
+  .results {
+    padding-top: 72px;
+    padding-bottom: 72px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+    gap: 40px;
+  }
+  .results > div {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 8px;
+    border-top: 2px solid var(--cyan);
+    padding-top: 20px;
+  }
+  .results dt {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink-2);
+  }
+  .results dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 64px;
+    line-height: 1;
+    color: var(--teal);
+  }
+
+  /* ---------- Challenge / work / outcome ---------- */
+  .story {
+    padding-top: 24px;
+    padding-bottom: 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+  }
+  .story__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px 48px;
+  }
+  .story__row--rule {
+    border-top: 1.5px solid var(--ink);
+    padding-top: 56px;
+  }
+  .story__h2 {
+    flex: 1 1 280px;
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    line-height: 1.1;
+  }
+  .story__text,
+  .story__copy {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.65;
+    color: var(--ink-2);
+  }
+  .story__text {
+    flex: 2 1 420px;
+  }
+  .story__work {
+    flex: 2 1 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+  .story__item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .story__item h3 {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--teal-ink);
+  }
+
+  /* ---------- Quote ---------- */
+  .quote {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 96px var(--gutter);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .quote blockquote {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    text-wrap: pretty;
+  }
+  .quote figcaption {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .quote__avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--tint-cyan);
+    border: 1.5px solid var(--ink);
+  }
+  .quote__who {
+    display: flex;
+    flex-direction: column;
+  }
+  .quote__name {
+    font-weight: 700;
+    font-size: 16px;
+  }
+  .quote__role {
+    font-size: 15px;
+    color: var(--ink-2);
+  }
+</style>

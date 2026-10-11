@@ -1,0 +1,91 @@
+---
+import Logo from './Logo.astro';
+import { mainNav } from '../data/site';
+
+interface Props {
+  /** href of the nav item to mark as the current page, e.g. '/work'. */
+  current?: string;
+}
+
+const { current } = Astro.props;
+---
+
+<header class="header">
+  <div class="header__inner">
+    <Logo id="logo-h" />
+    <nav aria-label="Main" class="header__nav">
+      {
+        mainNav.map((item) => (
+          <a
+            href={item.href}
+            class="header__link"
+            aria-current={item.href === current ? 'page' : undefined}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+      <a href="/contact" class="header__cta" aria-current={current === '/contact' ? 'page' : undefined}>
+        Start a project
+      </a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .header {
+    background: var(--white);
+    border-bottom: 1px solid var(--line);
+  }
+  .header__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 32px;
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: 16px var(--gutter);
+  }
+  .header__nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 8px;
+  }
+  .header__link {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 12px;
+    font-weight: 600;
+    font-size: 15px;
+    text-decoration: none;
+  }
+  .header__link[aria-current='page'] {
+    box-shadow: inset 0 -2px 0 var(--cyan);
+  }
+  .header__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    margin-left: 8px;
+    padding: 0 18px;
+    background: var(--cyan);
+    color: var(--ink);
+    font-weight: 700;
+    font-size: 15px;
+    border-radius: 8px;
+    text-decoration: none;
+  }
+  .header__cta:hover {
+    color: var(--ink);
+    background: #3fd5e1;
+  }
+  .header__cta[aria-current='page'],
+  .header__cta[aria-current='page']:hover {
+    background: var(--ink);
+    color: var(--white);
+  }
+</style>

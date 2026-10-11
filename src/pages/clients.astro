@@ -1,0 +1,248 @@
+---
+import Base from '../layouts/Base.astro';
+import CtaBand from '../components/CtaBand.astro';
+import Icon from '../components/Icon.astro';
+import { getProject, projectUrl, projects } from '../data/projects';
+
+// Real clients get a link card; the grid is topped up with dashed
+// placeholder tiles so it always shows 8 slots, as in the design.
+const TOTAL_SLOTS = 8;
+const clients = projects.filter((p) => !p.placeholder);
+const emptySlots = Math.max(0, TOTAL_SLOTS - clients.length);
+
+const testimonials = [
+  { company: getProject('leadity-io').name },
+  { company: getProject('zerodollars-xyz').name },
+  { company: '[COMPANY]' },
+].map((t) => ({
+  ...t,
+  quote: '[CLIENT QUOTE: one or two sentences about the result, in their own words.]',
+  name: '[NAME]',
+  role: '[ROLE]',
+}));
+---
+
+<Base
+  title="Clients"
+  current="/clients"
+  description="Brands that grew with us, from early-stage products to established names, and what we did for each of them."
+>
+  <section class="hero bg-paper">
+    <div aria-hidden="true" class="hero__art">
+      <svg viewBox="0 0 520 420" preserveAspectRatio="xMinYMid slice" fill="none">
+        <defs>
+          <linearGradient id="top-a" x1="520" y1="0" x2="80" y2="420" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#22D3DD"></stop>
+            <stop offset="0.6" stop-color="#2FB4F0"></stop>
+            <stop offset="1" stop-color="#2F8CF6"></stop>
+          </linearGradient>
+        </defs>
+        <path d="M560 -30 C 360 20, 260 80, 320 200 C 370 300, 260 380, 560 470 Z" fill="#EAE8FF"></path>
+        <path
+          d="M560 60 C 420 20, 280 100, 350 210 C 410 300, 330 380, 580 420"
+          stroke="url(#top-a)"
+          stroke-width="72"
+          stroke-linecap="round"></path>
+      </svg>
+    </div>
+    <div class="hero__inner">
+      <h1 class="h1 hero__title">Brands that grew <span class="highlight">with us.</span></h1>
+      <p class="lede hero__lede">
+        From early-stage products to established names. Here is who we work with and what we did for each of them.
+      </p>
+    </div>
+  </section>
+
+  <section aria-label="Client list" class="bg-paper">
+    <ul class="clients">
+      {
+        clients.map((p) => (
+          <li class="clients__item">
+            <a href={projectUrl(p)} class="client">
+              <span class="client__name">{p.name}</span>
+              <span class="client__foot">
+                <span class="client__line">{p.clientLine}</span>
+                <Icon name="arrow-right" size={20} />
+              </span>
+            </a>
+          </li>
+        ))
+      }
+      {
+        Array.from({ length: emptySlots }, () => (
+          <li class="client client--empty">
+            <span class="client__name">[CLIENT LOGO]</span>
+            <span class="client__line">[WHAT WE DID FOR THEM]</span>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="bg-white border-top border-bottom">
+    <div class="quotes">
+      <div class="quotes__head">
+        <h2 class="h2">What clients say after the first quarter.</h2>
+      </div>
+      <div class="quotes__grid">
+        {
+          testimonials.map((t) => (
+            <figure class="quote">
+              <blockquote>{t.quote}</blockquote>
+              <figcaption>
+                <span class="quote__name">{t.name}</span>
+                <span class="quote__role">{`${t.role}, ${t.company}`}</span>
+              </figcaption>
+            </figure>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <CtaBand title="Your name belongs on this page." pad="full" />
+</Base>
+
+<style>
+  /* ---------- Hero ---------- */
+
+  .hero {
+    position: relative;
+    overflow: hidden;
+  }
+  .hero__art {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: max(0px, calc(100% - 860px));
+    max-width: 520px;
+  }
+  .hero__art svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .hero__inner {
+    position: relative;
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: 88px var(--gutter) 56px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .hero__title {
+    max-width: 760px;
+  }
+  .hero__lede {
+    max-width: 620px;
+  }
+
+  /* ---------- Client list ---------- */
+
+  .clients {
+    list-style: none;
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: 24px var(--gutter) 96px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+    gap: 16px;
+  }
+  .clients__item {
+    display: flex;
+  }
+  .client {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 32px;
+    min-height: 180px;
+    border-radius: 16px;
+    padding: 24px;
+  }
+  a.client {
+    flex: 1 1 auto;
+    background: var(--white);
+    border: 1.5px solid var(--ink);
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .client--empty {
+    border: 1.5px dashed var(--dashed);
+  }
+  .client__name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 1.1;
+  }
+  .client--empty .client__name {
+    color: var(--ink-2);
+  }
+  .client__foot {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .client__foot > :global(svg) {
+    flex: none;
+  }
+  .client__line {
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  /* ---------- Testimonials ---------- */
+
+  .quotes {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: 96px var(--gutter);
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+  }
+  .quotes__head {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 760px;
+  }
+  .quotes__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+    gap: 24px;
+  }
+  .quote {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 32px;
+    border-top: 2px solid var(--cyan);
+    padding-top: 24px;
+  }
+  .quote blockquote {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 22px;
+    line-height: 1.35;
+  }
+  .quote figcaption {
+    display: flex;
+    flex-direction: column;
+  }
+  .quote__name {
+    font-weight: 700;
+    font-size: 16px;
+  }
+  .quote__role {
+    font-size: 15px;
+    color: var(--ink-2);
+  }
+</style>

@@ -1,0 +1,232 @@
+---
+import Base from '../../layouts/Base.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import Icon from '../../components/Icon.astro';
+import { services } from '../../data/site';
+import { projects, projectUrl, serviceLine } from '../../data/projects';
+
+const filters = ['All', ...services];
+const countLabel = (n: number) => (n === 1 ? '1 project' : `${n} projects`);
+---
+
+<Base
+  title="Work"
+  current="/work"
+  description="Companies we scaled with design, web development, SEO, GEO and AEO. Filter case studies by what we did."
+>
+  <section class="hero">
+    <div class="hero__art" aria-hidden="true">
+      <svg viewBox="0 0 520 420" preserveAspectRatio="xMinYMid slice" fill="none">
+        <defs>
+          <linearGradient id="top-a" x1="520" y1="0" x2="80" y2="420" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#5B4FE9"></stop>
+            <stop offset="0.5" stop-color="#2F8CF6"></stop>
+            <stop offset="1" stop-color="#22D3DD"></stop>
+          </linearGradient>
+        </defs>
+        <path d="M560 -20 C 380 -10, 240 110, 330 220 C 410 320, 300 420, 560 460 Z" fill="#DFF6F9"></path>
+        <path
+          d="M580 30 C 400 30, 250 130, 350 230 C 430 310, 380 400, 560 440"
+          stroke="url(#top-a)"
+          stroke-width="72"
+          stroke-linecap="round"></path>
+      </svg>
+    </div>
+    <div class="container hero__inner">
+      <h1 class="h1 hero__title">Companies we <span class="highlight">scaled.</span></h1>
+      <p class="lede hero__lede">Design, code and search work. Filter by what we did.</p>
+    </div>
+  </section>
+
+  <section class="bg-paper">
+    <div class="container work">
+      <div class="work__bar">
+        <div class="work__filters" role="group" aria-label="Filter by service">
+          {
+            filters.map((f) => (
+              <button type="button" class="toggle" data-filter={f} aria-pressed={f === 'All' ? 'true' : 'false'}>
+                {f}
+              </button>
+            ))
+          }
+        </div>
+        <p class="work__count" aria-live="polite" data-count>{countLabel(projects.length)}</p>
+      </div>
+      <div class="work__grid">
+        {
+          projects.map((p) => (
+            <a href={projectUrl(p)} class="card work-card" data-services={p.services.join('|')}>
+              <div class="shot work-card__shot" style={`background: ${p.look.tint}`}>
+                <svg aria-hidden="true" viewBox="0 0 600 240" preserveAspectRatio="xMidYMid slice" fill="none">
+                  <path d={p.look.path} stroke={p.look.stroke} stroke-width="60" stroke-linecap="round" />
+                </svg>
+                <span class="ph-tag">[PROJECT SCREENSHOT]</span>
+              </div>
+              <div class="work-card__body">
+                <span class="tagline">{serviceLine(p.services)}</span>
+                <h2 class="work-card__name">{p.name}</h2>
+                <p class="work-card__summary">{p.summary}</p>
+                <span class="work-card__more">
+                  Read the case
+                  <Icon name="arrow-right" />
+                </span>
+              </div>
+            </a>
+          ))
+        }
+      </div>
+      {/*
+        Inline (not bundled) so it runs during parsing: a ?service= deep link is
+        applied before first paint, with no flash of the unfiltered grid and no
+        aria-live announcement on load.
+      */}
+      <script is:inline>
+        (function () {
+          var buttons = Array.prototype.slice.call(document.querySelectorAll('[data-filter]'));
+          var cards = Array.prototype.slice.call(document.querySelectorAll('[data-services]'));
+          var count = document.querySelector('[data-count]');
+          var valid = buttons
+            .map(function (b) { return b.getAttribute('data-filter') || ''; })
+            .filter(function (f) { return f && f !== 'All'; });
+
+          function apply(filter, updateUrl) {
+            buttons.forEach(function (b) {
+              b.setAttribute('aria-pressed', String(b.getAttribute('data-filter') === filter));
+            });
+            var shown = 0;
+            cards.forEach(function (card) {
+              var match =
+                filter === 'All' || (card.getAttribute('data-services') || '').split('|').indexOf(filter) !== -1;
+              card.hidden = !match;
+              if (match) shown++;
+            });
+            if (count) count.textContent = shown === 1 ? '1 project' : shown + ' projects';
+
+            if (updateUrl) {
+              var url = new URL(window.location.href);
+              if (filter === 'All') url.searchParams.delete('service');
+              else url.searchParams.set('service', filter);
+              history.replaceState(history.state, '', url);
+            }
+          }
+
+          buttons.forEach(function (b) {
+            b.addEventListener('click', function () {
+              apply(b.getAttribute('data-filter') || 'All', true);
+            });
+          });
+
+          var initial = new URLSearchParams(window.location.search).get('service');
+          if (initial && valid.indexOf(initial) !== -1) apply(initial, false);
+        })();
+      </script>
+    </div>
+  </section>
+
+  <CtaBand title="Want to be the next one here?" pad="bottom" />
+</Base>
+
+<style>
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    background: var(--paper);
+  }
+  .hero__art {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: max(0px, calc(100% - 860px));
+    max-width: 520px;
+  }
+  .hero__art svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .hero__inner {
+    position: relative;
+    padding-top: 88px;
+    padding-bottom: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .hero__title {
+    max-width: 760px;
+  }
+  .hero__lede {
+    max-width: 620px;
+  }
+
+  /* ---------- Filter and grid ---------- */
+  .work {
+    padding-top: 24px;
+    padding-bottom: 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+  .work__bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px 24px;
+  }
+  .work__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .work__count {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-2);
+  }
+  .work__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
+    gap: 24px;
+  }
+
+  /* ---------- Project card ---------- */
+  /* .card sets display:flex, which would override the UA [hidden] rule. */
+  .work-card[hidden] {
+    display: none;
+  }
+  .work-card__shot {
+    min-height: 220px;
+  }
+  .work-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 28px;
+  }
+  .work-card__name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 30px;
+    line-height: 1.1;
+  }
+  .work-card__summary {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+  .work-card__more {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding-top: 6px;
+    font-weight: 700;
+    font-size: 15px;
+  }
+</style>

@@ -1,0 +1,372 @@
+/*
+ * Global tokens and shared primitives. Values are lifted 1:1 from the
+ * "Agency Portfolio" design canvas. Page-specific layout lives in each
+ * page's scoped <style>; only patterns used on several pages belong here.
+ */
+
+:root {
+  /* Ink and surfaces */
+  --ink: #0A1128;
+  --ink-2: #3D4763;
+  --paper: #F5FAFC;
+  --white: #FFFFFF;
+  --line: #D5DEE8;
+  --dashed: #5A6480;
+
+  /* Accent */
+  --cyan: #1CCAD8;
+  --teal: #089FB3;
+  --teal-ink: #077A8A;
+
+  /* Tints behind art and placeholders */
+  --tint-cyan: #DFF6F9;
+  --tint-blue: #E4EEFF;
+  --tint-violet: #EAE8FF;
+
+  /* Brand gradient stops */
+  --g-cyan: #22D3DD;
+  --g-sky: #2FB4F0;
+  --g-blue: #2F8CF6;
+  --g-violet: #5B4FE9;
+
+  /* Footer */
+  --footer-text: #C9D3EA;
+  --footer-line: #2A3352;
+
+  --error: #B42318;
+
+  /* Type */
+  --font-display: 'Outfit Variable', 'Outfit', 'Avenir Next', 'Segoe UI', sans-serif;
+  --font-body: 'Manrope Variable', 'Manrope', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --container: 1240px;
+  --gutter: 24px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { transition: none !important; }
+}
+
+body {
+  margin: 0;
+  background: var(--ink);
+}
+
+.site {
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: var(--paper);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+a { color: var(--ink); }
+a:hover { color: var(--teal-ink); }
+footer a { color: var(--footer-text); }
+footer a:hover { color: var(--white); }
+
+:focus-visible {
+  outline: 3px solid var(--teal);
+  outline-offset: 2px;
+}
+
+img, svg { max-width: 100%; }
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0);
+  white-space: nowrap; border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  left: 16px; top: -100px;
+  z-index: 10;
+  padding: 12px 16px;
+  background: var(--ink);
+  color: var(--white);
+  font-weight: 700;
+  border-radius: 8px;
+}
+.skip-link:focus { top: 16px; color: var(--white); }
+
+/* ---------- Layout ---------- */
+
+.container {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
+}
+
+.bg-paper { background: var(--paper); }
+.bg-white { background: var(--white); }
+.border-top { border-top: 1px solid var(--line); }
+.border-bottom { border-bottom: 1px solid var(--line); }
+
+/* ---------- Type ---------- */
+
+.display { font-family: var(--font-display); }
+
+/* Page h1: Work, Services, Clients, Company */
+.h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(2.5rem, 5.6vw, 4.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+/* Section h2 */
+.h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2rem, 3.4vw, 3rem);
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+}
+
+/* Teal block behind a key word in a headline */
+.highlight {
+  display: inline-block;
+  background: var(--teal);
+  color: var(--white);
+  padding: 0 0.16em;
+  border-radius: 0.08em;
+}
+
+.lede {
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+.muted { color: var(--ink-2); }
+
+/* Mono uppercase label: dt, small h3, footer column heads */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* "01", "02" counters */
+.num {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--teal-ink);
+}
+
+/* Service tag line on cards: "Web Development · SEO · GEO" */
+.tagline {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--teal-ink);
+}
+
+/* ---------- Buttons and links ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 8px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 17px;
+  line-height: 1.5;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn--lg { min-height: 56px; padding: 0 28px; }
+.btn--sm { font-size: 16px; }
+
+/* Only the outlined button has a border, as in the design. */
+.btn--primary { background: var(--cyan); color: var(--ink); }
+.btn--primary:hover { color: var(--ink); background: #3FD5E1; }
+
+.btn--dark { background: var(--ink); color: var(--white); }
+.btn--dark:hover { color: var(--white); background: #1B2547; }
+
+.btn--outline { background: var(--white); color: var(--ink); border: 1.5px solid var(--ink); }
+.btn--outline:hover { color: var(--ink); background: var(--tint-cyan); }
+
+.btn--light { background: var(--white); color: var(--ink); }
+.btn--light:hover { color: var(--ink); background: var(--tint-cyan); }
+
+/* Bold text link with a trailing arrow: "All services →" */
+.text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+/* ---------- Chips and toggles ---------- */
+
+.chip {
+  display: inline-block;
+  border: 1.5px solid var(--ink);
+  border-radius: 6px;
+  background: var(--white);
+  color: var(--ink);
+  padding: 6px 12px;
+  font-weight: 700;
+  font-size: 14px;
+}
+.chip--dark {
+  border: 0;
+  background: var(--ink);
+  color: var(--white);
+  padding: 7px 12px;
+}
+
+.chip-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Pressable pill used by the Work filter and the Contact "What do you need?" */
+.toggle {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1.5px solid var(--ink);
+  border-radius: 6px;
+  background: var(--white);
+  color: var(--ink);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+}
+.toggle[aria-pressed='true'] {
+  background: var(--ink);
+  color: var(--white);
+}
+
+/* ---------- Placeholders ---------- */
+
+/* White mono tag that labels a missing image: [PROJECT SCREENSHOT] */
+.ph-tag {
+  position: relative;
+  background: var(--white);
+  border: 1.5px solid var(--ink);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+/* Tinted image well with decorative wave art and a placeholder tag */
+.shot {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  padding: 20px;
+}
+.shot > svg {
+  position: absolute;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+}
+
+/* ---------- Cards ---------- */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  background: var(--white);
+  border: 1.5px solid var(--ink);
+  border-radius: 20px;
+  overflow: hidden;
+  color: var(--ink);
+  text-decoration: none;
+}
+.card:hover { color: var(--ink); }
+
+/* ---------- Stats ---------- */
+
+/* <dl class="stats"> with <div><dt/><dd/></div>; the value reads above the label */
+.stats {
+  margin: 0 auto;
+  max-width: var(--container);
+  padding: 48px var(--gutter);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+  gap: 32px;
+}
+.stats > div {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 4px;
+}
+.stats dt {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.stats dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 56px;
+  line-height: 1;
+}
+
+/* ---------- Numbered rule grid (Home "Modern methods", Company "Four rules") ---------- */
+
+.rule-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+  gap: 32px;
+}
+.rule-grid > li {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-top: 2px solid var(--cyan);
+  padding-top: 20px;
+}
+.rule-grid h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 1.1;
+}
+.rule-grid p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
