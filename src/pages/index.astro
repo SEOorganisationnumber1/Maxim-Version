@@ -4,6 +4,7 @@ import CtaBand from '../components/CtaBand.astro';
 import Icon from '../components/Icon.astro';
 import { services, site, type Service } from '../data/site';
 import { getProject, projects, projectUrl, serviceLine } from '../data/projects';
+import { ribbonPath } from '../scripts/hero-ribbons';
 
 /** "Companies we scaled:" chips: every real (non-placeholder) project. */
 const scaled = projects.filter((p) => !p.placeholder);
@@ -74,47 +75,48 @@ const methods = [
   description="More visibility. Better traffic. Qualified leads. We design, build and optimise so that when people ask Google, ChatGPT or Gemini, the answer is you."
 >
   <!-- Hero -->
-  <section class="hero bg-paper border-bottom">
-    <div aria-hidden="true" class="hero__art hero__art--left">
+  <section class="hero bg-paper border-bottom" data-hero-ribbons>
+    <div aria-hidden="true" class="hero__art hero__art--left" data-ribbon-art="left">
       <svg viewBox="0 0 400 640" preserveAspectRatio="xMaxYMid slice" fill="none">
         <defs>
-          <linearGradient id="hero-a" x1="0" y1="0" x2="400" y2="640" gradientUnits="userSpaceOnUse">
+          <linearGradient id="hero-a" data-ribbon-gradient x1="0" y1="0" x2="400" y2="640" gradientUnits="userSpaceOnUse">
             <stop offset="0" stop-color="#22D3DD"></stop>
             <stop offset="0.6" stop-color="#2FB4F0"></stop>
             <stop offset="1" stop-color="#2F8CF6"></stop>
           </linearGradient>
-          <linearGradient id="hero-b" x1="0" y1="440" x2="220" y2="660" gradientUnits="userSpaceOnUse">
+          <linearGradient id="hero-b" data-ribbon-gradient x1="0" y1="440" x2="220" y2="660" gradientUnits="userSpaceOnUse">
             <stop offset="0" stop-color="#2F8CF6"></stop>
             <stop offset="1" stop-color="#5B4FE9"></stop>
           </linearGradient>
         </defs>
+        <path data-ribbon="left-blob" d={ribbonPath('left-blob')} fill="#DFF6F9"></path>
         <path
-          d="M-40 -20 C 160 -60, 420 40, 330 220 C 250 380, 60 250, 40 420 C 20 590, 260 560, 300 700 L -40 700 Z"
-          fill="#DFF6F9"></path>
-        <path
-          d="M-60 60 C 110 0, 330 50, 290 190 C 250 320, 50 250, 70 390 C 90 520, 300 480, 320 680"
+          data-ribbon="left-ribbon"
+          d={ribbonPath('left-ribbon')}
           stroke="url(#hero-a)"
           stroke-width="78"
           stroke-linecap="round"></path>
         <path
-          d="M-70 540 C 30 470, 170 540, 130 700"
+          data-ribbon="left-accent"
+          d={ribbonPath('left-accent')}
           stroke="url(#hero-b)"
           stroke-width="104"
           stroke-linecap="round"></path>
       </svg>
     </div>
-    <div aria-hidden="true" class="hero__art hero__art--right">
+    <div aria-hidden="true" class="hero__art hero__art--right" data-ribbon-art="right">
       <svg viewBox="0 0 260 640" preserveAspectRatio="xMinYMid slice" fill="none">
         <defs>
-          <linearGradient id="hero-c" x1="260" y1="0" x2="60" y2="640" gradientUnits="userSpaceOnUse">
+          <linearGradient id="hero-c" data-ribbon-gradient x1="260" y1="0" x2="60" y2="640" gradientUnits="userSpaceOnUse">
             <stop offset="0" stop-color="#2F8CF6"></stop>
             <stop offset="0.5" stop-color="#2FB4F0"></stop>
             <stop offset="1" stop-color="#22D3DD"></stop>
           </linearGradient>
         </defs>
-        <path d="M300 -20 C 140 0, 40 180, 150 300 C 240 400, 200 560, 300 680 Z" fill="#E4EEFF"></path>
+        <path data-ribbon="right-blob" d={ribbonPath('right-blob')} fill="#E4EEFF"></path>
         <path
-          d="M300 20 C 150 60, 90 200, 190 310 C 280 410, 190 540, 290 690"
+          data-ribbon="right-ribbon"
+          d={ribbonPath('right-ribbon')}
           stroke="url(#hero-c)"
           stroke-width="70"
           stroke-linecap="round"></path>
@@ -146,9 +148,27 @@ const methods = [
 
       <div class="hero__actions">
         <a href="/contact" class="btn btn--primary">Start a project<Icon name="arrow-right" /></a>
-        <a href="/work" class="btn btn--outline">See the work</a>
+        <a href="/work" class="btn btn--outline" data-motion-fallback>See the work</a>
       </div>
     </div>
+
+    <!-- Pause control for the ambient ribbon motion (WCAG 2.2.2). Revealed by the script only when motion can run. -->
+    <button
+      type="button"
+      class="hero__motion"
+      data-motion-toggle
+      data-state="playing"
+      aria-label="Pause background animation"
+      hidden
+    >
+      <svg class="hero__motion-pause" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round">
+        <path d="M9 6v12"></path>
+        <path d="M15 6v12"></path>
+      </svg>
+      <svg class="hero__motion-play" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M8 5.5v13a1 1 0 0 0 1.5.86l11-6.5a1 1 0 0 0 0-1.72l-11-6.5A1 1 0 0 0 8 5.5z"></path>
+      </svg>
+    </button>
   </section>
 
   <!-- In numbers -->
@@ -312,6 +332,13 @@ const methods = [
   <CtaBand title="Tell us what you want to rank for." tone="white" pad="full" />
 </Base>
 
+<script>
+  import { startHeroRibbons } from '../scripts/hero-ribbons';
+
+  const hero = document.querySelector<HTMLElement>('[data-hero-ribbons]');
+  if (hero) startHeroRibbons(hero);
+</script>
+
 <style>
   /* ---------- Hero ---------- */
 
@@ -337,6 +364,52 @@ const methods = [
     width: 100%;
     height: 100%;
   }
+  /* Pause control for the ribbon motion: an opaque disc so the moving art never shows through it. */
+  .hero__motion {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1.5px solid rgb(10 17 40 / 0.72);
+    border-radius: 50%;
+    background: var(--white);
+    color: rgb(10 17 40 / 0.72);
+    cursor: pointer;
+    transition:
+      color 160ms ease,
+      border-color 160ms ease,
+      transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .hero__motion[hidden] {
+    display: none;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .hero__motion:hover {
+      color: var(--ink);
+      border-color: var(--ink);
+    }
+  }
+  /* Two-tone ring: readable over paper and every stop of the ribbon gradient. */
+  .hero__motion:focus-visible {
+    color: var(--ink);
+    border-color: var(--ink);
+    outline: 3px solid var(--ink);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px var(--white);
+  }
+  .hero__motion:active {
+    transform: scale(0.96);
+  }
+  .hero__motion[data-state='playing'] .hero__motion-play,
+  .hero__motion[data-state='paused'] .hero__motion-pause {
+    display: none;
+  }
+
   .hero__content {
     position: relative;
     z-index: 1;
