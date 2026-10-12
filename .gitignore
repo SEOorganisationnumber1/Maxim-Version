@@ -11,3 +11,9 @@ dist/
 
 # Design previews (not shipped)
 .temp/
+
+# Local Netlify folder
+.netlify
+
+# Netlify adapter build output
+.netlify/

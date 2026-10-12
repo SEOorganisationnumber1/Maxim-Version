@@ -1,5 +1,6 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
+import { defineConfig, envField } from 'astro/config';
+import netlify from '@astrojs/netlify';
 import sitemap from '@astrojs/sitemap';
 
 // Canonical URLs, the sitemap and robots.txt are built from this.
@@ -16,6 +17,16 @@ export default defineConfig({
   // link, the canonical tags and the sitemap. Pages build to work.html etc.
   trailingSlash: 'never',
   build: { format: 'file' },
+  // Every page stays prerendered static HTML. Only the brief API and /admin opt into
+  // on-demand rendering (export const prerender = false), served by a Netlify Function.
+  adapter: netlify(),
+  env: {
+    schema: {
+      // Password for /admin, set in Netlify (Project configuration > Environment variables).
+      // A secret: read at runtime on the server, never bundled into client code.
+      ADMIN_PASSWORD: envField.string({ context: 'server', access: 'secret', optional: true }),
+    },
+  },
   integrations: [
     // Case studies for the [CLIENT NAME] slots are placeholders: keep them out of the sitemap.
     sitemap({ filter: (page) => !/\/work\/client-\d+\/?$/.test(page) }),

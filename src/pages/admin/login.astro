@@ -1,0 +1,165 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import {
+  ADMIN_HEADERS,
+  adminConfigured,
+  clientIp,
+  isSignedIn,
+  passwordMatches,
+  sameOrigin,
+  startSession,
+  withinLimit,
+} from '../../lib/admin-auth';
+
+export const prerender = false;
+
+for (const [k, v] of Object.entries(ADMIN_HEADERS)) Astro.response.headers.set(k, v);
+
+if (await isSignedIn(Astro.cookies)) return Astro.redirect('/admin', 303);
+
+const configured = adminConfigured();
+let error = '';
+
+if (Astro.request.method === 'POST') {
+  if (!sameOrigin(Astro.request)) {
+    error = 'That request was blocked. Reload this page and try again.';
+  } else if (!configured) {
+    error = 'The admin password is not set up yet.';
+  } else if (!(await withinLimit('login', clientIp(() => Astro.clientAddress), 10, 15 * 60_000))) {
+    error = 'Too many attempts. Wait 15 minutes, then try again.';
+  } else {
+    const form = await Astro.request.formData();
+    if (await passwordMatches(String(form.get('password') ?? ''))) {
+      await startSession(Astro.cookies);
+      return Astro.redirect('/admin', 303);
+    }
+    await new Promise((r) => setTimeout(r, 600)); // slows down guessing
+    error = 'Wrong password.';
+  }
+  Astro.response.status = 401;
+}
+
+const signedOut = Astro.url.searchParams.get('notice') === 'signed-out';
+---
+
+<AdminLayout title="Sign in">
+  <section class="login">
+    <h1 class="login__title">Admin</h1>
+    <p class="login__lede">Briefs sent from the Contact page.</p>
+
+    {
+      !configured && (
+        <div class="login__setup" role="note">
+          <h2>One step left</h2>
+          <p>
+            Set a password in Netlify: <strong>Project configuration</strong>, <strong>Environment variables</strong>, add
+            <code>ADMIN_PASSWORD</code> with at least 12 characters, then redeploy. You sign in here with it.
+          </p>
+        </div>
+      )
+    }
+
+    {signedOut && <p class="login__notice" role="status">You are signed out.</p>}
+
+    <form method="post" class="login__form">
+      <label for="admin-password" class="login__label">Password</label>
+      <input
+        id="admin-password"
+        name="password"
+        type="password"
+        autocomplete="current-password"
+        required
+        disabled={!configured}
+        aria-invalid={error ? 'true' : undefined}
+        aria-describedby={error ? 'login-error' : undefined}
+        class="login__input"
+      />
+      {error && <p id="login-error" class="login__error" role="alert">{error}</p>}
+      <button type="submit" class="btn btn--primary login__submit" disabled={!configured}>Sign in</button>
+    </form>
+  </section>
+</AdminLayout>
+
+<style>
+  .login {
+    max-width: 420px;
+    margin: 64px auto 0;
+    padding: 40px;
+    background: var(--white);
+    border: 1.5px solid var(--ink);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .login__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 40px;
+    line-height: 1.05;
+  }
+  .login__lede {
+    margin: 0;
+    color: var(--ink-2);
+  }
+  .login__setup {
+    padding: 16px;
+    border-radius: 12px;
+    background: var(--tint-cyan);
+  }
+  .login__setup h2 {
+    margin: 0 0 6px;
+    font-size: 16px;
+  }
+  .login__setup p {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  .login__setup code {
+    font-family: var(--font-mono);
+    font-size: 13px;
+  }
+  .login__notice {
+    margin: 0;
+    font-weight: 600;
+  }
+  .login__form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .login__label {
+    font-weight: 700;
+    font-size: 15px;
+  }
+  .login__input {
+    width: 100%;
+    min-height: 48px;
+    padding: 0 14px;
+    border: 1.5px solid var(--ink);
+    border-radius: 8px;
+    background: var(--white);
+    color: var(--ink);
+    font: inherit;
+  }
+  .login__input[aria-invalid='true'] {
+    border-color: var(--error);
+  }
+  .login__error {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--error);
+  }
+  .login__submit {
+    margin-top: 12px;
+  }
+  .login__submit:disabled,
+  .login__input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+</style>

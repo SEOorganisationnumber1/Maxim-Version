@@ -1,0 +1,435 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { ADMIN_HEADERS, isSignedIn } from '../../lib/admin-auth';
+import { STATUSES, STATUS_LABEL, TIMELINES, listBriefs, websiteUrl, type Status } from '../../lib/briefs';
+import { site } from '../../data/site';
+
+export const prerender = false;
+
+for (const [k, v] of Object.entries(ADMIN_HEADERS)) Astro.response.headers.set(k, v);
+if (!(await isSignedIn(Astro.cookies))) return Astro.redirect('/admin/login', 303);
+
+/** Dates are shown in the agency's time zone. */
+const TIME_ZONE = 'Europe/Bucharest';
+const dateFormat = new Intl.DateTimeFormat('en-GB', { dateStyle: 'medium', timeStyle: 'short', timeZone: TIME_ZONE });
+
+const briefs = await listBriefs();
+const param = Astro.url.searchParams.get('status');
+const filter: Status | 'all' = STATUSES.includes(param as Status) ? (param as Status) : 'all';
+const shown = filter === 'all' ? briefs : briefs.filter((b) => b.status === filter);
+const count = (s: Status | 'all') => (s === 'all' ? briefs.length : briefs.filter((b) => b.status === s).length);
+const tabs = [{ key: 'all' as const, label: 'All' }, ...STATUSES.map((s) => ({ key: s, label: STATUS_LABEL[s] }))];
+
+const notices: Record<string, string> = {
+  updated: 'Status updated.',
+  deleted: 'Brief deleted.',
+  'not-found': 'That brief no longer exists.',
+};
+const notice = notices[Astro.url.searchParams.get('notice') ?? ''];
+const returnTo = filter === 'all' ? '/admin' : `/admin?status=${filter}`;
+const replySubject = encodeURIComponent(`Your brief for ${site.name}`);
+---
+
+<AdminLayout title="Briefs" signedIn>
+  <div class="inbox">
+    <div class="inbox__head">
+      <h1 class="inbox__title">Briefs</h1>
+      <p class="inbox__sub">Everything sent from the Contact page, newest first.</p>
+    </div>
+
+    <div class="toolbar">
+      <nav aria-label="Filter by status" class="tabs">
+        {
+          tabs.map((t) => (
+            <a
+              href={t.key === 'all' ? '/admin' : `/admin?status=${t.key}`}
+              class="tabs__tab"
+              aria-current={filter === t.key ? 'page' : undefined}
+            >
+              {t.label}
+              <span class="tabs__count">{count(t.key)}</span>
+            </a>
+          ))
+        }
+      </nav>
+      <div class="search">
+        <label for="brief-search" class="visually-hidden">Search briefs</label>
+        <input id="brief-search" type="search" placeholder="Search name, email, site or message" class="search__input" data-search />
+      </div>
+    </div>
+
+    {notice && <p class="notice" role="status">{notice}</p>}
+
+    {
+      shown.length === 0 ? (
+        <div class="empty">
+          <h2>{briefs.length === 0 ? 'No briefs yet' : 'Nothing here'}</h2>
+          <p>
+            {briefs.length === 0
+              ? 'They appear here as soon as someone sends the form on the Contact page.'
+              : 'No briefs have this status.'}
+          </p>
+        </div>
+      ) : (
+        <ol class="briefs" data-briefs>
+          {shown.map((b) => {
+            const url = websiteUrl(b.website);
+            const search = [b.name, b.email, b.website, b.message, b.needs.join(' ')].join(' ').toLowerCase();
+            return (
+              <li>
+                <article class="brief" data-search-text={search} aria-labelledby={`brief-${b.id}`}>
+                  <header class="brief__head">
+                    <h2 id={`brief-${b.id}`} class="brief__name">{b.name}</h2>
+                    <span class={`pill pill--${b.status}`}>{STATUS_LABEL[b.status]}</span>
+                    <time class="brief__date" datetime={b.createdAt}>{dateFormat.format(new Date(b.createdAt))}</time>
+                  </header>
+
+                  <dl class="brief__meta">
+                    <div>
+                      <dt>Email</dt>
+                      <dd><a href={`mailto:${b.email}`}>{b.email}</a></dd>
+                    </div>
+                    <div>
+                      <dt>Website</dt>
+                      <dd>
+                        {url ? (
+                          <a href={url} target="_blank" rel="noopener noreferrer nofollow">{b.website}</a>
+                        ) : (
+                          b.website || <span class="muted">Not given</span>
+                        )}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Needs</dt>
+                      <dd>
+                        {b.needs.length ? (
+                          <ul class="chip-list">{b.needs.map((n) => <><li class="chip">{n}</li>{'\n'}</>)}</ul>
+                        ) : (
+                          <span class="muted">Not specified</span>
+                        )}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Start</dt>
+                      <dd>{TIMELINES[b.timeline]}</dd>
+                    </div>
+                  </dl>
+
+                  {b.message ? <p class="brief__message">{b.message}</p> : <p class="brief__message muted">No message.</p>}
+
+                  <div class="brief__actions">
+                    <a href={`mailto:${b.email}?subject=${replySubject}`} class="btn btn--primary admin-btn">Reply by email</a>
+                    <form method="post" action="/api/admin/brief" class="status-form" aria-label={`Status of ${b.name}'s brief`}>
+                      <input type="hidden" name="id" value={b.id} />
+                      <input type="hidden" name="action" value="status" />
+                      <input type="hidden" name="returnTo" value={returnTo} />
+                      {STATUSES.map((s) => (
+                        <button type="submit" name="status" value={s} class="status-form__btn" aria-pressed={b.status === s ? 'true' : 'false'}>
+                          {STATUS_LABEL[s]}
+                        </button>
+                      ))}
+                    </form>
+                    <details class="delete">
+                      <summary class="delete__toggle">Delete</summary>
+                      <form method="post" action="/api/admin/brief" class="delete__form">
+                        <input type="hidden" name="id" value={b.id} />
+                        <input type="hidden" name="action" value="delete" />
+                        <input type="hidden" name="returnTo" value={returnTo} />
+                        <span>This cannot be undone.</span>
+                        <button type="submit" class="delete__confirm">Delete permanently</button>
+                      </form>
+                    </details>
+                  </div>
+                </article>
+              </li>
+            );
+          })}
+        </ol>
+      )
+    }
+    <p class="no-match" hidden data-no-match>No briefs match your search.</p>
+  </div>
+</AdminLayout>
+
+<script>
+  // Instant client-side search over the briefs already on the page.
+  const input = document.querySelector<HTMLInputElement>('[data-search]');
+  const items = [...document.querySelectorAll<HTMLElement>('[data-search-text]')];
+  const noMatch = document.querySelector<HTMLElement>('[data-no-match]');
+  input?.addEventListener('input', () => {
+    const q = input.value.trim().toLowerCase();
+    let visible = 0;
+    for (const el of items) {
+      const hit = !q || (el.dataset.searchText ?? '').includes(q);
+      (el.parentElement as HTMLElement).hidden = !hit;
+      if (hit) visible++;
+    }
+    if (noMatch) noMatch.hidden = visible > 0 || items.length === 0;
+  });
+</script>
+
+<style>
+  .inbox {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .inbox__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    line-height: 1.05;
+  }
+  .inbox__sub {
+    margin: 6px 0 0;
+    color: var(--ink-2);
+  }
+
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 24px;
+  }
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .tabs__tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1.5px solid var(--ink);
+    border-radius: 6px;
+    background: var(--white);
+    font-weight: 700;
+    font-size: 15px;
+    text-decoration: none;
+  }
+  .tabs__tab[aria-current='page'] {
+    background: var(--ink);
+    color: var(--white);
+  }
+  .tabs__count {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    opacity: 0.8;
+  }
+  .search__input {
+    width: min(340px, 100%);
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1.5px solid var(--ink);
+    border-radius: 8px;
+    background: var(--white);
+    color: var(--ink);
+    font: inherit;
+    font-size: 15px;
+  }
+  .search {
+    flex: 0 1 340px;
+  }
+
+  .notice {
+    margin: 0;
+    padding: 12px 16px;
+    border-radius: 8px;
+    background: var(--tint-cyan);
+    font-weight: 600;
+  }
+
+  .empty {
+    padding: 56px 24px;
+    border: 1.5px dashed var(--dashed);
+    border-radius: 16px;
+    text-align: center;
+  }
+  .empty h2 {
+    margin: 0 0 6px;
+    font-family: var(--font-display);
+    font-size: 24px;
+  }
+  .empty p {
+    margin: 0;
+    color: var(--ink-2);
+  }
+
+  .briefs {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .brief {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px;
+    background: var(--white);
+    border: 1.5px solid var(--ink);
+    border-radius: 16px;
+  }
+  .brief__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+  }
+  .brief__name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 1.15;
+  }
+  .brief__date {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    min-height: 26px;
+    padding: 0 10px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .pill--new {
+    background: var(--cyan);
+    color: var(--ink);
+  }
+  .pill--in-progress {
+    background: var(--tint-blue);
+    color: var(--ink);
+  }
+  .pill--done {
+    background: var(--paper);
+    color: var(--ink-2);
+    border: 1px solid var(--line);
+  }
+  .brief__meta {
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+    gap: 12px 24px;
+  }
+  .brief__meta dt {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .brief__meta dd {
+    margin: 4px 0 0;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+  .brief__message {
+    margin: 0;
+    padding: 16px;
+    border-radius: 10px;
+    background: var(--paper);
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .brief__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+  }
+  .status-form {
+    display: inline-flex;
+    margin: 0;
+    border: 1.5px solid var(--ink);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .status-form__btn {
+    min-height: 44px;
+    padding: 0 14px;
+    border: 0;
+    border-left: 1.5px solid var(--ink);
+    background: var(--white);
+    color: var(--ink);
+    font: inherit;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .status-form__btn:first-of-type {
+    border-left: 0;
+  }
+  .status-form__btn[aria-pressed='true'] {
+    background: var(--ink);
+    color: var(--white);
+  }
+  .delete {
+    margin-left: auto;
+  }
+  .delete__toggle {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 8px;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--error);
+    cursor: pointer;
+    list-style: none;
+  }
+  .delete__toggle::-webkit-details-marker {
+    display: none;
+  }
+  .delete__form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    margin: 4px 0 0;
+    font-size: 14px;
+    color: var(--ink-2);
+  }
+  .delete__confirm {
+    min-height: 40px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--error);
+    color: var(--white);
+    font: inherit;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .no-match {
+    margin: 0;
+    color: var(--ink-2);
+  }
+  @media (max-width: 640px) {
+    .brief {
+      padding: 18px;
+    }
+    .brief__date {
+      margin-left: 0;
+      width: 100%;
+    }
+    .delete {
+      margin-left: 0;
+    }
+  }
+</style>

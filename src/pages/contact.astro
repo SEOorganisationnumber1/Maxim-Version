@@ -81,7 +81,7 @@ const steps = [
           </div>
         </div>
 
-        {/* The script sends the brief (see PUBLIC_CONTACT_ENDPOINT). method="post" only keeps
+        {/* The script sends the brief to /api/brief (the /admin inbox). method="post" only keeps
             the fields out of the URL if the script never runs; there is no plain-HTML send path. */}
         <form class="form" method="post" novalidate data-contact-form>
           <div class="form__pair">
@@ -398,7 +398,8 @@ const steps = [
 
 <script>
   const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const ENDPOINT = String(import.meta.env.PUBLIC_CONTACT_ENDPOINT ?? '').trim();
+  // Briefs go to the site's own inbox (/api/brief, read in /admin) unless another endpoint is set.
+  const ENDPOINT = String(import.meta.env.PUBLIC_CONTACT_ENDPOINT ?? '').trim() || '/api/brief';
 
   type Field = {
     input: HTMLInputElement;

@@ -1,0 +1,123 @@
+---
+// Shell for the admin pages: site fonts and tokens, no public header or footer, never indexed.
+import '@fontsource-variable/outfit';
+import '@fontsource-variable/manrope';
+import '@fontsource/jetbrains-mono/500.css';
+import '../styles/global.css';
+
+import { site } from '../data/site';
+
+interface Props {
+  title: string;
+  /** Show the signed-in bar (title, export, sign out). */
+  signedIn?: boolean;
+}
+
+const { title, signedIn = false } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>{title} · {site.name} admin</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body class="admin-body">
+    <div class="site admin">
+      {
+        signedIn && (
+          <header class="admin-bar">
+            <div class="admin-bar__inner">
+              <a href="/admin" class="admin-bar__brand">
+                <svg aria-hidden="true" width="26" height="26" viewBox="0 0 30 30" fill="none">
+                  <defs>
+                    <linearGradient id="admin-logo" x1="0" y1="0" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+                      <stop offset="0" stop-color="#22D3DD" />
+                      <stop offset="0.55" stop-color="#2F8CF6" />
+                      <stop offset="1" stop-color="#5B4FE9" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M6 8 C 14 2, 26 8, 18 15 C 10 22, 20 28, 25 22" stroke="url(#admin-logo)" stroke-width="6" stroke-linecap="round" />
+                </svg>
+                <span>Briefs</span>
+              </a>
+              <div class="admin-bar__actions">
+                <a href="/" class="admin-bar__link">View site</a>
+                <a href="/admin/export.csv" class="btn btn--outline admin-btn">Export CSV</a>
+                <form method="post" action="/admin/logout">
+                  <button type="submit" class="btn btn--dark admin-btn">Sign out</button>
+                </form>
+              </div>
+            </div>
+          </header>
+        )
+      }
+      <main id="main" class="admin-main">
+        <slot />
+      </main>
+    </div>
+  </body>
+</html>
+
+<style>
+  .admin-body {
+    background: var(--paper);
+  }
+  .admin {
+    min-height: 100vh;
+  }
+  .admin-bar {
+    background: var(--white);
+    border-bottom: 1px solid var(--line);
+  }
+  .admin-bar__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 12px var(--gutter);
+  }
+  .admin-bar__brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 20px;
+    text-decoration: none;
+  }
+  .admin-bar__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+  }
+  .admin-bar__actions form {
+    margin: 0;
+  }
+  .admin-bar__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 8px;
+    font-weight: 600;
+    font-size: 15px;
+  }
+  :global(.admin-btn) {
+    min-height: 44px;
+    padding: 0 16px;
+    font-size: 15px;
+  }
+  .admin-main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px var(--gutter) 96px;
+  }
+</style>
