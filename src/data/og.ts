@@ -1,0 +1,48 @@
+// Share images (Open Graph), one per page, generated at build time by src/pages/og/[card].png.ts.
+// Pages pass the card's key to Base as `og`; titles follow each page's h1.
+import { caseStudies, serviceLine, type Look } from './projects';
+
+export type OgRun = { text: string; mark?: 'highlight' | 'accent' };
+export type OgCard = {
+  /** Page path, printed at the bottom of the image after the domain. */
+  path: string;
+  /** Words are separated by spaces; a highlight run never breaks across lines. */
+  title: OgRun[];
+  /** Mono line under the title. */
+  sub?: string;
+  tone: Look['tone'];
+};
+
+export const ogCards: Record<string, OgCard> = {
+  home: {
+    path: '/',
+    tone: 'cyan',
+    title: [{ text: 'SEO That Brings' }, { text: 'Qualified', mark: 'highlight' }, { text: 'Leads.', mark: 'accent' }],
+  },
+  work: { path: '/work', tone: 'cyan', title: [{ text: 'Companies we' }, { text: 'scaled.', mark: 'highlight' }] },
+  services: {
+    path: '/services',
+    tone: 'blue',
+    title: [{ text: 'Design, code and search.' }, { text: 'Built as one.', mark: 'highlight' }],
+  },
+  clients: { path: '/clients', tone: 'violet', title: [{ text: 'Brands that grew' }, { text: 'with us.', mark: 'highlight' }] },
+  company: {
+    path: '/company',
+    tone: 'cyan',
+    title: [{ text: 'A search-first studio for design, code and' }, { text: 'growth.', mark: 'highlight' }],
+  },
+  contact: {
+    path: '/contact',
+    tone: 'blue',
+    title: [{ text: 'Tell us what you want to' }, { text: 'rank for.', mark: 'highlight' }],
+  },
+  privacy: { path: '/privacy', tone: 'violet', title: [{ text: 'Privacy policy' }] },
+  ...Object.fromEntries(
+    caseStudies.map((p): [string, OgCard] => [
+      `work-${p.slug}`,
+      { path: `/work/${p.slug}`, tone: p.look.tone, title: [{ text: p.name }], sub: `Case study · ${serviceLine(p.services)}` },
+    ]),
+  ),
+};
+
+export type OgKey = keyof typeof ogCards;

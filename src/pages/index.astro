@@ -2,19 +2,21 @@
 import Base from '../layouts/Base.astro';
 import CtaBand from '../components/CtaBand.astro';
 import Icon from '../components/Icon.astro';
-import { services, site, type Service } from '../data/site';
-import { getProject, projects, projectUrl, serviceLine } from '../data/projects';
+import { filled, numbers, services, site, type Service } from '../data/site';
+import { projects, projectUrl, serviceLine } from '../data/projects';
 import { ribbonPath } from '../scripts/hero-ribbons';
 
-/** "Companies we scaled:" chips: every real (non-placeholder) project. */
-const scaled = projects.filter((p) => !p.placeholder);
+/** "Companies we scaled:" chips. Past CHIP_LIMIT the rest are behind "+ more brands". */
+const CHIP_LIMIT = 4;
+const chips = projects.slice(0, CHIP_LIMIT);
 
-const stats = [
-  { value: '[X]+', label: 'projects shipped' },
-  { value: '[X]', label: 'years in search' },
-  { value: '[X]', label: 'markets served' },
-  { value: '[X]%', label: 'clients who stay past year one' },
-];
+/** The numbers band shows only the figures that are set, and disappears without any. */
+const stats = filled([
+  { value: numbers.projectsShipped, label: 'projects shipped' },
+  { value: numbers.yearsInSearch, label: 'years in search' },
+  { value: numbers.marketsServed, label: 'markets served' },
+  { value: numbers.retention, label: 'clients who stay past year one' },
+]);
 
 // Home keeps its own discipline copy (it differs slightly from the Services page).
 const disciplineCopy: Record<Service, string> = {
@@ -29,25 +31,13 @@ const disciplineCopy: Record<Service, string> = {
 
 const pad = (n: number): string => String(n).padStart(2, '0');
 
-// Home card art is drawn specifically for this page (it does not follow the Work page look cycle).
-const featured = getProject('leadity-io');
-
-const smallCards = [
-  {
-    project: getProject('instagram-com'),
-    tint: 'blue',
-    gradientId: 'work-b',
-    stops: ['#2F8CF6', '#5B4FE9'],
-    path: 'M-40 60 C 140 20, 200 240, 340 170 C 460 110, 500 -10, 660 60',
-  },
-  {
-    project: getProject('zerodollars-xyz'),
-    tint: 'violet',
-    gradientId: 'work-c',
-    stops: ['#5B4FE9', '#22D3DD'],
-    path: 'M-40 200 C 100 80, 260 60, 320 150 C 380 240, 520 220, 660 120',
-  },
-] as const;
+// The first project gets the large card with its own art; the next two get small cards in the
+// Work page looks. Cards link once their case study is written.
+const [featured, ...others] = projects;
+const featuredUrl = featured ? projectUrl(featured) : null;
+const featuredResult = featured?.caseStudy?.results[0];
+const FeaturedCard = featuredUrl ? 'a' : 'article';
+const smallCards = others.slice(0, 2).map((project) => ({ project, url: projectUrl(project) }));
 
 const methods = [
   {
@@ -138,16 +128,22 @@ const methods = [
 
       <p class="hero__tagline">{site.tagline}</p>
 
-      <div class="hero__row">
-        <span class="hero__label">Companies we scaled:</span>
-        <ul class="chip-list">
-          {scaled.map((project) => <><li class="chip chip--dark">{project.name}</li>{'\n'}</>)}
-        </ul>
-        <a href="/clients" class="hero__more">+ more brands</a>
-      </div>
+      {
+        chips.length > 0 && (
+          <div class="hero__row">
+            <span class="hero__label">Companies we scaled:</span>
+            <ul class="chip-list">
+              {chips.map((project) => <><li class="chip chip--dark">{project.name}</li>{'\n'}</>)}
+            </ul>
+            {projects.length > chips.length && <a href="/clients" class="hero__more">+ more brands</a>}
+          </div>
+        )
+      }
 
       <div class="hero__actions">
-        <a href="/contact" class="btn btn--primary">Start a project<Icon name="arrow-right" /></a>
+        <a href="/contact" class="btn btn--primary" data-umami-event="Start a project" data-umami-event-from="hero">
+          Start a project<Icon name="arrow-right" />
+        </a>
         <a href="/work" class="btn btn--outline" data-motion-fallback>See the work</a>
       </div>
     </div>
@@ -172,18 +168,20 @@ const methods = [
   </section>
 
   <!-- In numbers -->
-  <section aria-label="In numbers" class="bg-white border-bottom">
-    <dl class="stats">
-      {
-        stats.map((stat) => (
-          <div>
-            <dt>{stat.label}</dt>
-            <dd>{stat.value}</dd>
-          </div>
-        ))
-      }
-    </dl>
-  </section>
+  {
+    stats.length > 0 && (
+      <section aria-label="In numbers" class="bg-white border-bottom">
+        <dl class="stats">
+          {stats.map((stat) => (
+            <div>
+              <dt>{stat.label}</dt>
+              <dd>{stat.value}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+    )
+  }
 
   <!-- Statement -->
   <section class="bg-paper">
@@ -222,89 +220,96 @@ const methods = [
   </section>
 
   <!-- Companies we scaled -->
-  <section class="bg-paper border-top">
-    <div class="container block">
-      <div class="block__head">
-        <div class="block__title">
-          <h2 class="h2">Companies we scaled.</h2>
-        </div>
-        <a href="/work" class="text-link">All work<Icon name="arrow-right" /></a>
-      </div>
-
-      <div class="work">
-        <a href={projectUrl(featured)} class="card featured">
-          <div class="shot shot--cyan featured__shot">
-            <svg aria-hidden="true" viewBox="0 0 600 400" preserveAspectRatio="xMidYMid slice" fill="none">
-              <defs>
-                <linearGradient id="work-a" x1="0" y1="0" x2="600" y2="400" gradientUnits="userSpaceOnUse">
-                  <stop offset="0" stop-color="#22D3DD"></stop>
-                  <stop offset="1" stop-color="#2F8CF6"></stop>
-                </linearGradient>
-              </defs>
-              <path
-                d="M-40 300 C 120 180, 220 420, 360 280 C 480 160, 520 60, 660 90"
-                stroke="url(#work-a)"
-                stroke-width="72"
-                stroke-linecap="round"></path>
-            </svg>
-            <span class="ph-tag">[PROJECT SCREENSHOT]</span>
-          </div>
-          <div class="featured__body">
-            <div class="featured__copy">
-              <span class="tagline">{serviceLine(featured.services)}</span>
-              <h3 class="featured__name">{featured.name}</h3>
-              <p class="featured__summary">[ONE-LINE SUMMARY: what the client needed and what changed.]</p>
+  {
+    featured && (
+      <section class="bg-paper border-top">
+        <div class="container block">
+          <div class="block__head">
+            <div class="block__title">
+              <h2 class="h2">Companies we scaled.</h2>
             </div>
-            <div class="featured__foot">
-              <div class="featured__metric">
-                <span class="featured__value">[+X%]</span>
-                <span class="featured__label">[KEY RESULT METRIC]</span>
+            <a href="/work" class="text-link">All work<Icon name="arrow-right" /></a>
+          </div>
+
+          <div class="work">
+            <FeaturedCard
+              href={featuredUrl ?? undefined}
+              class:list={['card', 'featured', { 'featured--compact': !featured.summary && !featuredResult && !featuredUrl }]}
+            >
+              <div class="shot shot--cyan featured__shot">
+                <svg aria-hidden="true" viewBox="0 0 600 400" preserveAspectRatio="xMidYMid slice" fill="none">
+                  <defs>
+                    <linearGradient id="work-a" x1="0" y1="0" x2="600" y2="400" gradientUnits="userSpaceOnUse">
+                      <stop offset="0" stop-color="#22D3DD" />
+                      <stop offset="1" stop-color="#2F8CF6" />
+                    </linearGradient>
+                  </defs>
+                  <path
+                    d="M-40 300 C 120 180, 220 420, 360 280 C 480 160, 520 60, 660 90"
+                    stroke="url(#work-a)"
+                    stroke-width="72"
+                    stroke-linecap="round"
+                  />
+                </svg>
               </div>
-              <span class="featured__read">Read the case<Icon name="arrow-right" /></span>
-            </div>
-          </div>
-        </a>
+              <div class="featured__body">
+                <div class="featured__copy">
+                  <span class="tagline">{serviceLine(featured.services)}</span>
+                  <h3 class="featured__name">{featured.name}</h3>
+                  {featured.summary && <p class="featured__summary">{featured.summary}</p>}
+                </div>
+                {(featuredResult || featuredUrl) && (
+                  <div class="featured__foot">
+                    {featuredResult && (
+                      <div class="featured__metric">
+                        <span class="featured__value">{featuredResult.value}</span>
+                        <span class="featured__label">{featuredResult.label}</span>
+                      </div>
+                    )}
+                    {featuredUrl && (
+                      <span class="featured__read">
+                        Read the case
+                        <Icon name="arrow-right" />
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+            </FeaturedCard>
 
-        <div class="work__grid">
-          {
-            smallCards.map((card) => (
-              <a href={projectUrl(card.project)} class="card">
-                <div class:list={['shot', `shot--${card.tint}`, 'small__shot']}>
-                  <svg aria-hidden="true" viewBox="0 0 600 240" preserveAspectRatio="xMidYMid slice" fill="none">
-                    <defs>
-                      <linearGradient
-                        id={card.gradientId}
-                        x1="0"
-                        y1="0"
-                        x2="600"
-                        y2="240"
-                        gradientUnits="userSpaceOnUse"
-                      >
-                        <stop offset="0" stop-color={card.stops[0]} />
-                        <stop offset="1" stop-color={card.stops[1]} />
-                      </linearGradient>
-                    </defs>
-                    <path
-                      d={card.path}
-                      stroke={`url(#${card.gradientId})`}
-                      stroke-width="60"
-                      stroke-linecap="round"
-                    />
-                  </svg>
-                  <span class="ph-tag">[PROJECT SCREENSHOT]</span>
-                </div>
-                <div class="small__body">
-                  <span class="tagline">{serviceLine(card.project.services)}</span>
-                  <h3 class="small__name">{card.project.name}</h3>
-                  <p class="small__summary">{card.project.summary}</p>
-                </div>
-              </a>
-            ))
-          }
+            {smallCards.length > 0 && (
+              <div class="work__grid">
+                {smallCards.map(({ project, url }) => {
+                  const Card = url ? 'a' : 'article';
+                  const gradientId = `work-${project.slug}`;
+                  return (
+                    <Card href={url ?? undefined} class="card">
+                      <div class:list={['shot', `shot--${project.look.tone}`, 'small__shot']}>
+                        <svg aria-hidden="true" viewBox="0 0 600 240" preserveAspectRatio="xMidYMid slice" fill="none">
+                          <defs>
+                            <linearGradient id={gradientId} x1="0" y1="0" x2="600" y2="240" gradientUnits="userSpaceOnUse">
+                              <stop offset="0" stop-color={project.look.gradient[0]} />
+                              <stop offset="1" stop-color={project.look.gradient[1]} />
+                            </linearGradient>
+                          </defs>
+                          <path d={project.look.path} stroke={`url(#${gradientId})`} stroke-width="60" stroke-linecap="round" />
+                        </svg>
+                      </div>
+                      <div class="small__body">
+                        <span class="tagline">{serviceLine(project.services)}</span>
+                        <h3 class="small__name">{project.name}</h3>
+                        {project.summary && <p class="small__summary">{project.summary}</p>}
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-    </div>
-  </section>
+      </section>
+    )
+  }
 
   <!-- Modern methods -->
   <section class="bg-white border-top">
@@ -560,16 +565,6 @@ const methods = [
     flex-direction: column;
     gap: 24px;
   }
-  .shot--cyan {
-    background: var(--tint-cyan);
-  }
-  .shot--blue {
-    background: var(--tint-blue);
-  }
-  .shot--violet {
-    background: var(--tint-violet);
-  }
-
   .featured {
     flex-direction: row;
     flex-wrap: wrap;
@@ -578,6 +573,10 @@ const methods = [
   .featured__shot {
     flex: 3 1 480px;
     min-height: 400px;
+  }
+  /* Until the project has a summary, a result or a case study, the card is only its name: keep it short. */
+  .featured--compact .featured__shot {
+    min-height: 240px;
   }
   .featured__body {
     flex: 2 1 320px;

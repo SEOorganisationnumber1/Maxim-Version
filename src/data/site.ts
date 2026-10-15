@@ -1,15 +1,65 @@
-// Agency-wide facts. Bracketed values are placeholders from the design:
-// replace them here and every page picks up the change.
+// Agency-wide facts and the content that is still to come. Anything left null, or an empty
+// list, is simply not shown: the line or section that needs it stays hidden until it is set.
+// The build fails if a bracketed placeholder such as [X] reaches a page, so never type one here.
+
+export type Social = { label: string; url: string };
+export type Testimonial = { quote: string; name: string; role: string; company: string };
+export type TeamMember = {
+  name: string;
+  role: string;
+  /** Square-ish photo under public/, e.g. '/team/ana.jpg'. Without it the card shows a tinted well. */
+  photo?: string;
+};
 
 export const site = {
   name: '67 billion bucks Agency',
   tagline: 'More visibility. Better traffic. Qualified leads.',
-  email: '[hello@youragency.com]',
-  social: '[SOCIAL HANDLE]',
-  location: '[CITY, COUNTRY]',
-  responseTime: '[RESPONSE TIME]',
-  year: 2026,
-} as const;
+  /** Public contact email, e.g. 'hello@youragency.com'. */
+  email: null as string | null,
+  /** Profiles linked in the footer and listed in the Organization JSON-LD (sameAs). */
+  socials: [] as Social[],
+  /** 'City, Country', shown in the footer. */
+  location: null as string | null,
+  /** Ends "We will reply to you within ...", e.g. 'one business day'. */
+  responseTime: null as string | null,
+};
+
+/** The business behind the site, named in the privacy policy as the data controller. */
+export const legal = {
+  /** Registered name, e.g. 'Example SRL'. Until it is set, the policy names the agency. */
+  entity: null as string | null,
+  /** Registration and tax numbers, as they appear on invoices. */
+  registration: null as string | null,
+  /** Registered address. */
+  address: null as string | null,
+};
+
+/** Agency numbers for the Home and Company bands, written as displayed ('40+', '92%'). */
+export const numbers = {
+  projectsShipped: null as string | null,
+  yearsInSearch: null as string | null,
+  marketsServed: null as string | null,
+  /** Share of clients who stay past year one. */
+  retention: null as string | null,
+  founded: null as string | null,
+  teamSize: null as string | null,
+};
+
+export const plans = ['Launch', 'Growth', 'Full stack'] as const;
+export type PlanName = (typeof plans)[number];
+
+/** Plan prices on Services, written as displayed ('€4,900', 'from €1,500'). Unset plans read "Custom quote". */
+export const prices: Record<PlanName, string | null> = {
+  Launch: null,
+  Growth: null,
+  'Full stack': null,
+};
+
+/** Client quotes on the Clients page, in the client's own words and with their permission. */
+export const testimonials: Testimonial[] = [];
+
+/** People on the Company page. */
+export const team: TeamMember[] = [];
 
 export const services = ['Design', 'Web Development', 'SEO', 'GEO', 'AEO'] as const;
 export type Service = (typeof services)[number];
@@ -25,3 +75,8 @@ export const mainNav: NavItem[] = [
 ];
 
 export const footerNav: NavItem[] = [...mainNav, { href: '/contact', label: 'Contact' }];
+
+/** A stat band entry: shown only once its value is set. */
+export type Stat = { value: string | null; label: string };
+export const filled = (stats: Stat[]): { value: string; label: string }[] =>
+  stats.flatMap((s) => (s.value ? [{ value: s.value, label: s.label }] : []));

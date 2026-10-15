@@ -1,8 +1,6 @@
 ---
 // Shell for the admin pages: site fonts and tokens, no public header or footer, never indexed.
-import '@fontsource-variable/outfit';
-import '@fontsource-variable/manrope';
-import '@fontsource/jetbrains-mono/500.css';
+import { Font } from 'astro:assets';
 import '../styles/global.css';
 
 import { site } from '../data/site';
@@ -21,6 +19,9 @@ const { title, signedIn = false } = Astro.props;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <Font cssVariable="--font-display" />
+    <Font cssVariable="--font-body" />
+    <Font cssVariable="--font-mono" />
     <meta name="robots" content="noindex, nofollow" />
     <title>{title} · {site.name} admin</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />

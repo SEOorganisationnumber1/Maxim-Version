@@ -2,11 +2,11 @@
 import Base from '../layouts/Base.astro';
 import CtaBand from '../components/CtaBand.astro';
 import Icon from '../components/Icon.astro';
-import type { Service } from '../data/site';
+import { prices, type PlanName, type Service } from '../data/site';
 
 type ServiceBlock = { name: Service; description: string; deliverables: string[] };
 type StackRow = { label: string; tools: string[] };
-type Plan = { name: string; summary: string; period: string; featured: boolean; items: string[] };
+type Plan = { name: PlanName; summary: string; period: string; featured: boolean; items: string[] };
 type Faq = { question: string; answer: string };
 
 const jumpLinks = [
@@ -177,6 +177,7 @@ const pad2 = (n: number): string => String(n).padStart(2, '0');
 <Base
   title="Services"
   current="/services"
+  og="services"
   description="Design, web development, SEO, GEO and AEO built as one. One team designs the site, builds it, and makes sure people and AI engines can find it."
   jsonLd={[faqPageJsonLd]}
 >
@@ -292,7 +293,11 @@ const pad2 = (n: number): string => String(n).padStart(2, '0');
                 <p class="plan__summary">{plan.summary}</p>
               </div>
               <p class="plan__price">
-                <span class="plan__amount">[€ PRICE]</span>
+                {prices[plan.name] ? (
+                  <span class="plan__amount">{prices[plan.name]}</span>
+                ) : (
+                  <span class="plan__amount plan__amount--quote">Custom quote</span>
+                )}
                 <span class="plan__period">{plan.period}</span>
               </p>
               <ul class="plan__list">
@@ -573,6 +578,11 @@ const pad2 = (n: number): string => String(n).padStart(2, '0');
     font-weight: 700;
     font-size: 40px;
     line-height: 1;
+  }
+  /* No price set yet (src/data/site.ts): a quieter line that still reads as the price slot. */
+  .plan__amount--quote {
+    font-size: 28px;
+    line-height: 1.15;
   }
   .plan__period {
     font-size: 15px;

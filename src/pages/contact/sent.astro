@@ -1,0 +1,74 @@
+---
+// Where /api/brief sends visitors whose browser posted the Contact form without JavaScript.
+// With JavaScript the same message appears in place on /contact instead.
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import { site } from '../../data/site';
+---
+
+<Base
+  title="Brief received"
+  description="Your brief reached us. We read every brief and reply by email."
+  current="/contact"
+  noindex
+>
+  <section class="bg-paper">
+    <div class="container sent">
+      <span class="sent__icon" aria-hidden="true">
+        <Icon name="check" size={28} strokeWidth={2.6} />
+      </span>
+      <h1 class="sent__title">Brief received.</h1>
+      <p class="sent__text">
+        Thanks for writing. We read every brief and reply by email {
+          site.responseTime ? `within ${site.responseTime}.` : 'with what we would fix first.'
+        }
+      </p>
+      <div class="sent__actions">
+        <a href="/work" class="btn btn--primary btn--sm">See the work</a>
+        <a href="/" class="btn btn--outline btn--sm">Back to home</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .sent {
+    padding-top: 96px;
+    padding-bottom: 128px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  .sent__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--cyan);
+    color: var(--ink);
+  }
+  .sent__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+  .sent__text {
+    margin: 0;
+    max-width: 560px;
+    font-size: 19px;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+  .sent__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-top: 8px;
+  }
+</style>

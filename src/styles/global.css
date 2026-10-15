@@ -35,10 +35,7 @@
 
   --error: #B42318;
 
-  /* Type */
-  --font-display: 'Outfit Variable', 'Outfit', 'Avenir Next', 'Segoe UI', sans-serif;
-  --font-body: 'Manrope Variable', 'Manrope', 'Segoe UI', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  /* Type: --font-display, --font-body and --font-mono come from the Fonts API (astro.config.mjs). */
 
   --container: 1240px;
   --gutter: 24px;
@@ -47,6 +44,10 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 html { scroll-behavior: smooth; }
+/* The mobile menu (Header.astro) covers the screen: keep the page under it from scrolling. */
+@media (max-width: 899.98px) {
+  html:has(#site-menu:popover-open) { overflow: hidden; }
+}
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition: none !important; }
@@ -296,6 +297,9 @@ img, svg { max-width: 100%; }
   left: 0; top: 0;
   width: 100%; height: 100%;
 }
+.shot--cyan { background: var(--tint-cyan); }
+.shot--blue { background: var(--tint-blue); }
+.shot--violet { background: var(--tint-violet); }
 
 /* ---------- Cards ---------- */
 

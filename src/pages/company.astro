@@ -1,13 +1,15 @@
 ---
 import Base from '../layouts/Base.astro';
 import CtaBand from '../components/CtaBand.astro';
+import { filled, numbers, team } from '../data/site';
 
-const facts = [
-  { value: '[YEAR]', label: 'founded' },
-  { value: '[X]', label: 'people on the team' },
-  { value: '[X]+', label: 'projects shipped' },
-  { value: '[X]', label: 'markets served' },
-];
+/** The facts band shows only the figures that are set, and disappears without any. */
+const facts = filled([
+  { value: numbers.founded, label: 'founded' },
+  { value: numbers.teamSize, label: 'people on the team' },
+  { value: numbers.projectsShipped, label: 'projects shipped' },
+  { value: numbers.marketsServed, label: 'markets served' },
+]);
 
 const rules = [
   {
@@ -28,18 +30,14 @@ const rules = [
   },
 ];
 
-// Placeholder team: one tinted photo well per person.
-const team: { tint: 'cyan' | 'blue' | 'violet' }[] = [
-  { tint: 'cyan' },
-  { tint: 'blue' },
-  { tint: 'violet' },
-  { tint: 'cyan' },
-];
+// Photo wells without a photo cycle through the three tints.
+const tints = ['cyan', 'blue', 'violet'] as const;
 ---
 
 <Base
   title="Company"
   current="/company"
+  og="company"
   description="A search-first studio for design, code and growth. We exist for one outcome: more of the right people finding you and getting in touch."
 >
   <section class="hero bg-paper">
@@ -70,20 +68,22 @@ const team: { tint: 'cyan' | 'blue' | 'violet' }[] = [
     </div>
   </section>
 
-  <section aria-label="Facts" class="bg-white border-top border-bottom">
-    <dl class="stats">
-      {
-        facts.map((fact) => (
-          <div>
-            <dt>{fact.label}</dt>
-            <dd>{fact.value}</dd>
-          </div>
-        ))
-      }
-    </dl>
-  </section>
+  {
+    facts.length > 0 && (
+      <section aria-label="Facts" class="bg-white border-top border-bottom">
+        <dl class="stats">
+          {facts.map((fact) => (
+            <div>
+              <dt>{fact.label}</dt>
+              <dd>{fact.value}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+    )
+  }
 
-  <section class="bg-paper">
+  <section class:list={['bg-paper', { 'border-top': facts.length === 0 }]}>
     <div class="container story">
       <div class="story__head">
         <h2 class="h2">Most agencies sell hours. We sell outcomes.</h2>
@@ -126,28 +126,40 @@ const team: { tint: 'cyan' | 'blue' | 'violet' }[] = [
     </div>
   </section>
 
-  <section class="bg-paper border-top">
-    <div class="container block block--team">
-      <div class="block__head">
-        <h2 class="h2">The people who do the work.</h2>
-      </div>
-      <ul class="team">
-        {
-          team.map((member) => (
-            <li class="team__member">
-              <div class:list={['team__photo', `team__photo--${member.tint}`]}>
-                <span class="ph-tag">[PHOTO]</span>
-              </div>
-              <div class="team__meta">
-                <span class="team__name">[NAME]</span>
-                <span class="team__role">[ROLE]</span>
-              </div>
-            </li>
-          ))
-        }
-      </ul>
-    </div>
-  </section>
+  {
+    team.length > 0 && (
+      <section class="bg-paper border-top">
+        <div class="container block block--team">
+          <div class="block__head">
+            <h2 class="h2">The people who do the work.</h2>
+          </div>
+          <ul class="team">
+            {team.map((member, i) => (
+              <li class="team__member">
+                {member.photo ? (
+                  <img
+                    class="team__photo team__photo--img"
+                    src={member.photo}
+                    alt={`Portrait of ${member.name}`}
+                    width="480"
+                    height="600"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ) : (
+                  <div aria-hidden="true" class:list={['team__photo', `team__photo--${tints[i % tints.length]}`]} />
+                )}
+                <div class="team__meta">
+                  <span class="team__name">{member.name}</span>
+                  <span class="team__role">{member.role}</span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
 
   <CtaBand title="Work with a team that reports in leads." borderTop pad="full" />
 </Base>
@@ -256,6 +268,13 @@ const team: { tint: 'cyan' | 'blue' | 'violet' }[] = [
     display: flex;
     align-items: flex-end;
     padding: 16px;
+  }
+  .team__photo--img {
+    display: block;
+    width: 100%;
+    height: auto;
+    padding: 0;
+    object-fit: cover;
   }
   .team__photo--cyan {
     background: var(--tint-cyan);

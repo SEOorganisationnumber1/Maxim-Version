@@ -3,6 +3,10 @@ import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
 import { services, site } from '../data/site';
 
+const sendErrorText = `Something went wrong sending your brief. Please try again${
+  site.email ? `, or email us at ${site.email}` : ' in a moment'
+}.`;
+
 const steps = [
   'We read your brief and look at your site.',
   'You get a short reply with what we would fix first.',
@@ -13,6 +17,7 @@ const steps = [
 <Base
   title="Contact"
   current="/contact"
+  og="contact"
   description="Tell us what you want to rank for. Send a short brief and we reply with what we would fix first."
 >
   <section class="bg-paper">
@@ -40,7 +45,13 @@ const steps = [
           </ol>
         </div>
 
-        <p class="intro__email">Prefer email? Write to <strong>{site.email}</strong></p>
+        {
+          site.email && (
+            <p class="intro__email">
+              Prefer email? Write to <a href={`mailto:${site.email}`}>{site.email}</a>
+            </p>
+          )
+        }
 
         <svg
           aria-hidden="true"
@@ -71,7 +82,8 @@ const steps = [
           </span>
           <h2 class="success__title" tabindex="-1" data-success-title>Brief received.</h2>
           <p class="success__text">
-            Thanks, <span data-sent-name></span>. We will reply to <span data-sent-email></span> within {site.responseTime}.
+            Thanks, <span data-sent-name></span>. We will reply to <span data-sent-email></span>
+            {site.responseTime ? `within ${site.responseTime}.` : 'with what we would fix first.'}
           </p>
           <div class="success__actions">
             <a href="/work" class="btn btn--primary btn--sm">See the work meanwhile</a>
@@ -81,9 +93,10 @@ const steps = [
           </div>
         </div>
 
-        {/* The script sends the brief to /api/brief (the /admin inbox). method="post" only keeps
-            the fields out of the URL if the script never runs; there is no plain-HTML send path. */}
-        <form class="form" method="post" novalidate data-contact-form>
+        {/* With JavaScript the script validates, sends JSON to /api/brief (the /admin inbox) and shows
+            the success panel above. Without it the browser validates the required fields and posts
+            the form itself; /api/brief then redirects to /contact/sent. */}
+        <form class="form" method="post" action="/api/brief" data-contact-form>
           <div class="form__pair">
             <div class="field">
               <label for="c-name" class="field__label">Name</label>
@@ -92,7 +105,8 @@ const steps = [
                 name="name"
                 type="text"
                 autocomplete="name"
-                aria-required="true"
+                required
+                maxlength="200"
                 aria-invalid="false"
                 class="field__control"
               />
@@ -105,7 +119,8 @@ const steps = [
                 name="email"
                 type="email"
                 autocomplete="email"
-                aria-required="true"
+                required
+                maxlength="254"
                 aria-invalid="false"
                 class="field__control"
               />
@@ -125,6 +140,7 @@ const steps = [
               type="text"
               inputmode="url"
               autocomplete="url"
+              maxlength="300"
               placeholder="yourdomain.com"
               class="field__control"
             />
@@ -135,9 +151,11 @@ const steps = [
             <div class="needs__list">
               {
                 services.map((service) => (
-                  <button type="button" class="toggle" aria-pressed="false" data-need={service}>
+                  <label class="check">
+                    <input type="checkbox" name="needs" value={service} />
+                    <Icon name="check" size={16} strokeWidth={2.6} class="check__icon" />
                     {service}
-                  </button>
+                  </label>
                 ))
               }
             </div>
@@ -158,6 +176,7 @@ const steps = [
               id="c-msg"
               name="message"
               rows="5"
+              maxlength="5000"
               placeholder="What you sell, who you want to reach, what you have tried so far."
               class="field__control field__control--area"></textarea>
           </div>
@@ -169,13 +188,16 @@ const steps = [
             <input id="c-hp" name="company" type="text" tabindex="-1" autocomplete="off" />
           </div>
 
-          <p class="field__error" role="alert" data-send-error hidden>
-            Something went wrong sending your brief. Please try again, or email us at {site.email}.
-          </p>
+          <p class="field__error" role="alert" data-send-error data-default={sendErrorText} hidden>{sendErrorText}</p>
 
-          <button type="submit" class="btn btn--primary btn--lg form__submit" data-contact-submit>
-            <span data-submit-label>Send brief</span><Icon name="arrow-right" />
-          </button>
+          <div class="form__send">
+            <button type="submit" class="btn btn--primary btn--lg form__submit" data-contact-submit>
+              <span data-submit-label>Send brief</span><Icon name="arrow-right" />
+            </button>
+            <p class="form__consent">
+              We use your details only to reply to this brief. <a href="/privacy">Privacy policy</a>
+            </p>
+          </div>
         </form>
       </div>
     </div>
@@ -257,7 +279,7 @@ const steps = [
     font-size: 16px;
     color: var(--ink-2);
   }
-  .intro__email strong {
+  .intro__email a {
     font-weight: 700;
     color: var(--ink);
   }
@@ -385,11 +407,66 @@ const steps = [
     flex-wrap: wrap;
     gap: 8px;
   }
+  /* Real checkboxes, drawn as the design's pills: the input stays focusable but invisible. */
+  .check {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 16px;
+    border: 1.5px solid var(--ink);
+    border-radius: 6px;
+    background: var(--white);
+    color: var(--ink);
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .check input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .check :global(.check__icon) {
+    display: none;
+  }
+  .check:has(input:checked) {
+    background: var(--ink);
+    color: var(--white);
+  }
+  .check:has(input:checked) :global(.check__icon) {
+    display: block;
+  }
+  .check:has(input:focus-visible) {
+    outline: 3px solid var(--teal);
+    outline-offset: 2px;
+  }
 
   .honeypot {
     display: none;
   }
 
+  .form__send {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .form__consent {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+  .form__consent a {
+    font-weight: 700;
+    color: var(--ink);
+  }
   .form__submit:disabled {
     cursor: progress;
     opacity: 0.75;
@@ -398,14 +475,15 @@ const steps = [
 
 <script>
   const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  // Briefs go to the site's own inbox (/api/brief, read in /admin) unless another endpoint is set.
-  const ENDPOINT = String(import.meta.env.PUBLIC_CONTACT_ENDPOINT ?? '').trim() || '/api/brief';
+  /** The site's own inbox: stored in Netlify Blobs, read in /admin, announced by email. */
+  const ENDPOINT = '/api/brief';
 
   type Field = {
     input: HTMLInputElement;
     error: HTMLElement;
     isValid: (value: string) => boolean;
   };
+  type Umami = { track: (event: string, data?: Record<string, string>) => void };
 
   const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
   const success = document.querySelector<HTMLElement>('[data-contact-success]');
@@ -428,7 +506,7 @@ const steps = [
     const sendError = $<HTMLElement>(form, '[data-send-error]');
     const submitButton = $<HTMLButtonElement>(form, '[data-contact-submit]');
     const submitLabel = $<HTMLElement>(form, '[data-submit-label]');
-    const toggles = Array.from(form.querySelectorAll<HTMLButtonElement>('[data-need]'));
+    const needs = Array.from(form.querySelectorAll<HTMLInputElement>('input[name="needs"]'));
 
     const successTitle = $<HTMLElement>(success, '[data-success-title]');
     const sentName = $<HTMLElement>(success, '[data-sent-name]');
@@ -436,6 +514,10 @@ const steps = [
     const resetButton = $<HTMLButtonElement>(success, '[data-contact-reset]');
 
     const idleLabel = submitLabel.textContent ?? 'Send brief';
+    const defaultError = sendError.dataset.default ?? sendError.textContent ?? '';
+
+    // The script validates with its own messages; without it the browser checks the required fields.
+    form.noValidate = true;
 
     const fields: Field[] = [
       {
@@ -465,6 +547,11 @@ const steps = [
       submitLabel.textContent = on ? 'Sending…' : idleLabel;
     }
 
+    function showError(message: string) {
+      sendError.textContent = message;
+      sendError.hidden = false;
+    }
+
     function showSuccess(name: string, email: string) {
       sentName.textContent = name;
       sentEmail.textContent = email;
@@ -482,13 +569,6 @@ const steps = [
       });
     }
 
-    for (const toggle of toggles) {
-      toggle.addEventListener('click', () => {
-        const pressed = toggle.getAttribute('aria-pressed') === 'true';
-        toggle.setAttribute('aria-pressed', String(!pressed));
-      });
-    }
-
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       if (sending) return;
@@ -498,7 +578,7 @@ const steps = [
       const invalid = fields.filter((field) => !field.isValid(field.input.value));
       for (const field of fields) setInvalid(field, invalid.includes(field));
       if (invalid.length > 0) {
-        invalid[0].input.focus();
+        invalid[0]!.input.focus();
         return;
       }
 
@@ -506,24 +586,13 @@ const steps = [
         name: nameInput.value.trim(),
         email: emailInput.value.trim(),
         website: siteInput.value.trim(),
-        needs: toggles
-          .filter((toggle) => toggle.getAttribute('aria-pressed') === 'true')
-          .map((toggle) => toggle.dataset.need ?? ''),
+        needs: needs.filter((box) => box.checked).map((box) => box.value),
         timeline: whenSelect.value,
         message: messageInput.value.trim(),
       };
 
       // Bots fill the honeypot: pretend it worked and send nothing.
       if (honeypot.value.trim() !== '') {
-        showSuccess(payload.name, payload.email);
-        return;
-      }
-
-      if (!ENDPOINT) {
-        console.info(
-          '[contact] PUBLIC_CONTACT_ENDPOINT is not set: demo mode, the brief was not sent.',
-          payload,
-        );
         showSuccess(payload.name, payload.email);
         return;
       }
@@ -535,13 +604,19 @@ const steps = [
           headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
           body: JSON.stringify(payload),
         });
-        if (!response.ok) throw new Error(`Contact endpoint answered ${response.status}`);
+        if (!response.ok) {
+          // 413, 422 and 429 carry a message written for the visitor; anything else gets the generic one.
+          const body = (await response.json().catch(() => null)) as { error?: unknown } | null;
+          const message = response.status < 500 && typeof body?.error === 'string' ? body.error : defaultError;
+          throw Object.assign(new Error(`Contact endpoint answered ${response.status}`), { visitorMessage: message });
+        }
         setSending(false);
         showSuccess(payload.name, payload.email);
+        (window as Window & { umami?: Umami }).umami?.track('Brief sent', { needs: payload.needs.join(', ') || 'none' });
       } catch (error) {
         console.error('[contact] Sending the brief failed.', error);
         setSending(false);
-        sendError.hidden = false;
+        showError((error as { visitorMessage?: string }).visitorMessage ?? defaultError);
         // Disabling the button can drop focus; put it back so keyboard users can retry.
         if (!document.activeElement || document.activeElement === document.body) {
           submitButton.focus();
@@ -551,7 +626,6 @@ const steps = [
 
     resetButton.addEventListener('click', () => {
       form.reset();
-      for (const toggle of toggles) toggle.setAttribute('aria-pressed', 'false');
       for (const field of fields) setInvalid(field, false);
       sendError.hidden = true;
       setSending(false);

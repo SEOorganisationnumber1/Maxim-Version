@@ -6,9 +6,14 @@ import { services, site } from '../data/site';
 export const GET: APIRoute = ({ site: base }) => {
   const url = (path: string) => new URL(path, base).href;
   const work = projects
-    .filter((p) => !p.placeholder)
-    .map((p) => `- [${p.name}](${url(projectUrl(p))}): ${serviceLine(p.services)}`)
+    .map((p) => {
+      const caseUrl = projectUrl(p);
+      return caseUrl
+        ? `- [${p.name}](${url(caseUrl)}): ${serviceLine(p.services)}`
+        : `- ${p.name}: ${serviceLine(p.services)}`;
+    })
     .join('\n');
+  const contact = site.email ? `\n\nEmail: ${site.email}` : '';
 
   const body = `# ${site.name}
 
@@ -17,13 +22,13 @@ export const GET: APIRoute = ({ site: base }) => {
 ## Pages
 
 - [Home](${url('/')}): What we do and companies we scaled
-- [Work](${url('/work')}): Case studies, filterable by service
+- [Work](${url('/work')}): Client projects and case studies
 - [Services](${url('/services')}): Design, Web Development, SEO, GEO and AEO; stack, pricing and FAQ
-- [Clients](${url('/clients')}): Brands we work with and what clients say
-- [Company](${url('/company')}): How we work and who does the work
-- [Contact](${url('/contact')}): Send a brief
+- [Clients](${url('/clients')}): Brands we work with and what we did for each
+- [Company](${url('/company')}): How we work and the rules we keep
+- [Contact](${url('/contact')}): Send a brief${contact}
 
-## Case studies
+## Clients
 
 ${work}
 `;

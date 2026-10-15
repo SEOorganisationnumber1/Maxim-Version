@@ -5,13 +5,16 @@ import Icon from '../../components/Icon.astro';
 import { services } from '../../data/site';
 import { projects, projectUrl, serviceLine } from '../../data/projects';
 
-const filters = ['All', ...services];
+// Filtering only helps with two or more projects, and only by services that have a project.
+const showFilters = projects.length > 1;
+const filters = ['All', ...services.filter((s) => projects.some((p) => p.services.includes(s)))];
 const countLabel = (n: number) => (n === 1 ? '1 project' : `${n} projects`);
 ---
 
 <Base
   title="Work"
   current="/work"
+  og="work"
   description="Companies we scaled with design, web development, SEO, GEO and AEO. Filter case studies by what we did."
 >
   <section class="hero">
@@ -34,45 +37,54 @@ const countLabel = (n: number) => (n === 1 ? '1 project' : `${n} projects`);
     </div>
     <div class="container hero__inner">
       <h1 class="h1 hero__title">Companies we <span class="highlight">scaled.</span></h1>
-      <p class="lede hero__lede">Design, code and search work. Filter by what we did.</p>
+      <p class="lede hero__lede">Design, code and search work.{showFilters && ' Filter by what we did.'}</p>
     </div>
   </section>
 
   <section class="bg-paper">
     <div class="container work">
-      <div class="work__bar">
-        <div class="work__filters" role="group" aria-label="Filter by service">
-          {
-            filters.map((f) => (
-              <button type="button" class="toggle" data-filter={f} aria-pressed={f === 'All' ? 'true' : 'false'}>
-                {f}
-              </button>
-            ))
-          }
-        </div>
-        <p class="work__count" aria-live="polite" data-count>{countLabel(projects.length)}</p>
-      </div>
+      {
+        showFilters && (
+          <div class="work__bar">
+            <div class="work__filters" role="group" aria-label="Filter by service">
+              {filters.map((f) => (
+                <button type="button" class="toggle" data-filter={f} aria-pressed={f === 'All' ? 'true' : 'false'}>
+                  {f}
+                </button>
+              ))}
+            </div>
+            <p class="work__count" aria-live="polite" data-count>
+              {countLabel(projects.length)}
+            </p>
+          </div>
+        )
+      }
       <div class="work__grid">
         {
-          projects.map((p) => (
-            <a href={projectUrl(p)} class="card work-card" data-services={p.services.join('|')}>
-              <div class="shot work-card__shot" style={`background: ${p.look.tint}`}>
-                <svg aria-hidden="true" viewBox="0 0 600 240" preserveAspectRatio="xMidYMid slice" fill="none">
-                  <path d={p.look.path} stroke={p.look.stroke} stroke-width="60" stroke-linecap="round" />
-                </svg>
-                <span class="ph-tag">[PROJECT SCREENSHOT]</span>
-              </div>
-              <div class="work-card__body">
-                <span class="tagline">{serviceLine(p.services)}</span>
-                <h2 class="work-card__name">{p.name}</h2>
-                <p class="work-card__summary">{p.summary}</p>
-                <span class="work-card__more">
-                  Read the case
-                  <Icon name="arrow-right" />
-                </span>
-              </div>
-            </a>
-          ))
+          projects.map((p) => {
+            const url = projectUrl(p);
+            const Card = url ? 'a' : 'article';
+            return (
+              <Card href={url ?? undefined} class="card work-card" data-services={p.services.join('|')}>
+                <div class:list={['shot', `shot--${p.look.tone}`, 'work-card__shot']}>
+                  <svg aria-hidden="true" viewBox="0 0 600 240" preserveAspectRatio="xMidYMid slice" fill="none">
+                    <path d={p.look.path} stroke={p.look.stroke} stroke-width="60" stroke-linecap="round" />
+                  </svg>
+                </div>
+                <div class="work-card__body">
+                  <span class="tagline">{serviceLine(p.services)}</span>
+                  <h2 class="work-card__name">{p.name}</h2>
+                  {p.summary && <p class="work-card__summary">{p.summary}</p>}
+                  {url && (
+                    <span class="work-card__more">
+                      Read the case
+                      <Icon name="arrow-right" />
+                    </span>
+                  )}
+                </div>
+              </Card>
+            );
+          })
         }
       </div>
       {/*
@@ -80,46 +92,50 @@ const countLabel = (n: number) => (n === 1 ? '1 project' : `${n} projects`);
         applied before first paint, with no flash of the unfiltered grid and no
         aria-live announcement on load.
       */}
-      <script is:inline>
-        (function () {
-          var buttons = Array.prototype.slice.call(document.querySelectorAll('[data-filter]'));
-          var cards = Array.prototype.slice.call(document.querySelectorAll('[data-services]'));
-          var count = document.querySelector('[data-count]');
-          var valid = buttons
-            .map(function (b) { return b.getAttribute('data-filter') || ''; })
-            .filter(function (f) { return f && f !== 'All'; });
+      {
+        showFilters && (
+          <script is:inline>
+            (function () {
+              var buttons = Array.prototype.slice.call(document.querySelectorAll('[data-filter]'));
+              var cards = Array.prototype.slice.call(document.querySelectorAll('[data-services]'));
+              var count = document.querySelector('[data-count]');
+              var valid = buttons
+                .map(function (b) { return b.getAttribute('data-filter') || ''; })
+                .filter(function (f) { return f && f !== 'All'; });
 
-          function apply(filter, updateUrl) {
-            buttons.forEach(function (b) {
-              b.setAttribute('aria-pressed', String(b.getAttribute('data-filter') === filter));
-            });
-            var shown = 0;
-            cards.forEach(function (card) {
-              var match =
-                filter === 'All' || (card.getAttribute('data-services') || '').split('|').indexOf(filter) !== -1;
-              card.hidden = !match;
-              if (match) shown++;
-            });
-            if (count) count.textContent = shown === 1 ? '1 project' : shown + ' projects';
+              function apply(filter, updateUrl) {
+                buttons.forEach(function (b) {
+                  b.setAttribute('aria-pressed', String(b.getAttribute('data-filter') === filter));
+                });
+                var shown = 0;
+                cards.forEach(function (card) {
+                  var match =
+                    filter === 'All' || (card.getAttribute('data-services') || '').split('|').indexOf(filter) !== -1;
+                  card.hidden = !match;
+                  if (match) shown++;
+                });
+                if (count) count.textContent = shown === 1 ? '1 project' : shown + ' projects';
 
-            if (updateUrl) {
-              var url = new URL(window.location.href);
-              if (filter === 'All') url.searchParams.delete('service');
-              else url.searchParams.set('service', filter);
-              history.replaceState(history.state, '', url);
-            }
-          }
+                if (updateUrl) {
+                  var url = new URL(window.location.href);
+                  if (filter === 'All') url.searchParams.delete('service');
+                  else url.searchParams.set('service', filter);
+                  history.replaceState(history.state, '', url);
+                }
+              }
 
-          buttons.forEach(function (b) {
-            b.addEventListener('click', function () {
-              apply(b.getAttribute('data-filter') || 'All', true);
-            });
-          });
+              buttons.forEach(function (b) {
+                b.addEventListener('click', function () {
+                  apply(b.getAttribute('data-filter') || 'All', true);
+                });
+              });
 
-          var initial = new URLSearchParams(window.location.search).get('service');
-          if (initial && valid.indexOf(initial) !== -1) apply(initial, false);
-        })();
-      </script>
+              var initial = new URLSearchParams(window.location.search).get('service');
+              if (initial && valid.indexOf(initial) !== -1) apply(initial, false);
+            })();
+          </script>
+        )
+      }
     </div>
   </section>
 

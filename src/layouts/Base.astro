@@ -1,12 +1,12 @@
 ---
-import '@fontsource-variable/outfit';
-import '@fontsource-variable/manrope';
-import '@fontsource/jetbrains-mono/500.css';
+import { Font } from 'astro:assets';
 import '../styles/global.css';
 
+import { BING_SITE_VERIFICATION, GOOGLE_SITE_VERIFICATION, UMAMI_WEBSITE_ID } from 'astro:env/server';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { services, site } from '../data/site';
+import { ogCards } from '../data/og';
 
 interface Props {
   /** Page name; " · {agency}" is appended unless `fullTitle` is set. */
@@ -16,6 +16,8 @@ interface Props {
   /** Header link to mark as current, e.g. '/work'. */
   current?: string;
   ogType?: 'website' | 'article';
+  /** Share image key in src/data/og.ts; pages without their own card share Home's. */
+  og?: string;
   /** Extra JSON-LD objects for this page (FAQPage, Article...). */
   jsonLd?: Record<string, unknown>[];
   noindex?: boolean;
@@ -27,6 +29,7 @@ const {
   description,
   current,
   ogType = 'website',
+  og = 'home',
   jsonLd = [],
   noindex = false,
 } = Astro.props;
@@ -40,16 +43,35 @@ const cleanPath =
     .replace(/\/index$/, '/')
     .replace(/(.)\/$/, '$1') || '/';
 const canonical = new URL(cleanPath, Astro.site);
+const abs = (path: string) => new URL(path, Astro.site).href;
 
-const organization = {
+const ogKey = og in ogCards ? og : 'home';
+const ogImage = abs(`/og/${ogKey}.png`);
+const ogImageAlt = `${ogCards[ogKey]!.title.map((run) => run.text).join(' ')} · ${site.name}`;
+
+const organization: Record<string, unknown> = {
   '@context': 'https://schema.org',
   '@type': 'ProfessionalService',
+  '@id': abs('/#organization'),
   name: site.name,
-  url: Astro.site?.href,
+  url: abs('/'),
+  logo: abs('/icon-512.png'),
+  image: abs('/og/home.png'),
   slogan: site.tagline,
   knowsAbout: [...services],
 };
-const ld = [organization, ...jsonLd];
+if (site.email) organization.email = site.email;
+if (site.socials.length) organization.sameAs = site.socials.map((s) => s.url);
+
+const website = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  '@id': abs('/#website'),
+  name: site.name,
+  url: abs('/'),
+  publisher: { '@id': abs('/#organization') },
+};
+const ld = [organization, ...(cleanPath === '/' ? [website] : []), ...jsonLd];
 ---
 
 <!doctype html>
@@ -57,22 +79,50 @@ const ld = [organization, ...jsonLd];
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {/* Headings and body text preload their latin file so the first paint already uses them. */}
+    <Font cssVariable="--font-display" preload={[{ subset: 'latin' }]} />
+    <Font cssVariable="--font-body" preload={[{ subset: 'latin' }]} />
+    <Font cssVariable="--font-mono" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex" />}
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <meta name="theme-color" content="#0A1128" />
+    {GOOGLE_SITE_VERIFICATION && <meta name="google-site-verification" content={GOOGLE_SITE_VERIFICATION} />}
+    {BING_SITE_VERIFICATION && <meta name="msvalidate.01" content={BING_SITE_VERIFICATION} />}
 
     <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={site.name} />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={ogImageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
 
     {ld.map((obj) => <script type="application/ld+json" set:html={JSON.stringify(obj)} />)}
+
+    {
+      /* Cookie-free analytics, counted only on the production domain (not on previews or localhost). */
+      UMAMI_WEBSITE_ID && (
+        <script
+          is:inline
+          defer
+          src="https://cloud.umami.is/script.js"
+          data-website-id={UMAMI_WEBSITE_ID}
+          data-domains={Astro.site?.hostname}
+        />
+      )
+    }
   </head>
   <body>
     <div class="site">

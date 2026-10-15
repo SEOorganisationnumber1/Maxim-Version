@@ -1,0 +1,183 @@
+---
+// Privacy policy. It describes what the code actually does: keep it in step with the Contact
+// form (src/pages/api/brief.ts), the rate limiter (src/lib/admin-auth.ts), the brief email
+// (src/lib/notify.ts) and analytics (src/layouts/Base.astro), and update the date when it changes.
+import { UMAMI_WEBSITE_ID } from 'astro:env/server';
+import Base from '../layouts/Base.astro';
+import { legal, site } from '../data/site';
+import { notifyConfigured } from '../lib/notify';
+
+const UPDATED = { iso: '2026-10-15', label: '15 October 2026' };
+
+// Only name the services this build actually uses; set their variables and redeploy to add them.
+const analytics = Boolean(UMAMI_WEBSITE_ID);
+const emailAlerts = notifyConfigured();
+
+const controller = [legal.entity ?? site.name, legal.registration, legal.address].filter(Boolean).join(', ');
+---
+
+<Base
+  title="Privacy policy"
+  description={`What ${site.name} collects when you use this site, why, who handles it for us, and how to have it deleted.`}
+  og="privacy"
+>
+  <section class="bg-paper">
+    <div class="container policy">
+      <header class="policy__head">
+        <h1 class="h1">Privacy policy</h1>
+        <p class="lede">What we collect when you use this site, why, and what you can ask us to do with it.</p>
+        <p class="policy__date">Last updated: <time datetime={UPDATED.iso}>{UPDATED.label}</time></p>
+      </header>
+
+      <div class="policy__body">
+        <h2>Who we are</h2>
+        <p>
+          This site is run by {controller}. We decide how the information described here is used, which makes us the
+          data controller under the GDPR. To ask anything about your data, {
+            site.email ? (
+              <>write to <a href={`mailto:${site.email}`}>{site.email}</a> or send a brief through the <a href="/contact">contact form</a>.</>
+            ) : (
+              <>send a message through the <a href="/contact">contact form</a>.</>
+            )
+          }
+        </p>
+
+        <h2>What we collect</h2>
+        <ul>
+          <li>
+            <strong>Your brief.</strong> When you send the contact form: your name, email address, website, the services you
+            picked, when you want to start and your message. Only the name and email are required.
+          </li>
+          <li>
+            <strong>Data that keeps the form safe.</strong> To stop spam and repeated sign-in attempts, we store a keyed hash of
+            your IP address with the times of your last requests. The hash cannot be turned back into your IP address
+            without our secret key.
+          </li>
+          {
+            analytics && (
+              <li>
+                <strong>Visit statistics.</strong> We count page views with Umami, which does not use cookies and does not
+                store your IP address. It records the page, the referring site, your browser, device type and country, so we
+                see how the site is used, not who you are.
+              </li>
+            )
+          }
+          <li>
+            <strong>Server logs.</strong> Our host, Netlify, processes your IP address and browser details to deliver pages and
+            protect the site, as every web host does.
+          </li>
+        </ul>
+
+        <h2>Why we use it</h2>
+        <ul>
+          <li>
+            To answer your brief and prepare a proposal you asked for. This is a step you request before a possible
+            contract (GDPR Article 6(1)(b)).
+          </li>
+          <li>
+            To keep the site secure and understand how it is used, without profiling you. This is our legitimate interest
+            (GDPR Article 6(1)(f)).
+          </li>
+        </ul>
+        <p>We do not sell your data, use it for advertising, or add you to a mailing list.</p>
+
+        <h2>Who handles it for us</h2>
+        <ul>
+          <li><strong>Netlify</strong> hosts the site and stores the briefs and the rate limit records.</li>
+          {emailAlerts && <li><strong>Resend</strong> delivers the email that tells us a brief has arrived. It contains your brief.</li>}
+          {analytics && <li><strong>Umami</strong> provides the cookie-free visit statistics.</li>}
+        </ul>
+        <p>
+          They act on our instructions only. Some of them are based in the United States. Where data leaves the European
+          Economic Area, they rely on safeguards such as the EU-US Data Privacy Framework or the European Commission's
+          standard contractual clauses.
+        </p>
+
+        <h2>How long we keep it</h2>
+        <ul>
+          <li>
+            <strong>Briefs</strong>{emailAlerts && ', and the email about each one,'} for as long as we discuss your project. If we work together,
+            for as long as the work and our legal obligations require. If no work follows, we delete them within 12 months
+            of our last exchange.
+          </li>
+          <li><strong>Rate limit records</strong> are deleted within two days.</li>
+          {analytics && <li><strong>Visit statistics</strong> contain nothing that identifies you and are kept in aggregate.</li>}
+        </ul>
+
+        <h2>Your rights</h2>
+        <p>
+          You can ask us for a copy of your data, to correct it, to delete it, to limit or object to how we use it, or to
+          receive it in a portable format. We reply within one month. You can also complain to the data protection authority
+          where you live or work.
+        </p>
+
+        <h2>Cookies and storage in your browser</h2>
+        <p>
+          This site sets no tracking or advertising cookies, and it loads no fonts or scripts from other companies{
+            analytics ? ' except the Umami script' : ''
+          }. If you pause the animation on the home page, your browser remembers that choice in its local
+          storage; it never leaves your device. The only cookie belongs to the private admin area and is set only when the
+          site owner signs in.
+        </p>
+
+        <h2>Changes</h2>
+        <p>When what we collect changes, we update this page and the date at the top.</p>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .policy {
+    padding-top: 88px;
+    padding-bottom: 112px;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+  }
+  .policy__head {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 760px;
+  }
+  .policy__date {
+    margin: 0;
+    font-size: 15px;
+    color: var(--ink-2);
+  }
+  .policy__body {
+    max-width: 70ch;
+    border-top: 1.5px solid var(--ink);
+    padding-top: 8px;
+  }
+  .policy__body h2 {
+    margin: 40px 0 12px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.5rem, 2.4vw, 1.875rem);
+    line-height: 1.15;
+  }
+  .policy__body p,
+  .policy__body li {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-2);
+  }
+  .policy__body p {
+    margin: 0 0 12px;
+  }
+  .policy__body ul {
+    margin: 0 0 12px;
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .policy__body strong {
+    color: var(--ink);
+  }
+  .policy__body a {
+    font-weight: 700;
+  }
+</style>

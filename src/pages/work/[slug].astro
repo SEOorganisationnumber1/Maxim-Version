@@ -3,21 +3,23 @@ import Base from '../../layouts/Base.astro';
 import CtaBand from '../../components/CtaBand.astro';
 import Icon from '../../components/Icon.astro';
 import { site } from '../../data/site';
-import { projects, projectUrl, serviceLine, type Project } from '../../data/projects';
+import { caseStudies, serviceLine, type PublishedProject } from '../../data/projects';
 
+// One page per written case study; projects without one get no page (see src/data/projects.ts).
 export function getStaticPaths() {
-  return projects.map((project) => ({
+  return caseStudies.map((project) => ({
     params: { slug: project.slug },
     props: { project },
   }));
 }
 
 interface Props {
-  project: Project;
+  project: PublishedProject;
 }
 
 const { project } = Astro.props;
 const cs = project.caseStudy;
+const path = `/work/${project.slug}`;
 
 const title = `Case study: ${project.name}`;
 const description = `${title}. ${project.clientLine} by ${site.name}: the challenge, what we did and the results.`;
@@ -29,19 +31,32 @@ const meta = [
   { label: 'Year', value: cs.year },
 ];
 
-const article: Record<string, unknown> = {
-  '@context': 'https://schema.org',
-  '@type': 'Article',
-  headline: title,
-  description,
-  about: project.services.map((name) => ({ '@type': 'Thing', name })),
-  publisher: { '@type': 'Organization', name: site.name },
-};
-if (Astro.site) {
-  const url = new URL(projectUrl(project), Astro.site).href;
-  article.url = url;
-  article.mainEntityOfPage = url;
-}
+const abs = (p: string) => new URL(p, Astro.site).href;
+const org = { '@id': abs('/#organization') };
+const jsonLd: Record<string, unknown>[] = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: title,
+    description,
+    url: abs(path),
+    mainEntityOfPage: abs(path),
+    image: abs(`/og/work-${project.slug}.png`),
+    datePublished: cs.published,
+    about: project.services.map((name) => ({ '@type': 'Thing', name })),
+    author: org,
+    publisher: org,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: abs('/') },
+      { '@type': 'ListItem', position: 2, name: 'Work', item: abs('/work') },
+      { '@type': 'ListItem', position: 3, name: project.name, item: abs(path) },
+    ],
+  },
+];
 ---
 
 <Base
@@ -49,8 +64,8 @@ if (Astro.site) {
   description={description}
   current="/work"
   ogType="article"
-  jsonLd={[article]}
-  noindex={project.placeholder}
+  og={`work-${project.slug}`}
+  jsonLd={jsonLd}
 >
   <section class="bg-paper">
     <div class="container intro">
@@ -92,7 +107,6 @@ if (Astro.site) {
           stroke-width="96"
           stroke-linecap="round"></path>
       </svg>
-      <span class="ph-tag">[HERO SCREENSHOT OF THE LIVE SITE]</span>
     </div>
   </section>
 
@@ -135,18 +149,22 @@ if (Astro.site) {
     </div>
   </section>
 
-  <section class="bg-paper border-top">
-    <figure class="quote">
-      <blockquote>{cs.quote}</blockquote>
-      <figcaption>
-        <span aria-hidden="true" class="quote__avatar"></span>
-        <span class="quote__who">
-          <span class="quote__name">{cs.quoteName}</span>
-          <span class="quote__role">{cs.quoteRole}, {project.name}</span>
-        </span>
-      </figcaption>
-    </figure>
-  </section>
+  {
+    cs.quote && (
+      <section class="bg-paper border-top">
+        <figure class="quote">
+          <blockquote>{cs.quote.text}</blockquote>
+          <figcaption>
+            <span aria-hidden="true" class="quote__avatar" />
+            <span class="quote__who">
+              <span class="quote__name">{cs.quote.name}</span>
+              <span class="quote__role">{cs.quote.role}, {project.name}</span>
+            </span>
+          </figcaption>
+        </figure>
+      </section>
+    )
+  }
 
   <CtaBand
     title="Want numbers like these?"

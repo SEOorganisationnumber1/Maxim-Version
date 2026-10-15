@@ -1,6 +1,7 @@
 ---
 import Logo from './Logo.astro';
-import { mainNav } from '../data/site';
+import Icon from './Icon.astro';
+import { mainNav, site } from '../data/site';
 
 interface Props {
   /** href of the nav item to mark as the current page, e.g. '/work'. */
@@ -8,6 +9,7 @@ interface Props {
 }
 
 const { current } = Astro.props;
+const isCurrent = (href: string) => (href === current ? 'page' : undefined);
 ---
 
 <header class="header">
@@ -16,21 +18,98 @@ const { current } = Astro.props;
     <nav aria-label="Main" class="header__nav">
       {
         mainNav.map((item) => (
-          <a
-            href={item.href}
-            class="header__link"
-            aria-current={item.href === current ? 'page' : undefined}
-          >
+          <a href={item.href} class="header__link" aria-current={isCurrent(item.href)}>
             {item.label}
           </a>
         ))
       }
-      <a href="/contact" class="header__cta" aria-current={current === '/contact' ? 'page' : undefined}>
+      <a
+        href="/contact"
+        class="header__cta"
+        aria-current={isCurrent('/contact')}
+        data-umami-event="Start a project"
+        data-umami-event-from="header"
+      >
         Start a project
       </a>
     </nav>
+    {/* Below 900px the links move into the menu sheet. The Popover API opens and closes it,
+        Esc and the back button included, without JavaScript. */}
+    <button type="button" class="header__menu-btn" popovertarget="site-menu" aria-label="Menu">
+      <Icon name="menu" size={22} />
+    </button>
   </div>
 </header>
+
+<div id="site-menu" class="menu" popover>
+  <div class="menu__top">
+    <Logo id="logo-m" class="menu__logo" />
+    <button
+      type="button"
+      class="menu__close"
+      popovertarget="site-menu"
+      popovertargetaction="hide"
+      aria-label="Close menu"
+      autofocus
+    >
+      <Icon name="close" size={20} />
+    </button>
+  </div>
+  <nav aria-label="Main">
+    <ul class="menu__links">
+      {
+        mainNav.map((item) => (
+          <li>
+            <a href={item.href} aria-current={isCurrent(item.href)}>
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+  <div class="menu__foot">
+    <a
+      href="/contact"
+      class="btn btn--primary btn--lg"
+      aria-current={isCurrent('/contact')}
+      data-umami-event="Start a project"
+      data-umami-event-from="menu"
+    >
+      Start a project<Icon name="arrow-right" />
+    </a>
+    {
+      site.email && (
+        <p class="menu__mail">
+          Prefer email? <a href={`mailto:${site.email}`}>{site.email}</a>
+        </p>
+      )
+    }
+  </div>
+</div>
+
+<script>
+  // The sheet covers the page, so while it is open the page behind it is inert for keyboard and
+  // screen reader users. It also closes when the window grows past the breakpoint and when a
+  // page comes back from the back/forward cache with the sheet still open.
+  const menu = document.getElementById('site-menu');
+  if (menu && 'hidePopover' in menu) {
+    const behind = [...document.querySelectorAll<HTMLElement>('.site > :not(#site-menu)')];
+    menu.addEventListener('beforetoggle', (event) => {
+      const open = (event as ToggleEvent).newState === 'open';
+      for (const el of behind) el.inert = open;
+    });
+    const close = () => {
+      if (menu.matches(':popover-open')) menu.hidePopover();
+    };
+    window.matchMedia('(min-width: 900px)').addEventListener('change', (event) => {
+      if (event.matches) close();
+    });
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted) close();
+    });
+  }
+</script>
 
 <style>
   .header {
@@ -87,5 +166,181 @@ const { current } = Astro.props;
   .header__cta[aria-current='page']:hover {
     background: var(--ink);
     color: var(--white);
+  }
+
+  /* ---------- Menu button and sheet (below 900px) ---------- */
+
+  .header__menu-btn,
+  .menu__close {
+    flex: none;
+    display: none;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1.5px solid var(--ink);
+    border-radius: 8px;
+    background: var(--white);
+    color: var(--ink);
+    cursor: pointer;
+    transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .header__menu-btn:active,
+  .menu__close:active {
+    transform: scale(0.96);
+  }
+  .menu__close {
+    display: grid;
+    background: transparent;
+    color: var(--white);
+    border-color: rgb(255 255 255 / 0.55);
+  }
+
+  @media (max-width: 899.98px) {
+    .header__inner {
+      flex-wrap: nowrap;
+      gap: 16px;
+    }
+    .header__nav {
+      display: none;
+    }
+    .header__menu-btn {
+      display: grid;
+    }
+  }
+
+  .menu {
+    position: fixed;
+    inset: 0;
+    width: auto;
+    height: auto;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: var(--ink);
+    color: var(--white);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    flex-direction: column;
+    opacity: 0;
+    transition:
+      opacity 140ms ease-out,
+      display 140ms allow-discrete,
+      overlay 140ms allow-discrete;
+  }
+  .menu:popover-open {
+    display: flex;
+    opacity: 1;
+    transition-duration: 200ms;
+    transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  @starting-style {
+    .menu:popover-open {
+      opacity: 0;
+    }
+  }
+  @media (min-width: 900px) {
+    .menu {
+      display: none !important;
+    }
+  }
+
+  .menu__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px var(--gutter);
+    border-bottom: 1px solid var(--footer-line);
+  }
+  .menu :global(.menu__logo),
+  .menu :global(.menu__logo:hover) {
+    color: var(--white);
+  }
+
+  .menu__links {
+    list-style: none;
+    margin: 0;
+    padding: 24px var(--gutter) 0;
+  }
+  .menu__links a {
+    display: flex;
+    align-items: center;
+    min-height: 64px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 40px;
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+    color: var(--white);
+    text-decoration: none;
+  }
+  .menu__links a:hover,
+  .menu__links a[aria-current='page'] {
+    color: var(--cyan);
+  }
+  /* The sheet's one moment: links rise into place, 30 ms apart. Closing is quicker and all at once. */
+  .menu__links li {
+    opacity: 0;
+    transform: translateY(10px);
+    transition:
+      opacity 120ms ease-out,
+      transform 120ms ease-out;
+  }
+  .menu:popover-open .menu__links li {
+    opacity: 1;
+    transform: none;
+    transition-duration: 260ms;
+    transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .menu:popover-open .menu__links li:nth-child(1) { transition-delay: 40ms; }
+  .menu:popover-open .menu__links li:nth-child(2) { transition-delay: 70ms; }
+  .menu:popover-open .menu__links li:nth-child(3) { transition-delay: 100ms; }
+  .menu:popover-open .menu__links li:nth-child(4) { transition-delay: 130ms; }
+  .menu:popover-open .menu__links li:nth-child(5) { transition-delay: 160ms; }
+  @starting-style {
+    .menu:popover-open .menu__links li {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+  }
+
+  .menu__foot {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 32px var(--gutter) max(32px, env(safe-area-inset-bottom));
+  }
+  .menu__foot .btn {
+    width: 100%;
+  }
+  .menu__foot .btn[aria-current='page'] {
+    background: var(--white);
+  }
+  .menu__mail {
+    margin: 0;
+    font-size: 15px;
+    color: var(--footer-text);
+  }
+  .menu__mail a {
+    color: var(--white);
+    font-weight: 700;
+  }
+
+  /* Browsers without the Popover API keep the wrapped link row instead of the menu. */
+  @supports not selector(:popover-open) {
+    .header__nav {
+      display: flex;
+    }
+    .header__inner {
+      flex-wrap: wrap;
+    }
+    .header__menu-btn,
+    .menu {
+      display: none !important;
+    }
   }
 </style>

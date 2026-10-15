@@ -1,6 +1,10 @@
 ---
 import Logo from './Logo.astro';
 import { footerNav, services, site } from '../data/site';
+
+// Each build stamps the current year; the site rebuilds on every deploy.
+const year = new Date().getFullYear();
+const hasContact = Boolean(site.email || site.socials.length || site.location);
 ---
 
 <footer class="footer">
@@ -20,13 +24,17 @@ import { footerNav, services, site } from '../data/site';
       </div>
       <div class="footer__list">
         <span class="eyebrow footer__head">Get in touch</span>
-        <span>{site.email}</span>
-        <span>{site.social}</span>
-        <span>{site.location}</span>
+        {site.email && <a href={`mailto:${site.email}`}>{site.email}</a>}
+        {site.socials.map((s) => <><a href={s.url} rel="me noopener" target="_blank">{s.label}</a>{'\n'}</>)}
+        {site.location && <span>{site.location}</span>}
+        {!hasContact && <a href="/contact">Send a brief</a>}
       </div>
     </div>
     <div class="footer__bottom">
-      <span>© {site.year} {site.name}</span>
+      <span class="footer__legal">
+        <span>© {year} {site.name}</span>
+        <a href="/privacy">Privacy policy</a>
+      </span>
       <span>{services.join(' · ')}</span>
     </div>
   </div>
@@ -86,18 +94,41 @@ import { footerNav, services, site } from '../data/site';
     flex-direction: column;
     gap: 10px;
   }
-  .footer__list > span:not(.footer__head) {
+  .footer__list > span:not(.footer__head),
+  .footer__list > a {
     font-size: 15px;
     color: var(--footer-text);
+  }
+  .footer__list > a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+  .footer__list > a:hover {
+    color: var(--white);
   }
   .footer__bottom {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+    align-items: center;
     gap: 12px;
     border-top: 1px solid var(--footer-line);
     padding-top: 24px;
     font-size: 14px;
     color: var(--footer-text);
+  }
+  .footer__legal {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 20px;
+  }
+  .footer__legal a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
   }
 </style>

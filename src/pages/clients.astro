@@ -2,30 +2,18 @@
 import Base from '../layouts/Base.astro';
 import CtaBand from '../components/CtaBand.astro';
 import Icon from '../components/Icon.astro';
-import { getProject, projectUrl, projects } from '../data/projects';
+import { projectUrl, projects } from '../data/projects';
+import { testimonials } from '../data/site';
 
-// Real clients get a link card; the grid is topped up with dashed
-// placeholder tiles so it always shows 8 slots, as in the design.
-const TOTAL_SLOTS = 8;
-const clients = projects.filter((p) => !p.placeholder);
-const emptySlots = Math.max(0, TOTAL_SLOTS - clients.length);
-
-const testimonials = [
-  { company: getProject('leadity-io').name },
-  { company: getProject('zerodollars-xyz').name },
-  { company: '[COMPANY]' },
-].map((t) => ({
-  ...t,
-  quote: '[CLIENT QUOTE: one or two sentences about the result, in their own words.]',
-  name: '[NAME]',
-  role: '[ROLE]',
-}));
+// Every client gets a tile; it links to the case study once that is written.
+const clients = projects.map((project) => ({ project, url: projectUrl(project) }));
 ---
 
 <Base
   title="Clients"
   current="/clients"
-  description="Brands that grew with us, from early-stage products to established names, and what we did for each of them."
+  og="clients"
+  description="The brands we work with and what we did for each of them, from design and web development to SEO, GEO and AEO."
 >
   <section class="hero bg-paper">
     <div aria-hidden="true" class="hero__art">
@@ -48,7 +36,7 @@ const testimonials = [
     <div class="hero__inner">
       <h1 class="h1 hero__title">Brands that grew <span class="highlight">with us.</span></h1>
       <p class="lede hero__lede">
-        From early-stage products to established names. Here is who we work with and what we did for each of them.
+        The brands we work with, and what we did for each of them.
       </p>
     </div>
   </section>
@@ -56,51 +44,49 @@ const testimonials = [
   <section aria-label="Client list" class="bg-paper">
     <ul class="clients">
       {
-        clients.map((p) => (
-          <li class="clients__item">
-            <a href={projectUrl(p)} class="client">
-              <span class="client__name">{p.name}</span>
-              <span class="client__foot">
-                <span class="client__line">{p.clientLine}</span>
-                <Icon name="arrow-right" size={20} />
-              </span>
-            </a>
-          </li>
-        ))
-      }
-      {
-        Array.from({ length: emptySlots }, () => (
-          <li class="client client--empty">
-            <span class="client__name">[CLIENT LOGO]</span>
-            <span class="client__line">[WHAT WE DID FOR THEM]</span>
-          </li>
-        ))
+        clients.map(({ project, url }) => {
+          const Tile = url ? 'a' : 'div';
+          return (
+            <li class="clients__item">
+              <Tile href={url ?? undefined} class="client">
+                <span class="client__name">{project.name}</span>
+                <span class="client__foot">
+                  <span class="client__line">{project.clientLine}</span>
+                  {url && <Icon name="arrow-right" size={20} />}
+                </span>
+              </Tile>
+            </li>
+          );
+        })
       }
     </ul>
   </section>
 
-  <section class="bg-white border-top border-bottom">
-    <div class="quotes">
-      <div class="quotes__head">
-        <h2 class="h2">What clients say after the first quarter.</h2>
-      </div>
-      <div class="quotes__grid">
-        {
-          testimonials.map((t) => (
-            <figure class="quote">
-              <blockquote>{t.quote}</blockquote>
-              <figcaption>
-                <span class="quote__name">{t.name}</span>
-                <span class="quote__role">{`${t.role}, ${t.company}`}</span>
-              </figcaption>
-            </figure>
-          ))
-        }
-      </div>
-    </div>
-  </section>
+  {
+    testimonials.length > 0 && (
+      <section class="bg-white border-top border-bottom">
+        <div class="quotes">
+          <div class="quotes__head">
+            <h2 class="h2">What clients say after the first quarter.</h2>
+          </div>
+          <div class="quotes__grid">
+            {testimonials.map((t) => (
+              <figure class="quote">
+                <blockquote>{t.quote}</blockquote>
+                <figcaption>
+                  <span class="quote__name">{t.name}</span>
+                  <span class="quote__role">{`${t.role}, ${t.company}`}</span>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
 
-  <CtaBand title="Your name belongs on this page." pad="full" />
+  {/* Without the white quotes section the band sits on the same paper as the list: no extra top padding. */}
+  <CtaBand title="Your name belongs on this page." pad={testimonials.length > 0 ? 'full' : 'bottom'} />
 </Base>
 
 <style>
@@ -162,24 +148,18 @@ const testimonials = [
     border-radius: 16px;
     padding: 24px;
   }
-  a.client {
+  .clients__item > .client {
     flex: 1 1 auto;
     background: var(--white);
     border: 1.5px solid var(--ink);
     color: var(--ink);
     text-decoration: none;
   }
-  .client--empty {
-    border: 1.5px dashed var(--dashed);
-  }
   .client__name {
     font-family: var(--font-display);
     font-weight: 700;
     font-size: 28px;
     line-height: 1.1;
-  }
-  .client--empty .client__name {
-    color: var(--ink-2);
   }
   .client__foot {
     display: flex;

@@ -47,7 +47,12 @@ const {
       <p>{text}</p>
     </div>
     <div class="cta__actions">
-      <a href="/contact" class:list={['btn', 'btn--lg', tone === 'white' ? 'btn--light' : 'btn--dark']}>
+      <a
+        href="/contact"
+        class:list={['btn', 'btn--lg', tone === 'white' ? 'btn--light' : 'btn--dark']}
+        data-umami-event="Start a project"
+        data-umami-event-from="cta-band"
+      >
         Start a project<Icon name="arrow-right" />
       </a>
       {
