@@ -18,58 +18,58 @@ const jumpLinks = [
 
 const serviceBlocks: ServiceBlock[] = [
   {
-    name: 'Design',
+    name: 'Product Design',
     description:
-      'Brand and interface design in Figma. A system of components, not a pile of pages, so the build is fast and every new page stays on-brand.',
+      'Interfaces and design systems in Figma, built around how people actually use the product. Components, not a pile of screens, so the build is fast and every new feature stays on-brand.',
     deliverables: [
-      'Brand identity and visual direction',
-      'UI and UX for sites and web apps',
+      'Product discovery and user flows',
+      'UI and UX for web apps and websites',
       'A design system with reusable components',
-      'Developer-ready handoff',
+      'Clickable prototypes and a developer-ready handoff',
     ],
   },
   {
     name: 'Web Development',
     description:
-      'Sites and web apps on modern frameworks. Server-rendered, typed and fast by default. Core Web Vitals are a build requirement, not an afterthought.',
+      'Websites and landing pages on modern frameworks. Server-rendered, typed and fast by default. Core Web Vitals are a build requirement, not an afterthought.',
     deliverables: [
-      'Marketing sites, landing pages and web apps',
-      'Server-side rendering and static generation for speed',
+      'Marketing sites and landing pages',
+      'Static and server rendering for speed',
       'A headless CMS your team can edit',
       'Analytics, tracking and performance budgets built in',
     ],
   },
   {
-    name: 'SEO',
+    name: 'Web Apps & SaaS',
     description:
-      'Search Engine Optimization. We go after the queries that bring buyers, not just visitors, and we fix the technical problems that keep good pages from ranking.',
+      'Custom web applications and SaaS products, from the first version to scale. Full-stack and typed end to end, with the unglamorous parts done properly.',
     deliverables: [
-      'Technical audit and fixes: crawl, index, speed',
-      'Keyword and search-intent mapping',
-      'On-page content and internal linking',
-      'Authority building with relevant links',
+      'MVPs and new SaaS products',
+      'Internal tools, portals and dashboards',
+      'Accounts, roles, payments and integrations',
+      'Tests, CI/CD and monitoring from day one',
     ],
   },
   {
-    name: 'GEO',
+    name: 'AI & Automation',
     description:
-      'Generative Engine Optimization. We structure your site and content so ChatGPT, Gemini and Perplexity can read, trust and cite your brand.',
+      'AI features that do real work inside your product or your operations, built on your own data and measured like any other feature.',
     deliverables: [
-      'An audit of how AI engines describe your brand today',
-      'Entity-rich content that is easy to cite',
+      'Assistants and copilots inside your product',
+      'Search and answers over your own data',
+      'Workflow automation that removes manual steps',
+      'Evaluation, guardrails and cost control',
+    ],
+  },
+  {
+    name: 'Search & Growth',
+    description:
+      'SEO, GEO and AEO, so what we launch gets found: in Google, in AI Overviews and in answers from ChatGPT, Gemini and Perplexity.',
+    deliverables: [
+      'Technical SEO audit and fixes',
+      'Search-intent and question research',
       'Structured data and an llms.txt file',
-      'Tracking of mentions and citations in AI answers',
-    ],
-  },
-  {
-    name: 'AEO',
-    description:
-      'Answer Engine Optimization. Clear, structured answers that win featured snippets, AI Overviews and voice results.',
-    deliverables: [
-      'Research into the questions people actually ask',
-      'Answer-first page structure',
-      'FAQ, HowTo and product schema',
-      'Targeting for snippets, AI Overviews and voice',
+      'A monthly report on rankings, AI citations and leads',
     ],
   },
 ];
@@ -81,12 +81,12 @@ const stack: StackRow[] = [
     tools: ['Next.js', 'Astro', 'TypeScript', 'Tailwind CSS', 'Headless CMS'],
   },
   {
-    label: 'Search',
-    tools: ['Google Search Console', 'Ahrefs', 'Screaming Frog', 'Schema.org markup'],
+    label: 'AI',
+    tools: ['LLM APIs', 'Retrieval over your data', 'Agents and automation', 'Evaluation'],
   },
   {
-    label: 'AI visibility',
-    tools: ['llms.txt', 'Structured answers', 'Citation tracking: ChatGPT, Gemini, Perplexity'],
+    label: 'Growth',
+    tools: ['Google Search Console', 'Ahrefs', 'Schema.org markup', 'llms.txt', 'Citation tracking: ChatGPT, Gemini, Perplexity'],
   },
   { label: 'Measure', tools: ['GA4', 'Looker Studio', 'Form and call tracking'] },
 ];
@@ -94,20 +94,20 @@ const stack: StackRow[] = [
 const plans: Plan[] = [
   {
     name: 'Launch',
-    summary: 'Design and build. A new site, ready to rank from day one.',
+    summary: 'Design and build. A new website or product, ready on launch day.',
     period: 'one-time',
     featured: false,
     items: [
-      'Brand and UI design in Figma',
-      'Site built on a modern framework',
-      'Technical SEO foundations: schema, sitemaps, Core Web Vitals',
-      'Analytics and lead tracking set up',
+      'Product and UI design in Figma',
+      'Built on a modern, typed stack',
+      'Launch-ready: SEO foundations, structured data, Core Web Vitals',
+      'Analytics and conversion tracking set up',
       'Handover and training for your team',
     ],
   },
   {
     name: 'Growth',
-    summary: 'SEO, GEO and AEO, run every month on the site you have.',
+    summary: 'SEO, GEO and AEO, run every month on the product you have.',
     period: 'per month',
     featured: true,
     items: [
@@ -120,13 +120,13 @@ const plans: Plan[] = [
   },
   {
     name: 'Full stack',
-    summary: 'Everything, as one ongoing team for design, code and search.',
+    summary: 'Everything, as one ongoing product team for design, code, AI and growth.',
     period: 'per month',
     featured: false,
     items: [
       'Everything in Launch and Growth',
-      'Ongoing design and development',
-      'Conversion testing on key pages',
+      'Ongoing design and engineering',
+      'AI features and automation',
       'A shared roadmap, reviewed every month',
       'Priority support',
     ],
@@ -135,24 +135,24 @@ const plans: Plan[] = [
 
 const faqs: Faq[] = [
   {
+    question: 'What do you build?',
+    answer:
+      'Websites and landing pages, custom web apps, SaaS products and AI features, plus the search work that gets them found. One team covers design, engineering and growth, so nothing gets lost between agencies.',
+  },
+  {
+    question: 'How long does a project take?',
+    answer:
+      'It depends on the scope. A landing page takes weeks; a first version of a web app or SaaS product usually takes a few months. You get a timeline with the proposal, and we report progress as we go.',
+  },
+  {
+    question: 'Do we need a full specification to start?',
+    answer:
+      'No. We start with a short discovery and scope the smallest version worth launching. Clear goals matter more than a long document.',
+  },
+  {
     question: 'What is the difference between SEO, GEO and AEO?',
     answer:
       'SEO gets your pages ranked in classic search results. AEO shapes your content so a search engine can lift a direct answer from it: featured snippets, AI Overviews, voice. GEO makes your brand readable and citable for generative engines such as ChatGPT, Gemini and Perplexity. All three share one foundation: a fast, well-structured site with content people actually want.',
-  },
-  {
-    question: 'How long until we see results?',
-    answer:
-      'Technical fixes usually show within weeks. Rankings and AI citations build over months, and the pace depends on your market and where you start. We report every month so you see the direction early.',
-  },
-  {
-    question: 'Do we need a new website to start?',
-    answer:
-      'No. We begin with an audit of the site you have. If it can be fixed, we fix it. We only recommend a rebuild when the current stack is what holds your rankings back.',
-  },
-  {
-    question: 'How do you define a qualified lead?',
-    answer:
-      'With you, before we start. We agree on who counts as a fit (industry, size, intent), set up tracking for forms and calls, and report on those leads, not on raw traffic.',
   },
   {
     question: 'Can you work with our in-house team?',
@@ -178,7 +178,7 @@ const pad2 = (n: number): string => String(n).padStart(2, '0');
   title="Services"
   current="/services"
   og="services"
-  description="Design, web development, SEO, GEO and AEO built as one. One team designs the site, builds it, and makes sure people and AI engines can find it."
+  description="Product design, web development, web apps and SaaS, AI and automation, and search-led growth. One team designs, builds, launches and grows your product."
   jsonLd={[faqPageJsonLd]}
 >
   <section class="hero bg-paper border-bottom">
@@ -209,11 +209,11 @@ const pad2 = (n: number): string => String(n).padStart(2, '0');
     </div>
     <div class="container hero__inner">
       <h1 class="h1 hero__title">
-        Design, code and search. <span class="highlight">Built as one.</span>
+        Design, code and growth. <span class="highlight">Built as one.</span>
       </h1>
       <p class="lede hero__lede">
-        One team designs the site, builds it, and makes sure people and AI engines can find it. No
-        handoffs between agencies, no lost context.
+        One team designs your product, engineers it, launches it and helps it grow. No handoffs
+        between agencies, no lost context.
       </p>
       <nav aria-label="On this page" class="jump">
         {

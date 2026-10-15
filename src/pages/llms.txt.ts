@@ -17,14 +17,16 @@ export const GET: APIRoute = ({ site: base }) => {
 
   const body = `# ${site.name}
 
-> ${site.tagline} A search-first studio for ${services.join(', ')}.
+> ${site.tagline} ${site.name} is a product studio: one team designs, builds, launches and grows websites, web apps, SaaS and AI products.
+
+Services: ${services.join(', ')}.
 
 ## Pages
 
-- [Home](${url('/')}): What we do and companies we scaled
+- [Home](${url('/')}): What we build and recent launches
 - [Work](${url('/work')}): Client projects and case studies
-- [Services](${url('/services')}): Design, Web Development, SEO, GEO and AEO; stack, pricing and FAQ
-- [Clients](${url('/clients')}): Brands we work with and what we did for each
+- [Services](${url('/services')}): Product design, web development, web apps and SaaS, AI and automation, search and growth; stack, pricing and FAQ
+- [Clients](${url('/clients')}): Teams we build with and what we built for each
 - [Company](${url('/company')}): How we work and the rules we keep
 - [Contact](${url('/contact')}): Send a brief${contact}
 

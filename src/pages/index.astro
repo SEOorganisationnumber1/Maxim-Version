@@ -6,27 +6,30 @@ import { filled, numbers, services, site, type Service } from '../data/site';
 import { projects, projectUrl, serviceLine } from '../data/projects';
 import { ribbonPath } from '../scripts/hero-ribbons';
 
-/** "Companies we scaled:" chips. Past CHIP_LIMIT the rest are behind "+ more brands". */
+/** "Trusted by:" chips. Past CHIP_LIMIT the rest are behind "+ more brands". */
 const CHIP_LIMIT = 4;
 const chips = projects.slice(0, CHIP_LIMIT);
 
 /** The numbers band shows only the figures that are set, and disappears without any. */
 const stats = filled([
   { value: numbers.projectsShipped, label: 'projects shipped' },
-  { value: numbers.yearsInSearch, label: 'years in search' },
+  { value: numbers.yearsInBusiness, label: 'years in business' },
   { value: numbers.marketsServed, label: 'markets served' },
   { value: numbers.retention, label: 'clients who stay past year one' },
 ]);
 
 // Home keeps its own discipline copy (it differs slightly from the Services page).
 const disciplineCopy: Record<Service, string> = {
-  Design:
-    'Brand and interface design in Figma. A system of components, not a pile of pages, so the build is fast and every new page stays on-brand.',
+  'Product Design':
+    'Interfaces and design systems in Figma, built around real user flows. A system of components, not a pile of screens, so every new feature stays on-brand.',
   'Web Development':
-    'Sites and web apps on modern frameworks. Server-rendered, typed and fast by default. Core Web Vitals are a build requirement, not an afterthought.',
-  SEO: 'Search Engine Optimization. Technical audits, search-intent mapping, content and authority. We go after the queries that bring buyers, not just visitors.',
-  GEO: 'Generative Engine Optimization. We structure your site and content so ChatGPT, Gemini and Perplexity can read, trust and cite your brand.',
-  AEO: 'Answer Engine Optimization. Clear, structured answers that win featured snippets, AI Overviews and voice results.',
+    'Websites and landing pages on modern frameworks. Server-rendered, typed and fast by default. Core Web Vitals are a build requirement, not an afterthought.',
+  'Web Apps & SaaS':
+    'Custom web applications and SaaS products, from the first version to scale. Full-stack and typed end to end, with accounts, payments, data and deploys done properly.',
+  'AI & Automation':
+    'AI features that do real work: assistants, answers from your own data, and automations that remove manual steps. Shipped with evaluation and guardrails, not as demos.',
+  'Search & Growth':
+    'SEO, GEO and AEO. We make sure people, Google and AI assistants such as ChatGPT and Gemini can find, understand and recommend what we launch.',
 };
 
 const pad = (n: number): string => String(n).padStart(2, '0');
@@ -41,28 +44,28 @@ const smallCards = others.slice(0, 2).map((project) => ({ project, url: projectU
 
 const methods = [
   {
-    title: 'Audit',
-    text: 'A full technical crawl, a content gap map, and a check of how Google and AI engines describe you today.',
+    title: 'Scope',
+    text: 'A short discovery: who it is for, what it must do, and the smallest version worth launching.',
+  },
+  {
+    title: 'Design',
+    text: 'Flows and interfaces in Figma, tested with real content before production code starts.',
   },
   {
     title: 'Build',
-    text: 'Design and development on a modern stack: semantic markup, structured data and fast pages from the first commit.',
+    text: 'A typed, tested, modern stack: fast pages, clean APIs and structured data from the first commit.',
   },
   {
-    title: 'Publish',
-    text: 'Content mapped to search intent and to the real questions people put to AI assistants.',
-  },
-  {
-    title: 'Measure',
-    text: "Rankings, AI citations and qualified leads in one monthly report. What works gets more budget. What doesn't gets cut.",
+    title: 'Launch',
+    text: "Release, measure, improve. Analytics, search and AI visibility are part of launch day. What works gets more budget. What doesn't gets cut.",
   },
 ];
 ---
 
 <Base
-  title={`${site.name} · SEO That Brings Qualified Leads`}
+  title={`${site.name} · Digital Products, Built to Launch`}
   fullTitle
-  description="More visibility. Better traffic. Qualified leads. We design, build and optimise so that when people ask Google, ChatGPT or Gemini, the answer is you."
+  description={`${site.name} designs, builds and launches websites, web apps, SaaS and AI products, then helps them grow through search. One team, from first sketch to launch day.`}
 >
   <!-- Hero -->
   <section class="hero bg-paper border-bottom" data-hero-ribbons>
@@ -115,8 +118,8 @@ const methods = [
 
     <div class="hero__content">
       <h1 class="hero__title">
-        <span>SEO That Brings</span>
-        <span><span class="highlight">Qualified</span> <span class="hero__accent">Leads.</span></span>
+        <span>Digital Products,</span>
+        <span><span class="highlight">Built</span> <span class="hero__accent">to Launch.</span></span>
       </h1>
 
       <div class="hero__row">
@@ -131,7 +134,7 @@ const methods = [
       {
         chips.length > 0 && (
           <div class="hero__row">
-            <span class="hero__label">Companies we scaled:</span>
+            <span class="hero__label">Trusted by:</span>
             <ul class="chip-list">
               {chips.map((project) => <><li class="chip chip--dark">{project.name}</li>{'\n'}</>)}
             </ul>
@@ -187,8 +190,8 @@ const methods = [
   <section class="bg-paper">
     <div class="container statement">
       <p class="statement__text">
-        Search has changed. People put the same question to Google, ChatGPT and Gemini. We design, build
-        and optimise so that <span class="statement__accent">the answer is you.</span>
+        Most products stall somewhere between design, code and launch. We do all three as one team, so
+        <span class="statement__accent">the plan becomes the product.</span>
       </p>
       <a href="/company" class="text-link statement__link">About the company<Icon name="arrow-right" /></a>
     </div>
@@ -219,14 +222,14 @@ const methods = [
     </div>
   </section>
 
-  <!-- Companies we scaled -->
+  <!-- Recent launches -->
   {
     featured && (
       <section class="bg-paper border-top">
         <div class="container block">
           <div class="block__head">
             <div class="block__title">
-              <h2 class="h2">Companies we scaled.</h2>
+              <h2 class="h2">Recent launches.</h2>
             </div>
             <a href="/work" class="text-link">All work<Icon name="arrow-right" /></a>
           </div>
@@ -317,7 +320,7 @@ const methods = [
       <div class="methods__head">
         <h2 class="h2">Modern methods. Nothing wasted.</h2>
         <p class="methods__intro">
-          We only use approaches that work in search right now, and we drop them the moment they stop.
+          We only use approaches that work right now, and we drop them the moment they stop.
         </p>
       </div>
       <ol class="rule-grid">
@@ -334,7 +337,7 @@ const methods = [
     </div>
   </section>
 
-  <CtaBand title="Tell us what you want to rank for." tone="white" pad="full" />
+  <CtaBand title="Tell us what you want to launch." tone="white" pad="full" />
 </Base>
 
 <script>
@@ -558,7 +561,7 @@ const methods = [
     color: var(--ink-2);
   }
 
-  /* ---------- Companies we scaled ---------- */
+  /* ---------- Recent launches ---------- */
 
   .work {
     display: flex;

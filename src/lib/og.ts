@@ -45,6 +45,26 @@ const fonts = () =>
     mono: ['latin', 'latin-ext'].map((s) => fontsource('@fontsource/jetbrains-mono', `jetbrains-mono-${s}-500-normal.woff`)),
   });
 
+const num = (v: number) => String(Math.round(v * 100) / 100);
+
+/**
+ * SVG path data for one glyph, origin at (x, y) on the baseline, built from the glyph's own commands
+ * in font units. Glyph.getPath() in opentype.js 2.0 sometimes emits NaN coordinates after earlier
+ * calls (seen on "Products,"), which cuts the rest of the word off; this does the plain transform.
+ */
+function outline(glyph: Glyph, x: number, y: number, scale: number): string {
+  const X = (v: number) => num(x + v * scale);
+  const Y = (v: number) => num(y - v * scale);
+  let d = '';
+  for (const c of glyph.path.commands) {
+    if (c.type === 'Z') d += 'Z';
+    else if (c.type === 'M' || c.type === 'L') d += `${c.type}${X(c.x!)} ${Y(c.y!)}`;
+    else if (c.type === 'Q') d += `Q${X(c.x1!)} ${Y(c.y1!)} ${X(c.x!)} ${Y(c.y!)}`;
+    else if (c.type === 'C') d += `C${X(c.x1!)} ${Y(c.y1!)} ${X(c.x2!)} ${Y(c.y2!)} ${X(c.x!)} ${Y(c.y!)}`;
+  }
+  return d;
+}
+
 /**
  * Outlines for one line of text, baseline at y. Glyphs are placed one by one with pair kerning and
  * tracking (in em): opentype.js cannot apply Outfit's contextual substitutions, which the
@@ -59,7 +79,7 @@ function setText(face: Face, text: string, x: number, y: number, size: number, t
     const glyph = font.charToGlyph(char);
     const scale = size / font.unitsPerEm;
     if (prev?.font === font) pen += font.getKerningValue(prev.glyph, glyph) * scale;
-    d += glyph.getPath(pen, y, size).toPathData(2);
+    d += outline(glyph, pen, y, scale);
     pen += (glyph.advanceWidth ?? 0) * scale + tracking * size;
     prev = { font, glyph };
   }
@@ -181,6 +201,8 @@ ${sub}
 <path d="${setText(f.mono, address, LEFT + 56, 561, 22).d}" fill="${INK_2}"/>
 </svg>`;
 
+  // A bad number in path data makes the renderer drop the rest of the shape: fail the build instead.
+  if (/NaN|Infinity|undefined/.test(svg)) throw new Error(`Share image ${card.path}: invalid coordinates in the SVG.`);
   return new Uint8Array(await sharp(Buffer.from(svg)).png({ compressionLevel: 9 }).toBuffer());
 }
 

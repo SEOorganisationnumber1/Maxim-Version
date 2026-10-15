@@ -8,8 +8,8 @@ const sendErrorText = `Something went wrong sending your brief. Please try again
 }.`;
 
 const steps = [
-  'We read your brief and look at your site.',
-  'You get a short reply with what we would fix first.',
+  'We read your brief and look at what you have so far.',
+  'You get a short reply with how we would approach it.',
   'If it fits, we scope the work together on a call.',
 ];
 ---
@@ -18,17 +18,17 @@ const steps = [
   title="Contact"
   current="/contact"
   og="contact"
-  description="Tell us what you want to rank for. Send a short brief and we reply with what we would fix first."
+  description="Tell us what you want to launch. Send a short brief and we reply with how we would approach it."
 >
   <section class="bg-paper">
     <div class="container contact">
       <div class="intro">
         <h1 class="intro__title">
-          Tell us what you want to <span class="highlight">rank for.</span>
+          Tell us what you want to <span class="highlight">launch.</span>
         </h1>
         <p class="lede intro__lede">
-          A few lines are enough. The more you share about your site and goals, the more specific our
-          first reply will be.
+          A few lines are enough. The more you share about your product and goals, the more specific
+          our first reply will be.
         </p>
 
         <div class="next">
@@ -83,7 +83,7 @@ const steps = [
           <h2 class="success__title" tabindex="-1" data-success-title>Brief received.</h2>
           <p class="success__text">
             Thanks, <span data-sent-name></span>. We will reply to <span data-sent-email></span>
-            {site.responseTime ? `within ${site.responseTime}.` : 'with what we would fix first.'}
+            {site.responseTime ? `within ${site.responseTime}.` : 'with how we would approach it.'}
           </p>
           <div class="success__actions">
             <a href="/work" class="btn btn--primary btn--sm">See the work meanwhile</a>
@@ -177,7 +177,7 @@ const steps = [
               name="message"
               rows="5"
               maxlength="5000"
-              placeholder="What you sell, who you want to reach, what you have tried so far."
+              placeholder="What you are building, who it is for, and where things stand today."
               class="field__control field__control--area"></textarea>
           </div>
 

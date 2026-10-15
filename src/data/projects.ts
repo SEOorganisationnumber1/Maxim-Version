@@ -58,16 +58,22 @@ export type Project = {
   services: Service[];
   /** One line on the Home and Work cards; hidden while null. */
   summary: string | null;
-  /** Lower-case line on the Clients page: "Web development, SEO and GEO". */
+  /** Lower-case line on the Clients page: "Web development and search & growth". */
   clientLine: string;
   look: Look;
   /** Null until the case study is written: no page is built for it and cards do not link. */
   caseStudy: CaseStudy | null;
 };
 
-/** "Web development, SEO and GEO" from ['Web Development', 'SEO', 'GEO']. */
+/** "Web development and AI & automation" from ['Web Development', 'AI & Automation']. */
 const toClientLine = (services: Service[]): string => {
-  const words = services.map((s) => (s.toUpperCase() === s ? s : s.toLowerCase()));
+  // Lower-case ordinary words; keep acronyms and mixed-case terms such as AI and SaaS as written.
+  const words = services.map((s) =>
+    s
+      .split(' ')
+      .map((w) => (/[A-Z].*[A-Z]/.test(w) ? w : w.toLowerCase()))
+      .join(' '),
+  );
   const line =
     words.length < 2
       ? words.join('')
@@ -80,7 +86,7 @@ type Seed = Pick<Project, 'slug' | 'name' | 'services'> & Partial<Pick<Project, 
 // Real clients only: every project here is shown on Home, Work, Clients and in llms.txt.
 // Add `summary` and `caseStudy` (shape: CaseStudy above) as they are written; the case study
 // page at /work/<slug> is published as soon as `caseStudy` is set.
-const seeds: Seed[] = [{ slug: 'leadity-io', name: 'leadity.io', services: ['Web Development', 'SEO', 'GEO'] }];
+const seeds: Seed[] = [{ slug: 'leadity-io', name: 'leadity.io', services: ['Web Development', 'Search & Growth'] }];
 
 export const projects: Project[] = seeds.map((seed, i) => ({
   slug: seed.slug,

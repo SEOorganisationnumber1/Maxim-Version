@@ -17,24 +17,24 @@ export const ogCards: Record<string, OgCard> = {
   home: {
     path: '/',
     tone: 'cyan',
-    title: [{ text: 'SEO That Brings' }, { text: 'Qualified', mark: 'highlight' }, { text: 'Leads.', mark: 'accent' }],
+    title: [{ text: 'Digital Products,' }, { text: 'Built', mark: 'highlight' }, { text: 'to Launch.', mark: 'accent' }],
   },
-  work: { path: '/work', tone: 'cyan', title: [{ text: 'Companies we' }, { text: 'scaled.', mark: 'highlight' }] },
+  work: { path: '/work', tone: 'cyan', title: [{ text: 'Products we' }, { text: 'launched.', mark: 'highlight' }] },
   services: {
     path: '/services',
     tone: 'blue',
-    title: [{ text: 'Design, code and search.' }, { text: 'Built as one.', mark: 'highlight' }],
+    title: [{ text: 'Design, code and growth.' }, { text: 'Built as one.', mark: 'highlight' }],
   },
-  clients: { path: '/clients', tone: 'violet', title: [{ text: 'Brands that grew' }, { text: 'with us.', mark: 'highlight' }] },
+  clients: { path: '/clients', tone: 'violet', title: [{ text: 'Teams we' }, { text: 'build with.', mark: 'highlight' }] },
   company: {
     path: '/company',
     tone: 'cyan',
-    title: [{ text: 'A search-first studio for design, code and' }, { text: 'growth.', mark: 'highlight' }],
+    title: [{ text: 'A product studio for design, engineering and' }, { text: 'launch.', mark: 'highlight' }],
   },
   contact: {
     path: '/contact',
     tone: 'blue',
-    title: [{ text: 'Tell us what you want to' }, { text: 'rank for.', mark: 'highlight' }],
+    title: [{ text: 'Tell us what you want to' }, { text: 'launch.', mark: 'highlight' }],
   },
   privacy: { path: '/privacy', tone: 'violet', title: [{ text: 'Privacy policy' }] },
   ...Object.fromEntries(

@@ -7,8 +7,8 @@ import { fontsourceFonts } from './integrations/fontsource-fonts.mjs';
 
 // Canonical URLs, the sitemap and robots.txt are built from this.
 // SITE_URL wins if set; on Netlify, URL is the site's main address
-// (the custom domain once one is added, else the .netlify.app one).
-const SITE_URL = process.env.SITE_URL ?? process.env.URL ?? 'https://www.youragency.com';
+// (the custom domain once one is added, else the .netlify.app one). Local builds fall back to the live site.
+const SITE_URL = process.env.SITE_URL ?? process.env.URL ?? 'https://maxim-version.netlify.app';
 
 /** `astro dev` injects styles inline for hot reload, which a hash-based CSP blocks: the CSP is for builds. */
 const DEV = process.argv.includes('dev');

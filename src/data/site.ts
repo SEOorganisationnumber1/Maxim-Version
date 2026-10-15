@@ -12,9 +12,9 @@ export type TeamMember = {
 };
 
 export const site = {
-  name: '67 billion bucks Agency',
-  tagline: 'More visibility. Better traffic. Qualified leads.',
-  /** Public contact email, e.g. 'hello@youragency.com'. */
+  name: 'Launchery',
+  tagline: 'Strong design. Solid engineering. Reliable launches.',
+  /** Public contact email, e.g. 'hello@yourdomain.com'. */
   email: null as string | null,
   /** Profiles linked in the footer and listed in the Organization JSON-LD (sameAs). */
   socials: [] as Social[],
@@ -37,7 +37,7 @@ export const legal = {
 /** Agency numbers for the Home and Company bands, written as displayed ('40+', '92%'). */
 export const numbers = {
   projectsShipped: null as string | null,
-  yearsInSearch: null as string | null,
+  yearsInBusiness: null as string | null,
   marketsServed: null as string | null,
   /** Share of clients who stay past year one. */
   retention: null as string | null,
@@ -61,7 +61,7 @@ export const testimonials: Testimonial[] = [];
 /** People on the Company page. */
 export const team: TeamMember[] = [];
 
-export const services = ['Design', 'Web Development', 'SEO', 'GEO', 'AEO'] as const;
+export const services = ['Product Design', 'Web Development', 'Web Apps & SaaS', 'AI & Automation', 'Search & Growth'] as const;
 export type Service = (typeof services)[number];
 
 export type NavItem = { href: string; label: string };
