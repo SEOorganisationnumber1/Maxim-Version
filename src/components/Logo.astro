@@ -8,6 +8,8 @@ interface Props {
 }
 
 const { id, class: className } = Astro.props;
+/** "Studio": the part of the full name after the wordmark, set as a small descriptor. */
+const descriptor = site.name.slice(site.shortName.length).trim();
 ---
 
 <a href="/" class:list={['logo', className]}>
@@ -25,7 +27,8 @@ const { id, class: className } = Astro.props;
       stroke-width="6"
       stroke-linecap="round"></path>
   </svg>
-  <span>{site.name}</span>
+  <span>{site.shortName}</span>
+  {descriptor && <span class="logo__descriptor">{descriptor}</span>}
 </a>
 
 <style>
@@ -41,5 +44,12 @@ const { id, class: className } = Astro.props;
   }
   .logo svg {
     flex: none;
+  }
+  .logo__descriptor {
+    margin-left: -4px;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0.72;
   }
 </style>

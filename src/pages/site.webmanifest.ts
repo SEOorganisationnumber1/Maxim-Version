@@ -8,7 +8,7 @@ export const GET: APIRoute = () =>
   new Response(
     JSON.stringify({
       name: site.name,
-      short_name: site.name,
+      short_name: site.shortName,
       start_url: '/',
       display: 'browser',
       background_color: '#F5FAFC',

@@ -187,6 +187,10 @@ export async function renderOgImage(card: OgCard, origin: URL): Promise<Uint8Arr
     ? `<path d="${setText(f.mono, card.sub, LEFT, top + rows.length * lineHeight + SUB_GAP + SUB_SIZE, SUB_SIZE).d}" fill="${TEAL_INK}"/>`
     : '';
   const address = `${origin.host}${card.path === '/' ? '' : card.path}`;
+  // The same lockup as the site header: the wordmark, then the rest of the name small and spaced.
+  const brand = setText(f.bold, site.shortName, LEFT + 58, 93, 32);
+  const descriptor = site.name.slice(site.shortName.length).trim().toUpperCase();
+  const descriptorPath = descriptor ? setText(f.bold, descriptor, LEFT + 58 + brand.width + 10, 93, 21, 0.06).d : '';
 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
 <title>${escapeXml(site.name)}</title>
@@ -194,7 +198,8 @@ export async function renderOgImage(card: OgCard, origin: URL): Promise<Uint8Arr
 <rect width="${W}" height="${H}" fill="${PAPER}"/>
 ${art(card.tone)}
 <svg x="${LEFT}" y="60" width="44" height="44" viewBox="0 0 30 30"><path d="${LOGO_PATH}" fill="none" stroke="url(#logo)" stroke-width="6" stroke-linecap="round"/></svg>
-<path d="${setText(f.bold, site.name, LEFT + 58, 93, 32).d}" fill="${INK}"/>
+<path d="${brand.d}" fill="${INK}"/>
+${descriptorPath ? `<path d="${descriptorPath}" fill="${INK_2}"/>` : ''}
 ${title}
 ${sub}
 <rect x="${LEFT}" y="551" width="40" height="4" rx="2" fill="${CYAN}"/>

@@ -12,7 +12,10 @@ export type TeamMember = {
 };
 
 export const site = {
-  name: 'Launchery',
+  /** Full name: titles, JSON-LD, share images, legal text. */
+  name: 'Launchery Studio',
+  /** The wordmark; the rest of the name ("Studio") is set smaller next to it. */
+  shortName: 'Launchery',
   tagline: 'Strong design. Solid engineering. Reliable launches.',
   /** Public contact email, e.g. 'hello@yourdomain.com'. */
   email: null as string | null,

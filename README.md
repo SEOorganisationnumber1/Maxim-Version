@@ -1,6 +1,6 @@
-# Launchery website
+# Launchery Studio website
 
-The site of Launchery, a product studio that designs, builds, launches and grows websites, web apps, SaaS and AI products. It is an Astro build of the "Agency Portfolio" design canvas: Home, Work, Case study, Services, Clients, Company, Contact and Privacy. Pages are static HTML; only the brief API and `/admin` run as a Netlify Function.
+The site of Launchery Studio, a product studio that designs, builds, launches and grows websites, web apps, SaaS and AI products. It is an Astro build of the "Agency Portfolio" design canvas: Home, Work, Case study, Services, Clients, Company, Contact and Privacy. Pages are static HTML; only the brief API and `/admin` run as a Netlify Function.
 
 The brand name, tagline and service list live in `src/data/site.ts`; every page, share image, JSON-LD block, the admin panel and the brief emails read them from there.
 
