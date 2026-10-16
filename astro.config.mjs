@@ -2,6 +2,7 @@
 import { defineConfig, envField } from 'astro/config';
 import netlify from '@astrojs/netlify';
 import sitemap from '@astrojs/sitemap';
+import { readFileSync } from 'node:fs';
 import placeholderGuard from './integrations/placeholder-guard.mjs';
 import { fontsourceFonts } from './integrations/fontsource-fonts.mjs';
 
@@ -15,6 +16,22 @@ const DEV = process.argv.includes('dev');
 
 /** Pages that exist but are not for search engines. */
 const NOT_IN_SITEMAP = [/^\/admin(\/|$)/, /^\/contact\/sent$/, /^\/404$/];
+
+/**
+ * Any built page that tells search engines not to index it stays out of the sitemap too, so a page
+ * can opt out from its own code (the Clients page does while it has too few clients to show).
+ */
+const DIST = new URL('./dist/', import.meta.url);
+/** @param {string} page */
+function isNoindex(page) {
+  const path = new URL(page).pathname;
+  try {
+    const html = readFileSync(new URL(path === '/' ? 'index.html' : `.${path}.html`, DIST), 'utf8');
+    return html.includes('<meta name="robots" content="noindex');
+  } catch {
+    return false;
+  }
+}
 
 export default defineConfig({
   site: SITE_URL,
@@ -102,7 +119,7 @@ export default defineConfig({
     },
   },
   integrations: [
-    sitemap({ filter: (page) => !NOT_IN_SITEMAP.some((re) => re.test(new URL(page).pathname)) }),
+    sitemap({ filter: (page) => !NOT_IN_SITEMAP.some((re) => re.test(new URL(page).pathname)) && !isNoindex(page) }),
     placeholderGuard(),
   ],
 });

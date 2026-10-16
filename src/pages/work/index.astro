@@ -75,11 +75,19 @@ const countLabel = (n: number) => (n === 1 ? '1 project' : `${n} projects`);
                   <span class="tagline">{serviceLine(p.services)}</span>
                   <h2 class="work-card__name">{p.name}</h2>
                   {p.summary && <p class="work-card__summary">{p.summary}</p>}
-                  {url && (
+                  {url ? (
                     <span class="work-card__more">
                       Read the case
                       <Icon name="arrow-right" />
                     </span>
+                  ) : (
+                    p.site && (
+                      <a href={p.site} class="work-card__more" target="_blank" rel="noopener">
+                        Visit {new URL(p.site).hostname}
+                        <span class="visually-hidden"> (opens in a new tab)</span>
+                        <Icon name="arrow-up-right" />
+                      </a>
+                    )
                   )}
                 </div>
               </Card>
@@ -237,10 +245,11 @@ const countLabel = (n: number) => (n === 1 ? '1 project' : `${n} projects`);
     color: var(--ink-2);
   }
   .work-card__more {
+    align-self: flex-start;
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding-top: 6px;
+    min-height: 44px;
     font-weight: 700;
     font-size: 15px;
   }

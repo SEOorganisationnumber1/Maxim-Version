@@ -54,7 +54,9 @@ Only real clients and real quotes go in: the site shows them as proof. The build
 
 ### Adding a project or a case study
 
-Add an entry to `seeds` in `src/data/projects.ts`. It appears on Home, Work, Clients and in `llms.txt`. Add `summary` for the card line, and `caseStudy` (its shape is the `CaseStudy` type in the same file) to publish `/work/<slug>` with its own share image and Article JSON-LD. The Work filters appear once there are two projects.
+Add an entry to `seeds` in `src/data/projects.ts`. It appears on Home, Work, Clients and in `llms.txt`. Add `summary` for the card line (what the client's product is, from its own public site), `site` for a "Visit" link to the live product, and `caseStudy` (its shape is the `CaseStudy` type in the same file) to publish `/work/<slug>` with its own share image and Article JSON-LD. The Work filters appear once there are two projects.
+
+Until there are three clients (`CLIENTS_PAGE_MIN`), the Clients page stays out of the nav, footer, sitemap and `llms.txt`, and carries `noindex`, because one entry there only repeats the Work page. The secondary buttons that point to proof ("See the work") send visitors to Services until the first case study is published. Any page with `noindex` is left out of the sitemap automatically.
 
 ## Where things live
 

@@ -3,7 +3,7 @@ import Base from '../layouts/Base.astro';
 import CtaBand from '../components/CtaBand.astro';
 import Icon from '../components/Icon.astro';
 import { filled, numbers, services, site, type Service } from '../data/site';
-import { projects, projectUrl, serviceLine } from '../data/projects';
+import { projects, projectUrl, proofLink, serviceLine } from '../data/projects';
 import { ribbonPath } from '../scripts/hero-ribbons';
 
 /** "Trusted by:" chips. Past CHIP_LIMIT the rest are behind "+ more brands". */
@@ -56,6 +56,30 @@ const methods = [
   {
     title: 'Launch',
     text: "Release, measure, improve. Analytics, search and AI visibility are part of launch day. What works gets more budget. What doesn't gets cut.",
+  },
+];
+
+// Public tools a visitor can point at this site. They always show live results, so no score is
+// typed into the page and nothing can go stale. The URL follows the site's own address.
+const home = new URL('/', Astro.site).href;
+const checks = [
+  {
+    name: 'Speed and Core Web Vitals',
+    text: 'Google PageSpeed Insights, run on this page now.',
+    href: `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(home)}`,
+    external: true,
+  },
+  {
+    name: 'Structured data',
+    text: 'The Schema.org validator reads what this page tells search engines about us.',
+    href: `https://validator.schema.org/#url=${encodeURIComponent(home)}`,
+    external: true,
+  },
+  {
+    name: 'Ready for AI assistants',
+    text: 'Our llms.txt: a plain-text map of the site for AI assistants and crawlers.',
+    href: '/llms.txt',
+    external: false,
   },
 ];
 ---
@@ -125,7 +149,7 @@ const methods = [
         <a href="/contact" class="btn btn--primary" data-umami-event="Start a project" data-umami-event-from="hero">
           Start a project<Icon name="arrow-right" />
         </a>
-        <a href="/work" class="btn btn--outline" data-motion-fallback>See the work</a>
+        <a href={proofLink.href} class="btn btn--outline" data-motion-fallback>{proofLink.label}</a>
       </div>
 
       {
@@ -216,7 +240,7 @@ const methods = [
         <div class="container block">
           <div class="block__head">
             <div class="block__title">
-              <h2 class="h2">Recent launches.</h2>
+              <h2 class="h2">{projects.length > 1 ? 'Recent launches.' : 'Latest launch.'}</h2>
             </div>
             <a href="/work" class="text-link">All work<Icon name="arrow-right" /></a>
           </div>
@@ -248,7 +272,7 @@ const methods = [
                   <h3 class="featured__name">{featured.name}</h3>
                   {featured.summary && <p class="featured__summary">{featured.summary}</p>}
                 </div>
-                {(featuredResult || featuredUrl) && (
+                {(featuredResult || featuredUrl || featured.site) && (
                   <div class="featured__foot">
                     {featuredResult && (
                       <div class="featured__metric">
@@ -256,11 +280,19 @@ const methods = [
                         <span class="featured__label">{featuredResult.label}</span>
                       </div>
                     )}
-                    {featuredUrl && (
+                    {featuredUrl ? (
                       <span class="featured__read">
                         Read the case
                         <Icon name="arrow-right" />
                       </span>
+                    ) : (
+                      featured.site && (
+                        <a href={featured.site} class="featured__read" target="_blank" rel="noopener">
+                          Visit {new URL(featured.site).hostname}
+                          <span class="visually-hidden"> (opens in a new tab)</span>
+                          <Icon name="arrow-up-right" />
+                        </a>
+                      )
                     )}
                   </div>
                 )}
@@ -289,6 +321,13 @@ const methods = [
                         <span class="tagline">{serviceLine(project.services)}</span>
                         <h3 class="small__name">{project.name}</h3>
                         {project.summary && <p class="small__summary">{project.summary}</p>}
+                        {!url && project.site && (
+                          <a href={project.site} class="small__visit" target="_blank" rel="noopener">
+                            Visit {new URL(project.site).hostname}
+                            <span class="visually-hidden"> (opens in a new tab)</span>
+                            <Icon name="arrow-up-right" />
+                          </a>
+                        )}
                       </div>
                     </Card>
                   );
@@ -300,6 +339,42 @@ const methods = [
       </section>
     )
   }
+
+  <!-- Checks a visitor can run on this site: proof that needs no client permission -->
+  <section class="bg-white border-top">
+    <div class="container block">
+      <div class="block__head">
+        <div class="block__title">
+          <h2 class="h2">Check our work on this site.</h2>
+          <p class="checks__intro">Don't take our word for it. Run the checks a developer would, on this site, live.</p>
+        </div>
+      </div>
+      <ul class="checks">
+        {
+          checks.map((check) => (
+            <li>
+              <a
+                href={check.href}
+                class="checks__link"
+                {...(check.external ? { target: '_blank', rel: 'noopener' } : {})}
+                data-umami-event="Site check"
+                data-umami-event-check={check.name}
+              >
+                <span class="checks__name">{check.name}</span>
+                <span class="checks__text">
+                  <span>
+                    {check.text}
+                    {check.external && <span class="visually-hidden"> (opens in a new tab)</span>}
+                  </span>
+                  <Icon name={check.external ? 'arrow-up-right' : 'arrow-right'} />
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
 
   <!-- Modern methods -->
   <section class="bg-white border-top">
@@ -641,6 +716,67 @@ const methods = [
     font-size: 16px;
     line-height: 1.6;
     color: var(--ink-2);
+  }
+  .small__visit {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    font-weight: 700;
+    font-size: 15px;
+  }
+
+  /* ---------- Checks on this site ---------- */
+
+  .checks__intro {
+    margin: 0;
+    max-width: 640px;
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+  .checks {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-bottom: 1.5px solid var(--ink);
+  }
+  .checks__link {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px 40px;
+    padding: 24px 0;
+    border-top: 1.5px solid var(--ink);
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .checks__name {
+    flex: 1 1 300px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.5rem, 2.4vw, 2rem);
+    line-height: 1.15;
+  }
+  .checks__text {
+    flex: 2 1 360px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+  .checks__text :global(svg) {
+    flex: none;
+    color: var(--ink);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .checks__link:hover .checks__name {
+      color: var(--teal-ink);
+    }
   }
 
   /* ---------- Modern methods ---------- */

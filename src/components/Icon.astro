@@ -1,7 +1,7 @@
 ---
 // Stroke icons from the design. Decorative by default (aria-hidden);
 // pass `label` when the icon is the only content of a control.
-type Name = 'arrow-right' | 'arrow-left' | 'plus' | 'check' | 'menu' | 'close';
+type Name = 'arrow-right' | 'arrow-left' | 'arrow-up-right' | 'plus' | 'check' | 'menu' | 'close';
 
 interface Props {
   name: Name;
@@ -16,6 +16,8 @@ const { name, size = 18, strokeWidth = 2.4, label, class: className } = Astro.pr
 const paths: Record<Name, string[]> = {
   'arrow-right': ['M5 12h14', 'M13 6l6 6-6 6'],
   'arrow-left': ['M19 12H5', 'M11 6l-6 6 6 6'],
+  /* Opens another site */
+  'arrow-up-right': ['M7 17L17 7', 'M8 7h9v9'],
   plus: ['M12 5v14', 'M5 12h14'],
   check: ['M5 12.5l4.5 4.5L19 7.5'],
   menu: ['M4 8.5h16', 'M4 15.5h16'],

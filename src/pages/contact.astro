@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
 import { services, site } from '../data/site';
+import { proofLink } from '../data/projects';
 
 const sendErrorText = `Something went wrong sending your brief. Please try again${
   site.email ? `, or email us at ${site.email}` : ' in a moment'
@@ -85,7 +86,7 @@ const steps = [
             {site.responseTime ? `within ${site.responseTime}.` : 'with how we would approach it.'}
           </p>
           <div class="success__actions">
-            <a href="/work" class="btn btn--primary btn--sm">See the work meanwhile</a>
+            <a href={proofLink.href} class="btn btn--primary btn--sm">{proofLink.label} meanwhile</a>
             <button type="button" class="btn btn--outline btn--sm" data-contact-reset>
               Send another brief
             </button>
@@ -112,7 +113,7 @@ const steps = [
               <p id="c-name-error" class="field__error" role="alert" hidden>Please enter your name.</p>
             </div>
             <div class="field">
-              <label for="c-email" class="field__label">Work email</label>
+              <label for="c-email" class="field__label">Email</label>
               <input
                 id="c-email"
                 name="email"

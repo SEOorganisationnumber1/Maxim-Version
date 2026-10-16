@@ -12,7 +12,8 @@ type Faq = { question: string; answer: string };
 const jumpLinks = [
   { href: '#services', label: 'What we do' },
   { href: '#stack', label: 'Stack & tools' },
-  { href: '#pricing', label: 'Pricing' },
+  // "Pricing" only once a price is published; until then the plans are what the section shows.
+  { href: '#pricing', label: Object.values(prices).some(Boolean) ? 'Pricing' : 'Plans' },
   { href: '#faq', label: 'FAQ' },
 ];
 
@@ -158,6 +159,16 @@ const faqs: Faq[] = [
     question: 'Can you work with our in-house team?',
     answer:
       'Yes. We can own the whole project, or plug into your designers, developers or content team and cover only the gaps.',
+  },
+  {
+    question: 'What happens after we send a brief?',
+    answer:
+      'We read it and look at what you have so far, then reply with how we would approach it. If it fits, we scope the work together on a call.',
+  },
+  {
+    question: 'Do you guarantee rankings or AI citations?',
+    answer:
+      'No. Nobody controls how Google or AI assistants rank and cite pages, so we do not promise positions. We promise the work: technical fixes, structured content and a monthly report on rankings, citations and leads.',
   },
 ];
 

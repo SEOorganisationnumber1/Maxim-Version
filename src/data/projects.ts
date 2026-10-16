@@ -58,6 +58,8 @@ export type Project = {
   services: Service[];
   /** One line on the Home and Work cards; hidden while null. */
   summary: string | null;
+  /** The live product, linked from the cards so visitors can see the work for themselves. */
+  site: string | null;
   /** Lower-case line on the Clients page: "Web development and search & growth". */
   clientLine: string;
   look: Look;
@@ -81,18 +83,28 @@ const toClientLine = (services: Service[]): string => {
   return line.charAt(0).toUpperCase() + line.slice(1);
 };
 
-type Seed = Pick<Project, 'slug' | 'name' | 'services'> & Partial<Pick<Project, 'summary' | 'caseStudy'>>;
+type Seed = Pick<Project, 'slug' | 'name' | 'services'> & Partial<Pick<Project, 'summary' | 'site' | 'caseStudy'>>;
 
 // Real clients only: every project here is shown on Home, Work, Clients and in llms.txt.
 // Add `summary` and `caseStudy` (shape: CaseStudy above) as they are written; the case study
-// page at /work/<slug> is published as soon as `caseStudy` is set.
-const seeds: Seed[] = [{ slug: 'leadity-io', name: 'leadity.io', services: ['Web Development', 'Search & Growth'] }];
+// page at /work/<slug> is published as soon as `caseStudy` is set. A summary says what the
+// client's product is (from its own public site), never results that were not measured.
+const seeds: Seed[] = [
+  {
+    slug: 'leadity-io',
+    name: 'leadity.io',
+    services: ['Web Development', 'Search & Growth'],
+    summary: 'A lead generation platform: local business leads from Google Maps, for the US, Canada, the UK and Australia.',
+    site: 'https://leadity.io',
+  },
+];
 
 export const projects: Project[] = seeds.map((seed, i) => ({
   slug: seed.slug,
   name: seed.name,
   services: seed.services,
   summary: seed.summary ?? null,
+  site: seed.site ?? null,
   clientLine: toClientLine(seed.services),
   look: looks[i % looks.length]!,
   caseStudy: seed.caseStudy ?? null,
@@ -105,6 +117,16 @@ export const caseStudies: PublishedProject[] = projects.filter((p): p is Publish
 
 /** The case study URL, or null while it is not written. */
 export const projectUrl = (p: Project): string | null => (p.caseStudy ? `/work/${p.slug}` : null);
+
+/**
+ * The Clients page is linked (nav, footer, sitemap, llms.txt) only once it can show this many
+ * clients. Below that it repeats the Work page with a line or two, which reads as thin proof.
+ */
+export const CLIENTS_PAGE_MIN = 3;
+export const showClientsPage = projects.length >= CLIENTS_PAGE_MIN;
+
+/** Where "see the proof" links point: the work once a case study exists, the services until then. */
+export const proofLink = caseStudies.length > 0 ? { href: '/work', label: 'See the work' } : { href: '/services', label: 'See services' };
 
 /** "Web Development · SEO · GEO" */
 export const serviceLine = (services: readonly string[]): string => services.join(' · ');

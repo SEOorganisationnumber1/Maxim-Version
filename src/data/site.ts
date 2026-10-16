@@ -2,6 +2,8 @@
 // list, is simply not shown: the line or section that needs it stays hidden until it is set.
 // The build fails if a bracketed placeholder such as [X] reaches a page, so never type one here.
 
+import { showClientsPage } from './projects';
+
 export type Social = { label: string; url: string };
 export type Testimonial = { quote: string; name: string; role: string; company: string };
 export type TeamMember = {
@@ -69,11 +71,11 @@ export type Service = (typeof services)[number];
 
 export type NavItem = { href: string; label: string };
 
-/** Header links; "Start a project" (Contact) is rendered separately as the CTA. */
+/** Header links; "Start a project" (Contact) is rendered separately as the CTA. Clients joins once it has enough clients to show. */
 export const mainNav: NavItem[] = [
   { href: '/work', label: 'Work' },
   { href: '/services', label: 'Services' },
-  { href: '/clients', label: 'Clients' },
+  ...(showClientsPage ? [{ href: '/clients', label: 'Clients' }] : []),
   { href: '/company', label: 'Company' },
 ];
 

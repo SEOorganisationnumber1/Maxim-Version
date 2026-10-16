@@ -4,6 +4,7 @@
 import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
 import { site } from '../../data/site';
+import { proofLink } from '../../data/projects';
 ---
 
 <Base
@@ -24,7 +25,7 @@ import { site } from '../../data/site';
         }
       </p>
       <div class="sent__actions">
-        <a href="/work" class="btn btn--primary btn--sm">See the work</a>
+        <a href={proofLink.href} class="btn btn--primary btn--sm">{proofLink.label}</a>
         <a href="/" class="btn btn--outline btn--sm">Back to home</a>
       </div>
     </div>
