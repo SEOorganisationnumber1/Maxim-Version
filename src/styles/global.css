@@ -18,7 +18,7 @@
   --teal: #089FB3;
   --teal-ink: #077A8A;
 
-  /* Tints behind art and placeholders */
+  /* Tints behind art, hovers and notices */
   --tint-cyan: #DFF6F9;
   --tint-blue: #E4EEFF;
   --tint-violet: #EAE8FF;
@@ -269,22 +269,9 @@ img, svg { max-width: 100%; }
   color: var(--white);
 }
 
-/* ---------- Placeholders ---------- */
+/* ---------- Art wells ---------- */
 
-/* White mono tag that labels a missing image: [PROJECT SCREENSHOT] */
-.ph-tag {
-  position: relative;
-  background: var(--white);
-  border: 1.5px solid var(--ink);
-  border-radius: 6px;
-  padding: 6px 10px;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--ink);
-}
-
-/* Tinted image well with decorative wave art and a placeholder tag */
+/* Tinted image well with decorative wave art (project cards) */
 .shot {
   position: relative;
   overflow: hidden;

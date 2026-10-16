@@ -50,6 +50,9 @@ export default defineConfig({
       scriptDirective: { resources: ["'self'", 'https://cloud.umami.is'] },
     },
   },
+  // No Markdown on the site. Shiki, the default code highlighter, writes inline styles that the
+  // CSP above would block, so code blocks (if any are ever added) stay plain.
+  markdown: { syntaxHighlight: false },
   // Self-hosted fonts from the Fontsource packages, with metric-matched fallbacks: text set in the
   // fallback has the web font's proportions, so pages barely move when the font arrives. The
   // layouts render <Font /> for each variable and preload the latin files.
