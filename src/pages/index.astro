@@ -2,13 +2,13 @@
 import Base from '../layouts/Base.astro';
 import CtaBand from '../components/CtaBand.astro';
 import Icon from '../components/Icon.astro';
-import { filled, numbers, services, site, type Service } from '../data/site';
-import { projects, projectUrl, proofLink, serviceLine } from '../data/projects';
+import { filled, formatPrice, lowestPrice, numbers, services, site, type Service } from '../data/site';
+import { cardLine, clients, projects, projectUrl, proofLink } from '../data/projects';
 import { ribbonPath } from '../scripts/hero-ribbons';
 
-/** "Trusted by:" chips. Past CHIP_LIMIT the rest are behind "+ more brands". */
+/** "Trusted by:" chips, clients only (never our own products). Past CHIP_LIMIT the rest are behind "+ more brands". */
 const CHIP_LIMIT = 4;
-const chips = projects.slice(0, CHIP_LIMIT);
+const chips = clients.slice(0, CHIP_LIMIT);
 
 /** The numbers band shows only the figures that are set, and disappears without any. */
 const stats = filled([
@@ -18,14 +18,16 @@ const stats = filled([
   { value: numbers.retention, label: 'clients who stay past year one' },
 ]);
 
-// Home keeps its own discipline copy (it differs slightly from the Services page).
+// Home keeps its own copy for each kind of project (it differs slightly from the Services page).
 const disciplineCopy: Record<Service, string> = {
-  'Product Design':
-    'Interfaces and design systems in Figma, built around real user flows. A system of components, not a pile of screens, so every new feature stays on-brand.',
-  'Web Development':
-    'Websites and landing pages on modern frameworks. Server-rendered, typed and fast by default. Core Web Vitals are a build requirement, not an afterthought.',
+  'Websites & Landing Pages':
+    'Company websites, landing pages and blogs on modern frameworks. Fast by default, ready for search, with a CMS your team can edit.',
   'Web Apps & SaaS':
-    'Custom web applications and SaaS products, from the first version to scale. Full-stack and typed end to end, with accounts, payments, data and deploys done properly.',
+    'Custom web applications and SaaS products, from the first version to scale. Accounts, payments, dashboards, data and deploys done properly.',
+  'Mobile & Desktop Apps':
+    'Mobile apps for iOS and Android and desktop apps for Windows, macOS and Linux, designed and built from the first version to release.',
+  'Telegram Bots & Extensions':
+    'Telegram bots and Mini Apps that take orders, answer customers or run a workflow inside the chat, and browser extensions for Chrome, Firefox and Edge.',
   'AI & Automation':
     'AI features that do real work: assistants, answers from your own data, and automations that remove manual steps. Shipped with evaluation and guardrails, not as demos.',
   'Search & Growth':
@@ -87,7 +89,7 @@ const checks = [
 <Base
   title={`${site.name} · Digital Products, Built to Launch`}
   fullTitle
-  description={`${site.name} designs, builds and launches websites, web apps, SaaS and AI products, then helps them grow through search. One team, from first sketch to launch day.`}
+  description={`${site.name} designs and builds websites, web and mobile apps, desktop apps, Telegram bots and browser extensions, then helps them grow through search.`}
 >
   <!-- Hero -->
   <section class="hero bg-paper border-bottom" data-hero-ribbons>
@@ -141,8 +143,8 @@ const checks = [
     <div class="hero__content">
       <h1 class="hero__title">We design, build and launch <span class="highlight">digital products.</span></h1>
       <p class="hero__lede">
-        Websites, web apps, SaaS and AI products, taken from first sketch to launch day. After launch, we help them
-        grow in search.
+        Websites, web and mobile apps, desktop apps, Telegram bots and browser extensions, from first sketch to launch
+        day. After launch, we help them grow in search.
       </p>
 
       <div class="hero__actions">
@@ -159,7 +161,7 @@ const checks = [
             <ul class="chip-list">
               {chips.map((project) => <><li class="chip chip--dark">{project.name}</li>{'\n'}</>)}
             </ul>
-            {projects.length > chips.length && <a href="/clients" class="hero__more">+ more brands</a>}
+            {clients.length > chips.length && <a href="/clients" class="hero__more">+ more brands</a>}
           </div>
         )
       }
@@ -184,12 +186,13 @@ const checks = [
     </button>
   </section>
 
-  <!-- What we do: the five disciplines, right after the hero -->
+  <!-- What we do: the kinds of projects we take on, right after the hero -->
   <section id="what-we-do" class="bg-white">
     <div class="container block">
       <div class="block__head">
         <div class="block__title">
-          <h2 class="h2">Five disciplines. One team.</h2>
+          <h2 class="h2">What we build.</h2>
+          <p class="block__intro">UI and UX design is part of every project, not an extra.</p>
         </div>
         <a href="/services" class="text-link">All services<Icon name="arrow-right" /></a>
       </div>
@@ -198,7 +201,10 @@ const checks = [
           services.map((service) => (
             <li class="discipline">
               <h3 class="discipline__name">{service}</h3>
-              <p class="discipline__text">{disciplineCopy[service]}</p>
+              <div class="discipline__body">
+                <p class="discipline__text">{disciplineCopy[service]}</p>
+                <p class="discipline__price">From {formatPrice(lowestPrice(service))}</p>
+              </div>
             </li>
           ))
         }
@@ -268,7 +274,7 @@ const checks = [
               </div>
               <div class="featured__body">
                 <div class="featured__copy">
-                  <span class="tagline">{serviceLine(featured.services)}</span>
+                  <span class="tagline">{cardLine(featured)}</span>
                   <h3 class="featured__name">{featured.name}</h3>
                   {featured.summary && <p class="featured__summary">{featured.summary}</p>}
                 </div>
@@ -318,7 +324,7 @@ const checks = [
                         </svg>
                       </div>
                       <div class="small__body">
-                        <span class="tagline">{serviceLine(project.services)}</span>
+                        <span class="tagline">{cardLine(project)}</span>
                         <h3 class="small__name">{project.name}</h3>
                         {project.summary && <p class="small__summary">{project.summary}</p>}
                         {!url && project.site && (
@@ -346,7 +352,7 @@ const checks = [
       <div class="block__head">
         <div class="block__title">
           <h2 class="h2">Check our work on this site.</h2>
-          <p class="checks__intro">Don't take our word for it. Run the checks a developer would, on this site, live.</p>
+          <p class="block__intro">Don't take our word for it. Run the checks a developer would, on this site, live.</p>
         </div>
       </div>
       <ul class="checks">
@@ -583,7 +589,7 @@ const checks = [
     gap: 12px;
   }
 
-  /* ---------- Five disciplines ---------- */
+  /* ---------- What we build ---------- */
 
   .disciplines {
     list-style: none;
@@ -607,8 +613,18 @@ const checks = [
     font-size: clamp(1.75rem, 3vw, 2.5rem);
     line-height: 1.1;
   }
-  .discipline__text {
+  .discipline__body {
     flex: 2 1 360px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .discipline__price {
+    margin: 0;
+    font-weight: 700;
+    font-size: 16px;
+  }
+  .discipline__text {
     margin: 0;
     font-size: 17px;
     line-height: 1.6;
@@ -729,7 +745,8 @@ const checks = [
 
   /* ---------- Checks on this site ---------- */
 
-  .checks__intro {
+  /* One line under a section title. */
+  .block__intro {
     margin: 0;
     max-width: 640px;
     font-size: 18px;

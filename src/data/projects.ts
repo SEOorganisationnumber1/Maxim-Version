@@ -60,6 +60,8 @@ export type Project = {
   summary: string | null;
   /** The live product, linked from the cards so visitors can see the work for themselves. */
   site: string | null;
+  /** Our own product rather than a client's: labelled so on the cards, never counted or shown as a client. */
+  own: boolean;
   /** Lower-case line on the Clients page: "Web development and search & growth". */
   clientLine: string;
   look: Look;
@@ -67,7 +69,7 @@ export type Project = {
   caseStudy: CaseStudy | null;
 };
 
-/** "Web development and AI & automation" from ['Web Development', 'AI & Automation']. */
+/** "Web apps & SaaS and AI & automation" from ['Web Apps & SaaS', 'AI & Automation']. */
 const toClientLine = (services: Service[]): string => {
   // Lower-case ordinary words; keep acronyms and mixed-case terms such as AI and SaaS as written.
   const words = services.map((s) =>
@@ -83,19 +85,21 @@ const toClientLine = (services: Service[]): string => {
   return line.charAt(0).toUpperCase() + line.slice(1);
 };
 
-type Seed = Pick<Project, 'slug' | 'name' | 'services'> & Partial<Pick<Project, 'summary' | 'site' | 'caseStudy'>>;
+type Seed = Pick<Project, 'slug' | 'name' | 'services'> & Partial<Pick<Project, 'summary' | 'site' | 'own' | 'caseStudy'>>;
 
-// Real clients only: every project here is shown on Home, Work, Clients and in llms.txt.
-// Add `summary` and `caseStudy` (shape: CaseStudy above) as they are written; the case study
-// page at /work/<slug> is published as soon as `caseStudy` is set. A summary says what the
-// client's product is (from its own public site), never results that were not measured.
+// Real work only: every project here is shown on Home, Work and in llms.txt; clients (not `own`)
+// also on Clients. Add `summary` and `caseStudy` (shape: CaseStudy above) as they are written;
+// the case study page at /work/<slug> is published as soon as `caseStudy` is set. A summary says
+// what the product is and what we built, never results that were not measured.
 const seeds: Seed[] = [
   {
     slug: 'leadity-io',
     name: 'leadity.io',
-    services: ['Web Development', 'Search & Growth'],
-    summary: 'A lead generation platform: local business leads from Google Maps, for the US, Canada, the UK and Australia.',
+    services: ['Websites & Landing Pages', 'Web Apps & SaaS', 'Search & Growth'],
+    summary:
+      'A lead generation platform for local business leads from Google Maps. We co-founded it and built the first version full stack, then the website, the user area and its SEO.',
     site: 'https://leadity.io',
+    own: true,
   },
 ];
 
@@ -105,6 +109,7 @@ export const projects: Project[] = seeds.map((seed, i) => ({
   services: seed.services,
   summary: seed.summary ?? null,
   site: seed.site ?? null,
+  own: seed.own ?? false,
   clientLine: toClientLine(seed.services),
   look: looks[i % looks.length]!,
   caseStudy: seed.caseStudy ?? null,
@@ -123,10 +128,15 @@ export const projectUrl = (p: Project): string | null => (p.caseStudy ? `/work/$
  * clients. Below that it repeats the Work page with a line or two, which reads as thin proof.
  */
 export const CLIENTS_PAGE_MIN = 3;
-export const showClientsPage = projects.length >= CLIENTS_PAGE_MIN;
+/** Client work only: our own products are never shown as clients ("Trusted by", the Clients page). */
+export const clients: Project[] = projects.filter((p) => !p.own);
+export const showClientsPage = clients.length >= CLIENTS_PAGE_MIN;
+
+/** The small line above a card's name: "Our own product", or the services we delivered. */
+export const cardLine = (p: Project): string => (p.own ? 'Our own product' : serviceLine(p.services));
 
 /** Where "see the proof" links point: the work once a case study exists, the services until then. */
 export const proofLink = caseStudies.length > 0 ? { href: '/work', label: 'See the work' } : { href: '/services', label: 'See services' };
 
-/** "Web Development · SEO · GEO" */
+/** "Web Apps & SaaS · Search & Growth" */
 export const serviceLine = (services: readonly string[]): string => services.join(' · ');

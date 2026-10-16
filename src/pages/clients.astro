@@ -2,11 +2,11 @@
 import Base from '../layouts/Base.astro';
 import CtaBand from '../components/CtaBand.astro';
 import Icon from '../components/Icon.astro';
-import { projectUrl, projects, showClientsPage } from '../data/projects';
+import { clients as clientProjects, projectUrl, showClientsPage } from '../data/projects';
 import { testimonials } from '../data/site';
 
-// Every client gets a tile; it links to the case study once that is written.
-const clients = projects.map((project) => ({ project, url: projectUrl(project) }));
+// Every client (never our own products) gets a tile; it links to the case study once that is written.
+const clients = clientProjects.map((project) => ({ project, url: projectUrl(project) }));
 ---
 
 {/* Until there are enough clients to show (CLIENTS_PAGE_MIN), nothing links here and the page stays out of search. */}

@@ -1,6 +1,6 @@
 # Launchery Studio website
 
-The site of Launchery Studio, a product studio that designs, builds, launches and grows websites, web apps, SaaS and AI products. It is an Astro build of the "Agency Portfolio" design canvas: Home, Work, Case study, Services, Clients, Company, Contact and Privacy. Pages are static HTML; only the brief API and `/admin` run as a Netlify Function.
+The site of Launchery Studio, a studio that designs and builds websites, web and mobile apps, desktop apps, Telegram bots, browser extensions and AI features, then helps them grow through search. It is an Astro build of the "Agency Portfolio" design canvas: Home, Work, Case study, Services, Clients, Company, Contact and Privacy. Pages are static HTML; only the brief API and `/admin` run as a Netlify Function.
 
 The brand name, tagline and service list live in `src/data/site.ts`; every page, share image, JSON-LD block, the admin panel and the brief emails read them from there.
 
@@ -46,7 +46,8 @@ Everything that still needs real data lives in two files. A value left `null` (o
 | Public email, social profiles, city, reply time | `site` in `src/data/site.ts` | "Prefer email?" lines, footer contacts, JSON-LD email and sameAs |
 | Company name, registration, address | `legal` in `src/data/site.ts` | Privacy policy names the agency until then |
 | Numbers (projects, years, markets, retention, founded, team size) | `numbers` in `src/data/site.ts` | Number bands on Home and Company |
-| Plan prices | `prices` in `src/data/site.ts` | Plans read "Custom quote" |
+| Plan prices and starting prices per kind of project | `prices` and `startingPrices` in `src/data/site.ts` | Plans read "Custom quote"; starting prices show on Services, Home and in `llms.txt` |
+| Working terms (estimate, payments, ownership, fixes) | `terms` in `src/pages/services.astro`, steps in `src/pages/contact.astro` | Always shown: keep them in step with how you really work |
 | Client quotes, team | `testimonials`, `team` in `src/data/site.ts` | Quotes on Clients, team on Company |
 | Projects, summaries, case studies | `seeds` in `src/data/projects.ts` | A project without `caseStudy` has no page and its cards do not link |
 

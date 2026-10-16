@@ -2,42 +2,69 @@
 import Base from '../layouts/Base.astro';
 import CtaBand from '../components/CtaBand.astro';
 import Icon from '../components/Icon.astro';
-import { prices, type PlanName, type Service } from '../data/site';
+import { formatPrice, prices, startingPrices, type PlanName, type Service } from '../data/site';
 
 type ServiceBlock = { name: Service; description: string; deliverables: string[] };
 type StackRow = { label: string; tools: string[] };
 type Plan = { name: PlanName; summary: string; period: string; featured: boolean; items: string[] };
 type Faq = { question: string; answer: string };
+type Term = { title: string; text: string };
 
 const jumpLinks = [
   { href: '#services', label: 'What we do' },
   { href: '#stack', label: 'Stack & tools' },
   // "Pricing" only once a price is published; until then the plans are what the section shows.
   { href: '#pricing', label: Object.values(prices).some(Boolean) ? 'Pricing' : 'Plans' },
+  { href: '#terms', label: 'Terms' },
   { href: '#faq', label: 'FAQ' },
 ];
 
-const serviceBlocks: ServiceBlock[] = [
+// How every project works, approved by the owner on 2026-10-16. These are promises the studio
+// keeps: change them here first if the way of working changes.
+const terms: Term[] = [
   {
-    name: 'Product Design',
-    description:
-      'Interfaces and design systems in Figma, built around how people actually use the product. Components, not a pile of screens, so the build is fast and every new feature stays on-brand.',
-    deliverables: [
-      'Product discovery and user flows',
-      'UI and UX for web apps and websites',
-      'A design system with reusable components',
-      'Clickable prototypes and a developer-ready handoff',
-    ],
+    title: 'Free estimate',
+    text: 'Send a brief and within two business days you get our approach and a fixed price in writing. It costs nothing.',
   },
   {
-    name: 'Web Development',
+    title: 'Fixed price, written scope',
+    text: 'The price is fixed for the scope we agree in writing. Anything new gets its own price and timeline, and you approve it before we start.',
+  },
+  {
+    title: 'Pay in stages',
+    text: '50% to start and 50% at launch. Above $5,000: 30% to start, 40% when the design is approved and 30% at launch.',
+  },
+  {
+    title: 'You own everything',
+    text: 'Code, design files and accounts are yours once the final payment is made. Domain, hosting and app store accounts are in your name from day one.',
+  },
+  { title: 'Two rounds of design changes', text: 'Two rounds of changes on the design are included in the price.' },
+  { title: '30 days of free fixes', text: 'For 30 days after launch, we fix any bug in what we built, free.' },
+  {
+    title: 'Support if you want it',
+    text: "Monthly care for websites from $50 per month, optional. Cancel any time with 30 days' notice.",
+  },
+  {
+    title: 'No hidden costs',
+    text: 'Hosting, domains, AI and API usage and app store fees are paid by you directly, at cost.',
+  },
+  {
+    title: 'SEO month to month',
+    text: "No long contract: cancel with 30 days' notice. Nobody can guarantee rankings, so we don't.",
+  },
+];
+
+// One block per kind of project. UI and UX design is in every one of them, so it has no block of its own.
+const serviceBlocks: ServiceBlock[] = [
+  {
+    name: 'Websites & Landing Pages',
     description:
-      'Websites and landing pages on modern frameworks. Server-rendered, typed and fast by default. Core Web Vitals are a build requirement, not an afterthought.',
+      'Company websites, landing pages and blogs on modern frameworks. Server-rendered and fast by default. Core Web Vitals are a build requirement, not an afterthought.',
     deliverables: [
-      'Marketing sites and landing pages',
-      'Static and server rendering for speed',
+      'Design of every page, for desktop and mobile',
+      'Company sites, landing pages and blogs',
       'A headless CMS your team can edit',
-      'Analytics, tracking and performance budgets built in',
+      'Analytics, tracking and SEO foundations built in',
     ],
   },
   {
@@ -49,6 +76,28 @@ const serviceBlocks: ServiceBlock[] = [
       'Internal tools, portals and dashboards',
       'Accounts, roles, payments and integrations',
       'Tests, CI/CD and monitoring from day one',
+    ],
+  },
+  {
+    name: 'Mobile & Desktop Apps',
+    description:
+      'Mobile apps for iOS and Android and desktop apps for Windows, macOS and Linux, designed and built from the first version to release.',
+    deliverables: [
+      'Interface design for every screen',
+      'iOS and Android apps',
+      'Desktop apps for Windows, macOS and Linux',
+      'Help with publishing to the App Store and Google Play',
+    ],
+  },
+  {
+    name: 'Telegram Bots & Extensions',
+    description:
+      'Telegram bots and Mini Apps that take orders, answer customers or run a workflow inside the chat, and browser extensions that add a feature where your users already work.',
+    deliverables: [
+      'Telegram bots with commands, menus and payments',
+      'Telegram Mini Apps',
+      'Extensions for Chrome, Firefox and Edge',
+      'The admin panel, database and integrations behind them',
     ],
   },
   {
@@ -138,7 +187,7 @@ const faqs: Faq[] = [
   {
     question: 'What do you build?',
     answer:
-      'Websites and landing pages, custom web apps, SaaS products and AI features, plus the search work that gets them found. One team covers design, engineering and growth, so nothing gets lost between agencies.',
+      'Websites and landing pages, web apps and SaaS, mobile and desktop apps, Telegram bots and Mini Apps, browser extensions and AI features, plus the search work that gets them found. Design is part of every project, and one team covers design, engineering and growth.',
   },
   {
     question: 'How long does a project take?',
@@ -163,7 +212,22 @@ const faqs: Faq[] = [
   {
     question: 'What happens after we send a brief?',
     answer:
-      'We read it and look at what you have so far, then reply with how we would approach it. If it fits, we scope the work together on a call.',
+      'We read it and look at what you have so far. Within two business days you get our approach and a fixed price in writing, free. If it fits, we confirm the scope together and start.',
+  },
+  {
+    question: 'How much does a project cost?',
+    answer:
+      'Every project gets a fixed price for a written scope. As a guide: landing pages from $600, websites from $1,500, Telegram bots from $300, mobile apps from $3,500 and web apps from $5,000. The starting prices for each kind of project are listed above.',
+  },
+  {
+    question: 'How do payments work?',
+    answer:
+      '50% to start and 50% at launch. Projects above $5,000 pay in three stages: 30% to start, 40% when the design is approved and 30% at launch.',
+  },
+  {
+    question: 'Who owns the code and the design?',
+    answer:
+      'You do. Code, design files and accounts are yours once the final payment is made, and the domain, hosting and app store accounts are in your name from day one.',
   },
   {
     question: 'Do you guarantee rankings or AI citations?',
@@ -187,7 +251,7 @@ const faqPageJsonLd: Record<string, unknown> = {
   title="Services"
   current="/services"
   og="services"
-  description="Product design, web development, web apps and SaaS, AI and automation, and search-led growth. One team designs, builds, launches and grows your product."
+  description="Websites, web apps and SaaS, mobile and desktop apps, Telegram bots and browser extensions, AI and automation, and search-led growth. One team designs, builds and grows your product."
   jsonLd={[faqPageJsonLd]}
 >
   <section class="hero bg-paper border-bottom">
@@ -244,6 +308,14 @@ const faqPageJsonLd: Record<string, unknown> = {
             <div class="service__col">
               <h2 class="service__title">{service.name}</h2>
               <p class="service__text">{service.description}</p>
+              <dl class="service__prices">
+                {startingPrices[service.name].map((price) => (
+                  <div>
+                    <dt>{price.item}</dt>
+                    <dd>From {formatPrice(price)}</dd>
+                  </div>
+                ))}
+              </dl>
             </div>
             <div class="service__col">
               <h3 class="service__label">What you get</h3>
@@ -302,7 +374,10 @@ const faqPageJsonLd: Record<string, unknown> = {
               </div>
               <p class="plan__price">
                 {prices[plan.name] ? (
-                  <span class="plan__amount">{prices[plan.name]}</span>
+                  <>
+                    <span class="plan__from">From</span>
+                    <span class="plan__amount">{prices[plan.name]}</span>
+                  </>
                 ) : (
                   <span class="plan__amount plan__amount--quote">Custom quote</span>
                 )}
@@ -323,6 +398,25 @@ const faqPageJsonLd: Record<string, unknown> = {
           ))
         }
       </div>
+    </div>
+  </section>
+
+  <section id="terms" class="anchor bg-paper border-top">
+    <div class="container terms__inner">
+      <div class="section-head">
+        <h2 class="h2">Clear terms. No surprises.</h2>
+        <p class="section-head__text">How every project works, before you sign anything.</p>
+      </div>
+      <dl class="terms">
+        {
+          terms.map((term) => (
+            <div class="terms__row">
+              <dt class="terms__title">{term.title}</dt>
+              <dd class="terms__text">{term.text}</dd>
+            </div>
+          ))
+        }
+      </dl>
     </div>
   </section>
 
@@ -467,6 +561,29 @@ const faqPageJsonLd: Record<string, unknown> = {
     font-size: 17px;
     line-height: 1.5;
   }
+  /* Starting prices under each description: item on the left, price on the right. */
+  .service__prices {
+    margin: 8px 0 0;
+    max-width: 520px;
+    border-top: 1.5px solid var(--ink);
+  }
+  .service__prices > div {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 4px 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .service__prices dt {
+    font-size: 16px;
+    color: var(--ink-2);
+  }
+  .service__prices dd {
+    margin: 0;
+    font-weight: 700;
+    font-size: 16px;
+  }
 
   /* ---------- Shared section head ---------- */
 
@@ -584,6 +701,11 @@ const faqPageJsonLd: Record<string, unknown> = {
     font-size: 28px;
     line-height: 1.15;
   }
+  .plan__from {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink-2);
+  }
   .plan__period {
     font-size: 15px;
     font-weight: 600;
@@ -606,6 +728,41 @@ const faqPageJsonLd: Record<string, unknown> = {
   }
 
   /* ---------- FAQ ---------- */
+
+  /* ---------- Terms ---------- */
+
+  .terms__inner {
+    padding-top: 96px;
+    padding-bottom: 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+  }
+  .terms {
+    margin: 0;
+    border-bottom: 1.5px solid var(--ink);
+  }
+  .terms__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 40px;
+    padding: 22px 0;
+    border-top: 1.5px solid var(--ink);
+  }
+  .terms__title {
+    flex: 1 1 260px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 22px;
+    line-height: 1.25;
+  }
+  .terms__text {
+    flex: 2 1 380px;
+    margin: 0;
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
 
   .faq__inner {
     max-width: 1000px;

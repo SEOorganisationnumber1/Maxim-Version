@@ -3,7 +3,7 @@ import Base from '../../layouts/Base.astro';
 import CtaBand from '../../components/CtaBand.astro';
 import Icon from '../../components/Icon.astro';
 import { services } from '../../data/site';
-import { projects, projectUrl, serviceLine } from '../../data/projects';
+import { cardLine, projects, projectUrl } from '../../data/projects';
 
 // Filtering only helps with two or more projects, and only by services that have a project.
 const showFilters = projects.length > 1;
@@ -15,7 +15,7 @@ const countLabel = (n: number) => (n === 1 ? '1 project' : `${n} projects`);
   title="Work"
   current="/work"
   og="work"
-  description="Websites, web apps, SaaS and AI products we designed, built and launched, and what we did for each of them."
+  description="Websites, apps, bots and other products we designed, built and launched, and what we did for each of them."
 >
   <section class="hero">
     <div class="hero__art" aria-hidden="true">
@@ -72,7 +72,7 @@ const countLabel = (n: number) => (n === 1 ? '1 project' : `${n} projects`);
                   </svg>
                 </div>
                 <div class="work-card__body">
-                  <span class="tagline">{serviceLine(p.services)}</span>
+                  <span class="tagline">{cardLine(p)}</span>
                   <h2 class="work-card__name">{p.name}</h2>
                   {p.summary && <p class="work-card__summary">{p.summary}</p>}
                   {url ? (
