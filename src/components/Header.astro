@@ -10,9 +10,22 @@ interface Props {
 
 const { current } = Astro.props;
 const isCurrent = (href: string) => (href === current ? 'page' : undefined);
+
+/** The nav underline: one soft wave that ends rising, the hero ribbons in miniature. */
+const CURVE = 'M3 8 C 22 2, 38 2, 52 6.5 S 80 11, 97 4';
 ---
 
 <header class="header">
+  {/* The brand gradient for every nav curve, defined once (header and menu sheet). */}
+  <svg class="nav-curve-defs" aria-hidden="true" focusable="false" width="0" height="0">
+    <defs>
+      <linearGradient id="nav-curve-gradient" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#22D3DD"></stop>
+        <stop offset="0.55" stop-color="#2F8CF6"></stop>
+        <stop offset="1" stop-color="#5B4FE9"></stop>
+      </linearGradient>
+    </defs>
+  </svg>
   <div class="header__inner">
     <Logo id="logo-h" />
     <nav aria-label="Main" class="header__nav">
@@ -20,6 +33,9 @@ const isCurrent = (href: string) => (href === current ? 'page' : undefined);
         mainNav.map((item) => (
           <a href={item.href} class="header__link" aria-current={isCurrent(item.href)}>
             {item.label}
+            <svg class="nav-curve" aria-hidden="true" focusable="false" viewBox="0 0 100 12" preserveAspectRatio="none">
+              <path d={CURVE}></path>
+            </svg>
           </a>
         ))
       }
@@ -61,7 +77,12 @@ const isCurrent = (href: string) => (href === current ? 'page' : undefined);
         mainNav.map((item) => (
           <li>
             <a href={item.href} aria-current={isCurrent(item.href)}>
-              {item.label}
+              <span class="menu__label">
+                {item.label}
+                <svg class="nav-curve nav-curve--menu" aria-hidden="true" focusable="false" viewBox="0 0 100 12" preserveAspectRatio="none">
+                  <path d={CURVE}></path>
+                </svg>
+              </span>
             </a>
           </li>
         ))
@@ -133,6 +154,7 @@ const isCurrent = (href: string) => (href === current ? 'page' : undefined);
     gap: 4px 8px;
   }
   .header__link {
+    position: relative;
     display: flex;
     align-items: center;
     min-height: 44px;
@@ -141,8 +163,65 @@ const isCurrent = (href: string) => (href === current ? 'page' : undefined);
     font-size: 15px;
     text-decoration: none;
   }
-  .header__link[aria-current='page'] {
-    box-shadow: inset 0 -2px 0 var(--cyan);
+  .header__link:hover {
+    color: var(--ink);
+  }
+
+  /* ---------- Nav curve ---------- */
+
+  .nav-curve-defs {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+  }
+  /* Under the link text. Hidden by a clip that covers it from the right; hover, keyboard focus
+     and the current page open the clip, so the wave draws in from the left. A transition, so a
+     quick hover in and out turns back from where it is instead of restarting. */
+  .nav-curve {
+    position: absolute;
+    left: 12px;
+    bottom: 1px;
+    width: calc(100% - 24px);
+    height: 10px;
+    overflow: visible;
+    pointer-events: none;
+    clip-path: inset(-4px 100% -4px -4px);
+    transition: clip-path 160ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .nav-curve path {
+    fill: none;
+    stroke: url(#nav-curve-gradient);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+  }
+  .header__link[aria-current='page'] .nav-curve,
+  .header__link:focus-visible .nav-curve {
+    clip-path: inset(-4px);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .header__link:hover .nav-curve {
+      clip-path: inset(-4px);
+      transition-duration: 240ms;
+    }
+  }
+  /* Reduced motion: the wave fades in place instead of drawing. */
+  @media (prefers-reduced-motion: reduce) {
+    .nav-curve {
+      clip-path: inset(-4px);
+      opacity: 0;
+      transition: opacity 150ms ease;
+    }
+    .header__link[aria-current='page'] .nav-curve,
+    .header__link:focus-visible .nav-curve {
+      opacity: 1;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) and (hover: hover) and (pointer: fine) {
+    .header__link:hover .nav-curve {
+      opacity: 1;
+    }
   }
   .header__cta {
     display: inline-flex;
@@ -280,6 +359,27 @@ const isCurrent = (href: string) => (href === current ? 'page' : undefined);
   .menu__links a:hover,
   .menu__links a[aria-current='page'] {
     color: var(--cyan);
+  }
+  /* The current page in the sheet carries the same wave, static and heavier, under its name. */
+  .menu__label {
+    position: relative;
+    display: inline-block;
+  }
+  .nav-curve--menu {
+    display: none;
+    left: 0;
+    bottom: -8px;
+    width: 100%;
+    height: 14px;
+    clip-path: none;
+    transition: none;
+  }
+  .nav-curve--menu path {
+    stroke-width: 4;
+  }
+  .menu__links a[aria-current='page'] .nav-curve--menu {
+    display: block;
+    opacity: 1;
   }
   /* The sheet's one moment: links rise into place, 30 ms apart. Closing is quicker and all at once. */
   .menu__links li {
