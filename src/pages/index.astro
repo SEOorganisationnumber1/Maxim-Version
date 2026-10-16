@@ -32,8 +32,6 @@ const disciplineCopy: Record<Service, string> = {
     'SEO, GEO and AEO. We make sure people, Google and AI assistants such as ChatGPT and Gemini can find, understand and recommend what we launch.',
 };
 
-const pad = (n: number): string => String(n).padStart(2, '0');
-
 // The first project gets the large card with its own art; the next two get small cards in the
 // Work page looks. Cards link once their case study is written.
 const [featured, ...others] = projects;
@@ -117,8 +115,7 @@ const methods = [
     </div>
 
     <div class="hero__content">
-      <p class="eyebrow hero__eyebrow">Product studio</p>
-      <h1 class="hero__title">We design, build and launch digital products.</h1>
+      <h1 class="hero__title">We design, build and launch <span class="highlight">digital products.</span></h1>
       <p class="hero__lede">
         Websites, web apps, SaaS and AI products, taken from first sketch to launch day. After launch, we help them
         grow in search.
@@ -168,19 +165,15 @@ const methods = [
     <div class="container block">
       <div class="block__head">
         <div class="block__title">
-          <span class="eyebrow block__eyebrow">What we do</span>
           <h2 class="h2">Five disciplines. One team.</h2>
         </div>
         <a href="/services" class="text-link">All services<Icon name="arrow-right" /></a>
       </div>
       <ol class="disciplines">
         {
-          services.map((service, i) => (
+          services.map((service) => (
             <li class="discipline">
-              <div class="discipline__name">
-                <span class="num">{pad(i + 1)}</span>
-                <h3>{service}</h3>
-              </div>
+              <h3 class="discipline__name">{service}</h3>
               <p class="discipline__text">{disciplineCopy[service]}</p>
             </li>
           ))
@@ -319,9 +312,8 @@ const methods = [
       </div>
       <ol class="rule-grid">
         {
-          methods.map((step, i) => (
+          methods.map((step) => (
             <li>
-              <span class="num">{pad(i + 1)}</span>
               <h3>{step.title}</h3>
               <p>{step.text}</p>
             </li>
@@ -422,16 +414,7 @@ const methods = [
     flex-direction: column;
     align-items: flex-start;
   }
-  /* "Product studio" over the h1, "What we do" over the disciplines */
-  .hero__eyebrow,
-  .block__eyebrow {
-    font-size: 13px;
-    color: var(--teal-ink);
-  }
-  .hero__eyebrow {
-    margin: 0 0 20px;
-  }
-  /* One plain sentence in ink: deliberately unlike the share image (two lines, boxed word, teal). */
+  /* One sentence; as in every page title, its last words sit in the highlight. */
   .hero__title {
     margin: 0;
     max-width: 12.5em;
@@ -543,11 +526,6 @@ const methods = [
   }
   .discipline__name {
     flex: 1 1 300px;
-    display: flex;
-    align-items: baseline;
-    gap: 20px;
-  }
-  .discipline__name h3 {
     margin: 0;
     font-family: var(--font-display);
     font-weight: 700;

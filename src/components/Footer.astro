@@ -15,15 +15,15 @@ const hasContact = Boolean(site.email || site.socials.length || site.location);
         <p>{site.tagline}</p>
       </div>
       <nav aria-label="Footer" class="footer__nav">
-        <span class="eyebrow footer__head">Pages</span>
+        <span class="footer__head">Pages</span>
         {footerNav.map((item) => <><a href={item.href}>{item.label}</a>{'\n'}</>)}
       </nav>
       <div class="footer__list">
-        <span class="eyebrow footer__head">We do</span>
+        <span class="footer__head">We do</span>
         {services.map((s) => <><span>{s}</span>{'\n'}</>)}
       </div>
       <div class="footer__list">
-        <span class="eyebrow footer__head">Get in touch</span>
+        <span class="footer__head">Get in touch</span>
         {site.email && <a href={`mailto:${site.email}`}>{site.email}</a>}
         {site.socials.map((s) => <><a href={s.url} rel="me noopener" target="_blank">{s.label}</a>{'\n'}</>)}
         {site.location && <span>{site.location}</span>}
@@ -74,8 +74,10 @@ const hasContact = Boolean(site.email || site.socials.length || site.location);
     color: var(--footer-text);
   }
   .footer__head {
-    color: var(--cyan);
     padding-bottom: 8px;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--white);
   }
   .footer__nav {
     display: flex;

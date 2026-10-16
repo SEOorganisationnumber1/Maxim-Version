@@ -82,7 +82,6 @@ const ld = [organization, ...(cleanPath === '/' ? [website] : []), ...jsonLd];
     {/* Headings and body text preload their latin file so the first paint already uses them. */}
     <Font cssVariable="--font-display" preload={[{ subset: 'latin' }]} />
     <Font cssVariable="--font-body" preload={[{ subset: 'latin' }]} />
-    <Font cssVariable="--font-mono" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />

@@ -35,9 +35,8 @@ const steps = [
           <h2 class="next__title">What happens next</h2>
           <ol class="next__list">
             {
-              steps.map((step, i) => (
+              steps.map((step) => (
                 <li>
-                  <span class="num">{String(i + 1).padStart(2, '0')}</span>
                   <span class="next__text">{step}</span>
                 </li>
               ))
@@ -246,12 +245,10 @@ const steps = [
   }
   .next__title {
     margin: 0;
-    font-family: var(--font-mono);
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--ink-2);
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
   }
   .next__list {
     list-style: none;

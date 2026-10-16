@@ -170,8 +170,6 @@ const faqPageJsonLd: Record<string, unknown> = {
     acceptedAnswer: { '@type': 'Answer', text: faq.answer },
   })),
 };
-
-const pad2 = (n: number): string => String(n).padStart(2, '0');
 ---
 
 <Base
@@ -230,10 +228,9 @@ const pad2 = (n: number): string => String(n).padStart(2, '0');
   <section id="services" class="anchor bg-white">
     <div class="container services__inner">
       {
-        serviceBlocks.map((service, i) => (
+        serviceBlocks.map((service) => (
           <article class="service">
             <div class="service__col">
-              <span class="num">{pad2(i + 1)}</span>
               <h2 class="service__title">{service.name}</h2>
               <p class="service__text">{service.description}</p>
             </div>
@@ -447,12 +444,8 @@ const pad2 = (n: number): string => String(n).padStart(2, '0');
   }
   .service__label {
     margin: 0;
-    font-family: var(--font-mono);
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--ink-2);
+    font-size: 16px;
+    font-weight: 700;
   }
   .service__list {
     margin: 0;
@@ -506,12 +499,8 @@ const pad2 = (n: number): string => String(n).padStart(2, '0');
   }
   .stack__label {
     flex: 0 0 200px;
-    font-family: var(--font-mono);
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--teal-ink);
+    font-size: 16px;
+    font-weight: 700;
   }
   .stack__tools {
     flex: 1 1 320px;

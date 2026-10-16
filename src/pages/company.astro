@@ -113,9 +113,8 @@ const tints = ['cyan', 'blue', 'violet'] as const;
       </div>
       <ol class="rule-grid">
         {
-          rules.map((rule, i) => (
+          rules.map((rule) => (
             <li>
-              <span class="num">{String(i + 1).padStart(2, '0')}</span>
               <h3>{rule.title}</h3>
               <p>{rule.text}</p>
             </li>

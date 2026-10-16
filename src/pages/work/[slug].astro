@@ -76,7 +76,7 @@ const jsonLd: Record<string, unknown>[] = [
         {
           meta.map((item) => (
             <div>
-              <dt class="eyebrow">{item.label}</dt>
+              <dt>{item.label}</dt>
               <dd>{item.value}</dd>
             </div>
           ))
@@ -222,6 +222,8 @@ const jsonLd: Record<string, unknown>[] = [
     gap: 4px;
   }
   .meta dt {
+    font-size: 14px;
+    font-weight: 600;
     color: var(--ink-2);
   }
   .meta dd {
@@ -332,12 +334,10 @@ const jsonLd: Record<string, unknown>[] = [
   }
   .story__item h3 {
     margin: 0;
-    font-family: var(--font-mono);
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--teal-ink);
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
   }
 
   /* ---------- Quote ---------- */
