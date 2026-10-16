@@ -27,8 +27,8 @@ In Netlify, under Project configuration > Environment variables (then trigger a 
 | `ADMIN_PASSWORD` | Password for `/admin`, at least 12 characters. |
 | `RESEND_API_KEY`, `BRIEF_NOTIFY_TO` | An email for every new brief. Create a free [Resend](https://resend.com) account and an API key. Until you verify a domain in Resend, `BRIEF_NOTIFY_TO` must be the address you signed up with. |
 | `BRIEF_NOTIFY_FROM` | Optional sender, e.g. `Briefs <briefs@yourdomain.com>`, once the domain is verified in Resend. |
-| `UMAMI_WEBSITE_ID` | Turns on cookie-free analytics ([Umami Cloud](https://umami.is)). No cookie banner is needed. |
-| `GOOGLE_SITE_VERIFICATION`, `BING_SITE_VERIFICATION` | The `content` value of the HTML-tag verification for Search Console and Bing Webmaster Tools. |
+| `UMAMI_WEBSITE_ID` | Turns on cookie-free analytics ([Umami Cloud](https://umami.is)). No cookie banner is needed. The website ID, or the whole tracking `<script>` tag Umami shows. |
+| `GOOGLE_SITE_VERIFICATION`, `BING_SITE_VERIFICATION` | The HTML-tag verification for Search Console and Bing Webmaster Tools: its `content` value, or the whole `<meta>` tag. |
 
 Also in Netlify:
 
@@ -65,7 +65,7 @@ Add an entry to `seeds` in `src/data/projects.ts`. It appears on Home, Work, Cli
 | Share image titles (one per page) | `src/data/og.ts` |
 | Colours and shared styles | `src/styles/global.css` |
 | Fonts (self-hosted from the Fontsource packages) | `fonts` in `astro.config.mjs`, `integrations/fontsource-fonts.mjs` |
-| `<head>`, SEO meta, JSON-LD, analytics | `src/layouts/Base.astro` |
+| `<head>`, SEO meta, JSON-LD, analytics | `src/layouts/Base.astro`; the Umami ID and verification codes are cleaned up in `src/lib/integrations.ts` |
 | Header with the mobile menu, footer, CTA band, icons | `src/components/` |
 | Pages | `src/pages/` (case studies come from `work/[slug].astro`) |
 | Share images, favicon, app icons, manifest | `src/pages/og/[card].png.ts`, `favicon.ico.ts`, `apple-touch-icon.png.ts`, `icon-[size].png.ts`, `site.webmanifest.ts`, drawn by `src/lib/og.ts` |

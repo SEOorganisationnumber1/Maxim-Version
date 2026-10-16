@@ -2,7 +2,7 @@
 import { Font } from 'astro:assets';
 import '../styles/global.css';
 
-import { BING_SITE_VERIFICATION, GOOGLE_SITE_VERIFICATION, UMAMI_WEBSITE_ID } from 'astro:env/server';
+import { bingSiteVerification, googleSiteVerification, umamiWebsiteId } from '../lib/integrations';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { services, site } from '../data/site';
@@ -93,8 +93,8 @@ const ld = [organization, ...(cleanPath === '/' ? [website] : []), ...jsonLd];
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <meta name="theme-color" content="#0A1128" />
-    {GOOGLE_SITE_VERIFICATION && <meta name="google-site-verification" content={GOOGLE_SITE_VERIFICATION} />}
-    {BING_SITE_VERIFICATION && <meta name="msvalidate.01" content={BING_SITE_VERIFICATION} />}
+    {googleSiteVerification && <meta name="google-site-verification" content={googleSiteVerification} />}
+    {bingSiteVerification && <meta name="msvalidate.01" content={bingSiteVerification} />}
 
     <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={site.name} />
@@ -113,12 +113,12 @@ const ld = [organization, ...(cleanPath === '/' ? [website] : []), ...jsonLd];
 
     {
       /* Cookie-free analytics, counted only on the production domain (not on previews or localhost). */
-      UMAMI_WEBSITE_ID && (
+      umamiWebsiteId && (
         <script
           is:inline
           defer
           src="https://cloud.umami.is/script.js"
-          data-website-id={UMAMI_WEBSITE_ID}
+          data-website-id={umamiWebsiteId}
           data-domains={Astro.site?.hostname}
         />
       )

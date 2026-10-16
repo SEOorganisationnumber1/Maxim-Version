@@ -2,15 +2,15 @@
 // Privacy policy. It describes what the code actually does: keep it in step with the Contact
 // form (src/pages/api/brief.ts), the rate limiter (src/lib/admin-auth.ts), the brief email
 // (src/lib/notify.ts) and analytics (src/layouts/Base.astro), and update the date when it changes.
-import { UMAMI_WEBSITE_ID } from 'astro:env/server';
 import Base from '../layouts/Base.astro';
 import { legal, site } from '../data/site';
+import { umamiWebsiteId } from '../lib/integrations';
 import { notifyConfigured } from '../lib/notify';
 
 const UPDATED = { iso: '2026-10-15', label: '15 October 2026' };
 
 // Only name the services this build actually uses; set their variables and redeploy to add them.
-const analytics = Boolean(UMAMI_WEBSITE_ID);
+const analytics = Boolean(umamiWebsiteId);
 const emailAlerts = notifyConfigured();
 
 const controller = [legal.entity ?? site.name, legal.registration, legal.address].filter(Boolean).join(', ');
