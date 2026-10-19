@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import CtaBand from '../components/CtaBand.astro';
 import Icon from '../components/Icon.astro';
+import { Image } from 'astro:assets';
 import { filled, formatPrice, lowestPrice, numbers, services, site, type Service } from '../data/site';
 import { cardLine, clients, projects, projectUrl, proofLink } from '../data/projects';
 import { ribbonPath } from '../scripts/hero-ribbons';
@@ -271,6 +272,15 @@ const checks = [
                     stroke-linecap="round"
                   />
                 </svg>
+                {featured.image && (
+                  <Image
+                    src={featured.image.src}
+                    alt={featured.image.alt}
+                    widths={[640, 960, 1280, 1600]}
+                    sizes="(min-width: 1240px) 720px, (min-width: 800px) 58vw, 88vw"
+                    class="shot__img"
+                  />
+                )}
               </div>
               <div class="featured__body">
                 <div class="featured__copy">
@@ -322,6 +332,15 @@ const checks = [
                           </defs>
                           <path d={project.look.path} stroke={`url(#${gradientId})`} stroke-width="60" stroke-linecap="round" />
                         </svg>
+                        {project.image && (
+                          <Image
+                            src={project.image.src}
+                            alt={project.image.alt}
+                            widths={[480, 800, 1200]}
+                            sizes="(min-width: 1240px) 560px, (min-width: 800px) 45vw, 88vw"
+                            class="shot__img"
+                          />
+                        )}
                       </div>
                       <div class="small__body">
                         <span class="tagline">{cardLine(project)}</span>

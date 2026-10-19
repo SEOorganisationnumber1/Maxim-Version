@@ -46,7 +46,9 @@ export default defineConfig({
   // on-demand rendering (export const prerender = false), served by a Netlify Function.
   // staticHeaders: the CSP of static pages is sent as an HTTP header (so frame-ancestors works),
   // not as a <meta> tag.
-  adapter: netlify({ staticHeaders: true }),
+  // imageCDN: false: images are resized at build time into static files (/_astro), so they work on any
+  // host and cost no Netlify image transformations.
+  adapter: netlify({ staticHeaders: true, imageCDN: false }),
   security: {
     // Astro hashes every script and style it renders and lists the hashes here, so no inline
     // code runs unless the build produced it. Umami (analytics) is the only outside origin.

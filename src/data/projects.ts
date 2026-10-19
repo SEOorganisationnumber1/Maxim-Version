@@ -1,4 +1,10 @@
+import type { ImageMetadata } from 'astro';
 import type { Service } from './site';
+import leadityShot from '../assets/work/leadity.webp';
+import cryptoExchangeShot from '../assets/work/crypto-exchange-platform.webp';
+import carPartsShot from '../assets/work/car-parts-store.webp';
+import electronicsShot from '../assets/work/electronics-store.webp';
+import reviewsShot from '../assets/work/reviews-site.webp';
 
 // Card art. Each project cycles through these three looks, in order,
 // exactly as the Work page in the design does.
@@ -60,6 +66,8 @@ export type Project = {
   summary: string | null;
   /** The live product, linked from the cards so visitors can see the work for themselves. */
   site: string | null;
+  /** A real screenshot of the product for the card (src/assets/work). Without it the card shows the wave art. */
+  image: { src: ImageMetadata; alt: string } | null;
   /** Our own product rather than a client's: labelled so on the cards, never counted or shown as a client. */
   own: boolean;
   /**
@@ -91,7 +99,7 @@ const toClientLine = (services: Service[]): string => {
   return line.charAt(0).toUpperCase() + line.slice(1);
 };
 
-type Seed = Pick<Project, 'slug' | 'name' | 'services'> & Partial<Pick<Project, 'summary' | 'site' | 'own' | 'client' | 'caseStudy'>>;
+type Seed = Pick<Project, 'slug' | 'name' | 'services'> & Partial<Pick<Project, 'summary' | 'site' | 'image' | 'own' | 'client' | 'caseStudy'>>;
 
 // Real work only: every project here is shown on Home, Work and in llms.txt; clients (not `own`)
 // also on Clients. Add `summary` and `caseStudy` (shape: CaseStudy above) as they are written;
@@ -105,6 +113,7 @@ const seeds: Seed[] = [
     summary:
       'A lead generation platform for local business leads from Google Maps. We co-founded it and built the first version full stack, then the website, the user area and its SEO.',
     site: 'https://leadity.io',
+    image: { src: leadityShot, alt: 'The leadity.io home page: a lead search with a map of the US and sample business owners' },
     own: true,
   },
   // From the owner's own repositories (2026-10-19). Shown without product names or links until the
@@ -115,13 +124,7 @@ const seeds: Seed[] = [
     services: ['Web Apps & SaaS'],
     summary:
       'A crypto-to-fiat exchange: sign-up with email verification and KYC, a dashboard, exchanges with live status, wallet deposits by QR code, transaction history and an admin view. React and Supabase.',
-  },
-  {
-    slug: 'electronics-store',
-    name: 'Electronics store',
-    services: ['Websites & Landing Pages', 'Web Apps & SaaS'],
-    summary:
-      'An online electronics store in several languages: catalog, product pages, favorites, cart, accounts, orders and an admin page, with the catalog filled by import scripts we wrote. React and Supabase.',
+    image: { src: cryptoExchangeShot, alt: 'The exchange home page: "Convert Crypto to Real Money in Minutes" with its call to action' },
   },
   {
     slug: 'car-parts-store',
@@ -129,6 +132,15 @@ const seeds: Seed[] = [
     services: ['Websites & Landing Pages'],
     summary:
       'An online store for car parts and performance accessories: shop, product pages, cart, checkout and customer account. React and TypeScript, with automated tests, shipped in Docker.',
+    image: { src: carPartsShot, alt: 'The car parts store home page: a brake disc hero, search by year, make and model' },
+  },
+  {
+    slug: 'electronics-store',
+    name: 'Electronics store',
+    services: ['Websites & Landing Pages', 'Web Apps & SaaS'],
+    summary:
+      'An online electronics store in several languages: catalog, product pages, favorites, cart, accounts, orders and an admin page, with the catalog filled by import scripts we wrote. React and Supabase.',
+    image: { src: electronicsShot, alt: 'The electronics store: search, catalog categories, brand logos and product tabs' },
   },
   {
     slug: 'reviews-site',
@@ -136,6 +148,7 @@ const seeds: Seed[] = [
     services: ['Websites & Landing Pages'],
     summary:
       'A reviews site for a crypto exchange service: visitors post star ratings with photos, and a password-protected admin panel moderates them. Next.js and Supabase.',
+    image: { src: reviewsShot, alt: 'The reviews site home page: "Real Reviews from Real Users" with an Add Review button' },
   },
 ];
 
@@ -145,6 +158,7 @@ export const projects: Project[] = seeds.map((seed, i) => ({
   services: seed.services,
   summary: seed.summary ?? null,
   site: seed.site ?? null,
+  image: seed.image ?? null,
   own: seed.own ?? false,
   client: seed.client ?? false,
   clientLine: toClientLine(seed.services),

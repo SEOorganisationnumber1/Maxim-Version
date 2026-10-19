@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import CtaBand from '../../components/CtaBand.astro';
 import Icon from '../../components/Icon.astro';
+import { Image } from 'astro:assets';
 import { services } from '../../data/site';
 import { cardLine, projects, projectUrl } from '../../data/projects';
 
@@ -70,6 +71,15 @@ const countLabel = (n: number) => (n === 1 ? '1 project' : `${n} projects`);
                   <svg aria-hidden="true" viewBox="0 0 600 240" preserveAspectRatio="xMidYMid slice" fill="none">
                     <path d={p.look.path} stroke={p.look.stroke} stroke-width="60" stroke-linecap="round" />
                   </svg>
+                  {p.image && (
+                    <Image
+                      src={p.image.src}
+                      alt={p.image.alt}
+                      widths={[480, 800, 1200]}
+                      sizes="(min-width: 1240px) 380px, (min-width: 800px) 45vw, 88vw"
+                      class="shot__img"
+                    />
+                  )}
                 </div>
                 <div class="work-card__body">
                   <span class="tagline">{cardLine(p)}</span>
