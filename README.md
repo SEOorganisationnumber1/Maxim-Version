@@ -29,6 +29,7 @@ In Netlify, under Project configuration > Environment variables (then trigger a 
 | `BRIEF_NOTIFY_FROM` | Optional sender, e.g. `Briefs <briefs@yourdomain.com>`, once the domain is verified in Resend. |
 | `UMAMI_WEBSITE_ID` | Turns on cookie-free analytics ([Umami Cloud](https://umami.is)). No cookie banner is needed. The website ID, or the whole tracking `<script>` tag Umami shows. |
 | `GOOGLE_SITE_VERIFICATION`, `BING_SITE_VERIFICATION` | The HTML-tag verification for Search Console and Bing Webmaster Tools: its `content` value, or the whole `<meta>` tag. |
+| `BOOKING_URL` | Your scheduling page (for example a free [Cal.com](https://cal.com) or Calendly link). Contact then shows "Pick a time" and visitors book the call themselves. Without it, the Contact form asks when suits them and you send the invite. |
 
 Also in Netlify:
 

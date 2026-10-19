@@ -3,33 +3,40 @@ import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
 import { services, site } from '../data/site';
 import { proofLink } from '../data/projects';
+import { CALL_TIMES } from '../lib/briefs';
+import { bookingUrl } from '../lib/integrations';
 
-const sendErrorText = `Something went wrong sending your brief. Please try again${
+// With a scheduling page (BOOKING_URL) visitors pick a time there and the form is the written
+// alternative. Without one, the form is the call request: it asks when suits them, and we send the invite.
+const sendErrorText = `Something went wrong sending your request. Please try again${
   site.email ? `, or email us at ${site.email}` : ' in a moment'
 }.`;
 
 const steps = [
-  'We read your brief and look at what you have so far.',
-  'Within two business days you get our approach and a fixed price in writing, free.',
-  'If it fits, we confirm the scope together and start.',
+  bookingUrl ? 'You pick a time that suits you.' : 'You tell us when suits you, and we email you a calendar invite.',
+  'On the call we go through what you want to launch and what you have so far.',
+  'Within two business days after the call you get our approach and a fixed price in writing, free.',
 ];
 ---
 
 <Base
-  title="Contact"
+  title="Book a call"
   current="/contact"
   og="contact"
-  description="Tell us what you want to launch. Send a short brief and we reply with how we would approach it."
+  description="Book a free 30-minute call about what you want to launch. Within two business days after it, you get our approach and a fixed price in writing."
 >
   <section class="bg-paper">
     <div class="container contact">
       <div class="intro">
         <h1 class="intro__title">
-          Tell us what you want to <span class="highlight">launch.</span>
+          Book a free <span class="highlight">call.</span>
         </h1>
         <p class="lede intro__lede">
-          A few lines are enough. The more you share about your product and goals, the more specific
-          our first reply will be.
+          {
+            bookingUrl
+              ? 'Pick a time for a 30-minute video call about what you want to launch. It is free, with no obligation.'
+              : 'Tell us what you want to launch and when suits you. We set up a 30-minute video call, free and with no obligation.'
+          }
         </p>
 
         <div class="next">
@@ -76,19 +83,41 @@ const steps = [
       </div>
 
       <div class="panel">
+        {
+          bookingUrl && (
+            <>
+              <div class="book">
+                <h2 class="book__title">Pick a time</h2>
+                <p class="book__text">See the open times and book in a minute. The invite and the call link arrive by email.</p>
+                <a
+                  href={bookingUrl}
+                  class="btn btn--primary btn--lg"
+                  target="_blank"
+                  rel="noopener"
+                  data-umami-event="Open calendar"
+                >
+                  Pick a time<span class="visually-hidden"> (opens in a new tab)</span>
+                  <Icon name="arrow-up-right" />
+                </a>
+              </div>
+              <p class="panel__or">Prefer to write first? Send a brief and we reply by email.</p>
+            </>
+          )
+        }
+
         <div class="success" role="status" data-contact-success hidden>
           <span class="success__icon" aria-hidden="true">
             <Icon name="check" size={28} strokeWidth={2.6} />
           </span>
-          <h2 class="success__title" tabindex="-1" data-success-title>Brief received.</h2>
+          <h2 class="success__title" tabindex="-1" data-success-title>Request received.</h2>
           <p class="success__text">
             Thanks, <span data-sent-name></span>. We will reply to <span data-sent-email></span>
-            {site.responseTime ? `within ${site.responseTime}.` : 'with how we would approach it.'}
+            {site.responseTime ? `within ${site.responseTime}` : 'by email'}{bookingUrl ? '.' : ', with a time for the call.'}
           </p>
           <div class="success__actions">
             <a href={proofLink.href} class="btn btn--primary btn--sm">{proofLink.label} meanwhile</a>
             <button type="button" class="btn btn--outline btn--sm" data-contact-reset>
-              Send another brief
+              Send another request
             </button>
           </div>
         </div>
@@ -161,13 +190,31 @@ const steps = [
             </div>
           </fieldset>
 
-          <div class="field">
-            <label for="c-when" class="field__label">When do you want to start?</label>
-            <select id="c-when" name="timeline" class="field__control">
-              <option value="asap">As soon as possible</option>
-              <option value="1-3">In 1 to 3 months</option>
-              <option value="exploring">Just exploring</option>
-            </select>
+          <div class:list={[{ form__pair: !bookingUrl }]}>
+            <div class="field">
+              <label for="c-when" class="field__label">When do you want to start?</label>
+              <select id="c-when" name="timeline" class="field__control">
+                <option value="asap">As soon as possible</option>
+                <option value="1-3">In 1 to 3 months</option>
+                <option value="exploring">Just exploring</option>
+              </select>
+            </div>
+            {
+              !bookingUrl && (
+                <div class="field">
+                  <label for="c-call" class="field__label">Best time for a call</label>
+                  <select id="c-call" name="callTime" class="field__control" aria-describedby="c-call-hint">
+                    {Object.entries(CALL_TIMES).map(([value, label]) => (
+                      <option value={value}>{label}</option>
+                    ))}
+                  </select>
+                  <p id="c-call-hint" class="field__note" data-tz-hint>
+                    In your time zone.
+                  </p>
+                  <input type="hidden" name="timezone" value="" data-tz />
+                </div>
+              )
+            }
           </div>
 
           <div class="field">
@@ -192,10 +239,11 @@ const steps = [
 
           <div class="form__send">
             <button type="submit" class="btn btn--primary btn--lg form__submit" data-contact-submit>
-              <span data-submit-label>Send brief</span><Icon name="arrow-right" />
+              <span data-submit-label>{bookingUrl ? 'Send brief' : 'Request a call'}</span><Icon name="arrow-right" />
             </button>
             <p class="form__consent">
-              We use your details only to reply to this brief. <a href="/privacy">Privacy policy</a>
+              {bookingUrl ? 'We use your details only to reply to you.' : 'We use your details only to set up the call and reply to you.'}
+              <a href="/privacy">Privacy policy</a>
             </p>
           </div>
         </form>
@@ -361,6 +409,39 @@ const steps = [
     font-weight: 500;
     color: var(--ink-2);
   }
+  .field__note {
+    margin: 0;
+    font-size: 14px;
+    color: var(--ink-2);
+  }
+
+  /* Scheduling page block, shown above the form once BOOKING_URL is set. */
+  .book {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 4px 0 28px;
+  }
+  .book__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 30px;
+    line-height: 1.1;
+  }
+  .book__text {
+    margin: 0;
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+  .panel__or {
+    margin: 0 0 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    font-weight: 700;
+  }
   .field__control {
     width: 100%;
     min-height: 48px;
@@ -499,6 +580,10 @@ const steps = [
     const emailInput = $<HTMLInputElement>(form, '#c-email');
     const siteInput = $<HTMLInputElement>(form, '#c-site');
     const whenSelect = $<HTMLSelectElement>(form, '#c-when');
+    // Only there while the form is the call request (no scheduling page set).
+    const callSelect = form.querySelector<HTMLSelectElement>('#c-call');
+    const zoneInput = form.querySelector<HTMLInputElement>('[data-tz]');
+    const zoneHint = form.querySelector<HTMLElement>('[data-tz-hint]');
     const messageInput = $<HTMLTextAreaElement>(form, '#c-msg');
     const honeypot = $<HTMLInputElement>(form, '#c-hp');
     const sendError = $<HTMLElement>(form, '[data-send-error]');
@@ -511,7 +596,17 @@ const steps = [
     const sentEmail = $<HTMLElement>(success, '[data-sent-email]');
     const resetButton = $<HTMLButtonElement>(success, '[data-contact-reset]');
 
-    const idleLabel = submitLabel.textContent ?? 'Send brief';
+    const idleLabel = submitLabel.textContent ?? 'Send';
+
+    // The visitor's time zone, so "Afternoons" means their afternoon. Also sent by a plain form post.
+    let timezone = '';
+    try {
+      timezone = Intl.DateTimeFormat().resolvedOptions().timeZone ?? '';
+    } catch {
+      timezone = '';
+    }
+    if (zoneInput) zoneInput.value = timezone;
+    if (zoneHint && timezone) zoneHint.textContent = `In your time zone (${timezone.replace(/_/g, ' ')}).`;
     const defaultError = sendError.dataset.default ?? sendError.textContent ?? '';
 
     // The script validates with its own messages; without it the browser checks the required fields.
@@ -586,6 +681,7 @@ const steps = [
         website: siteInput.value.trim(),
         needs: needs.filter((box) => box.checked).map((box) => box.value),
         timeline: whenSelect.value,
+        ...(callSelect ? { callTime: callSelect.value, timezone } : {}),
         message: messageInput.value.trim(),
       };
 
@@ -610,9 +706,9 @@ const steps = [
         }
         setSending(false);
         showSuccess(payload.name, payload.email);
-        (window as Window & { umami?: Umami }).umami?.track('Brief sent', { needs: payload.needs.join(', ') || 'none' });
+        (window as Window & { umami?: Umami }).umami?.track('Request sent', { needs: payload.needs.join(', ') || 'none' });
       } catch (error) {
-        console.error('[contact] Sending the brief failed.', error);
+        console.error('[contact] Sending the request failed.', error);
         setSending(false);
         showError((error as { visitorMessage?: string }).visitorMessage ?? defaultError);
         // Disabling the button can drop focus; put it back so keyboard users can retry.
@@ -624,6 +720,7 @@ const steps = [
 
     resetButton.addEventListener('click', () => {
       form.reset();
+      if (zoneInput) zoneInput.value = timezone;
       for (const field of fields) setInvalid(field, false);
       sendError.hidden = true;
       setSending(false);

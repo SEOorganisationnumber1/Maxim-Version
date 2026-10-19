@@ -36,13 +36,13 @@ What we build: ${services.join(', ')}. UI and UX design is part of every project
 - [Work](${url('/work')}): Products we built and case studies
 - [Services](${url('/services')}): Every kind of project we take on, our stack, plans and FAQ${clientsPage}
 - [Company](${url('/company')}): How we work and the rules we keep
-- [Contact](${url('/contact')}): Send a brief${contact}
+- [Contact](${url('/contact')}): Book a free 30-minute call or send a brief${contact}
 
 ## Starting prices (USD)
 
 ${pricing}
 
-Every project gets a fixed price for a written scope. The estimate is free and arrives within two business days of a brief.${own}${clientWork}${otherWork}
+Every project gets a fixed price for a written scope. The estimate is free and arrives within two business days of the call or brief.${own}${clientWork}${otherWork}
 `;
   return new Response(body, { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
 };

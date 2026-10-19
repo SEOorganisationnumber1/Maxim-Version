@@ -11,6 +11,15 @@ export const STATUS_LABEL: Record<Status, string> = { new: 'New', 'in-progress':
 export const TIMELINES = { asap: 'As soon as possible', '1-3': 'In 1 to 3 months', exploring: 'Just exploring' } as const;
 export type Timeline = keyof typeof TIMELINES;
 
+/** When the visitor would like the call, in their own time zone. */
+export const CALL_TIMES = {
+  any: 'Any time',
+  morning: 'Mornings (9 to 12)',
+  afternoon: 'Afternoons (12 to 5)',
+  evening: 'Evenings (5 to 8)',
+} as const;
+export type CallTime = keyof typeof CALL_TIMES;
+
 export interface Brief {
   id: string;
   createdAt: string; // ISO 8601
@@ -19,6 +28,10 @@ export interface Brief {
   website: string;
   needs: string[];
   timeline: Timeline;
+  /** Missing on briefs sent before the call request existed. */
+  callTime?: CallTime;
+  /** The visitor's IANA time zone, e.g. "Europe/Berlin"; empty if the browser did not say. */
+  timezone?: string;
   message: string;
   status: Status;
 }
@@ -42,9 +55,21 @@ export function parseBrief(body: unknown): { ok: true; value: Omit<Brief, 'id' |
   const known = new Set<string>(services);
   const needs = Array.isArray(b.needs) ? [...new Set(b.needs.filter((n): n is string => typeof n === 'string' && known.has(n)))] : [];
   const timeline = typeof b.timeline === 'string' && b.timeline in TIMELINES ? (b.timeline as Timeline) : 'exploring';
+  const callTime = typeof b.callTime === 'string' && b.callTime in CALL_TIMES ? (b.callTime as CallTime) : 'any';
+  const zone = text(b.timezone, 64);
+  const timezone = /^[A-Za-z][\w+\-/]*$/.test(zone) ? zone : '';
   return {
     ok: true,
-    value: { name, email, website: text(b.website, LIMITS.website), needs, timeline, message: text(b.message, LIMITS.message) },
+    value: {
+      name,
+      email,
+      website: text(b.website, LIMITS.website),
+      needs,
+      timeline,
+      callTime,
+      timezone,
+      message: text(b.message, LIMITS.message),
+    },
   };
 }
 
@@ -82,6 +107,9 @@ export async function deleteBrief(id: string): Promise<boolean> {
   return true;
 }
 
+/** "Afternoons (12 to 5)"; empty for briefs sent before the call request existed. */
+export const callTimeLabel = (b: Brief): string => (b.callTime ? CALL_TIMES[b.callTime] : '');
+
 /** "yourdomain.com" or "https://..." to a safe http(s) URL, or null if it is not one. */
 export function websiteUrl(raw: string): string | null {
   if (!raw) return null;
@@ -99,9 +127,22 @@ export function toCsv(briefs: Brief[]): string {
     const safe = /^[=+\-@\t\r]/.test(v) ? `'${v}` : v;
     return `"${safe.replace(/"/g, '""')}"`;
   };
-  const head = ['Date', 'Status', 'Name', 'Email', 'Website', 'Needs', 'Timeline', 'Message'];
+  const head = ['Date', 'Status', 'Name', 'Email', 'Website', 'Needs', 'Timeline', 'Call time', 'Time zone', 'Message'];
   const rows = briefs.map((b) =>
-    [b.createdAt, STATUS_LABEL[b.status], b.name, b.email, b.website, b.needs.join(', '), TIMELINES[b.timeline], b.message].map(cell).join(','),
+    [
+      b.createdAt,
+      STATUS_LABEL[b.status],
+      b.name,
+      b.email,
+      b.website,
+      b.needs.join(', '),
+      TIMELINES[b.timeline],
+      callTimeLabel(b),
+      b.timezone ?? '',
+      b.message,
+    ]
+      .map(cell)
+      .join(','),
   );
   return `﻿${[head.map(cell).join(','), ...rows].join('\r\n')}\r\n`; // BOM so Excel reads UTF-8
 }

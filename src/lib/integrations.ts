@@ -2,7 +2,7 @@
 // Server-only. These values often get pasted as whole snippets (the tracking <script>, the
 // verification <meta>): the ID or code is taken out of them, and a value without one counts as unset.
 
-import { BING_SITE_VERIFICATION, GOOGLE_SITE_VERIFICATION, UMAMI_WEBSITE_ID } from 'astro:env/server';
+import { BING_SITE_VERIFICATION, BOOKING_URL, GOOGLE_SITE_VERIFICATION, UMAMI_WEBSITE_ID } from 'astro:env/server';
 
 const UUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
 
@@ -18,3 +18,17 @@ function verificationCode(raw: string | undefined): string | null {
 
 export const googleSiteVerification = verificationCode(GOOGLE_SITE_VERIFICATION);
 export const bingSiteVerification = verificationCode(BING_SITE_VERIFICATION);
+
+/**
+ * The scheduling page visitors book a call on, from the link itself or from a pasted snippet that
+ * contains it. Only https links count. Without one, Contact asks when suits the visitor instead.
+ */
+export const bookingUrl: string | null = (() => {
+  const raw = BOOKING_URL?.match(/https:\/\/[^\s"'<>]+/)?.[0];
+  if (!raw) return null;
+  try {
+    return new URL(raw).href;
+  } catch {
+    return null;
+  }
+})();

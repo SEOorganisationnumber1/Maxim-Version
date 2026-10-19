@@ -4,10 +4,10 @@
 // (src/lib/notify.ts) and analytics (src/layouts/Base.astro), and update the date when it changes.
 import Base from '../layouts/Base.astro';
 import { legal, site } from '../data/site';
-import { umamiWebsiteId } from '../lib/integrations';
+import { bookingUrl, umamiWebsiteId } from '../lib/integrations';
 import { notifyConfigured } from '../lib/notify';
 
-const UPDATED = { iso: '2026-10-15', label: '15 October 2026' };
+const UPDATED = { iso: '2026-10-19', label: '19 October 2026' };
 
 // Only name the services this build actually uses; set their variables and redeploy to add them.
 const analytics = Boolean(umamiWebsiteId);
@@ -35,7 +35,7 @@ const controller = [legal.entity ?? site.name, legal.registration, legal.address
           This site is run by {controller}. We decide how the information described here is used, which makes us the
           data controller under the GDPR. To ask anything about your data, {
             site.email ? (
-              <>write to <a href={`mailto:${site.email}`}>{site.email}</a> or send a brief through the <a href="/contact">contact form</a>.</>
+              <>write to <a href={`mailto:${site.email}`}>{site.email}</a> or write to us through the <a href="/contact">contact form</a>.</>
             ) : (
               <>send a message through the <a href="/contact">contact form</a>.</>
             )
@@ -45,9 +45,18 @@ const controller = [legal.entity ?? site.name, legal.registration, legal.address
         <h2>What we collect</h2>
         <ul>
           <li>
-            <strong>Your brief.</strong> When you send the contact form: your name, email address, website, the services you
-            picked, when you want to start and your message. Only the name and email are required.
+            <strong>Your request.</strong> When you send the contact form: your name, email address, website, the services you
+            picked, when you want to start{!bookingUrl && ', the time that suits you for a call with your time zone'} and your
+            message. Only the name and email are required.
           </li>
+          {
+            bookingUrl && (
+              <li>
+                <strong>Calls you book.</strong> If you book a call through our scheduling page, the scheduling service records
+                the name, email address and time you enter there and sends both of us the invite.
+              </li>
+            )
+          }
           <li>
             <strong>Data that keeps the form safe.</strong> To stop spam and repeated sign-in attempts, we store a keyed hash of
             your IP address with the times of your last requests. The hash cannot be turned back into your IP address
@@ -71,7 +80,7 @@ const controller = [legal.entity ?? site.name, legal.registration, legal.address
         <h2>Why we use it</h2>
         <ul>
           <li>
-            To answer your brief and prepare a proposal you asked for. This is a step you request before a possible
+            To set up the call, answer you and prepare a proposal you asked for. This is a step you request before a possible
             contract (GDPR Article 6(1)(b)).
           </li>
           <li>
@@ -83,8 +92,10 @@ const controller = [legal.entity ?? site.name, legal.registration, legal.address
 
         <h2>Who handles it for us</h2>
         <ul>
-          <li><strong>Netlify</strong> hosts the site and stores the briefs and the rate limit records.</li>
-          {emailAlerts && <li><strong>Resend</strong> delivers the email that tells us a brief has arrived. It contains your brief.</li>}
+          <li><strong>Netlify</strong> hosts the site and stores the requests and the rate limit records.</li>
+          {bookingUrl && <li><strong>The scheduling service</strong> linked from the Contact page handles the calls booked there.</li>}
+          <li><strong>The video call service</strong> named in your calendar invite connects the call.</li>
+          {emailAlerts && <li><strong>Resend</strong> delivers the email that tells us a request has arrived. It contains your request.</li>}
           {analytics && <li><strong>Umami</strong> provides the cookie-free visit statistics.</li>}
         </ul>
         <p>
@@ -96,7 +107,7 @@ const controller = [legal.entity ?? site.name, legal.registration, legal.address
         <h2>How long we keep it</h2>
         <ul>
           <li>
-            <strong>Briefs</strong>{emailAlerts && ', and the email about each one,'} for as long as we discuss your project. If we work together,
+            <strong>Requests</strong>{emailAlerts && ', and the email about each one,'} for as long as we discuss your project. If we work together,
             for as long as the work and our legal obligations require. If no work follows, we delete them within 12 months
             of our last exchange.
           </li>

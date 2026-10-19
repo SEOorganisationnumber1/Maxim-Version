@@ -119,7 +119,7 @@ export const lowestPrice = (service: Service): StartingPrice =>
 
 export type NavItem = { href: string; label: string };
 
-/** Header links; "Start a project" (Contact) is rendered separately as the CTA. Clients joins once it has enough clients to show. */
+/** Header links; "Book a call" (Contact) is rendered separately as the CTA. Clients joins once it has enough clients to show. */
 export const mainNav: NavItem[] = [
   { href: '/work', label: 'Work' },
   { href: '/services', label: 'Services' },

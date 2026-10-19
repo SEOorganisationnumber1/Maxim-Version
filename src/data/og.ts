@@ -34,7 +34,7 @@ export const ogCards: Record<string, OgCard> = {
   contact: {
     path: '/contact',
     tone: 'blue',
-    title: [{ text: 'Tell us what you want to' }, { text: 'launch.', mark: 'highlight' }],
+    title: [{ text: 'Book a free' }, { text: 'call.', mark: 'highlight' }],
   },
   privacy: { path: '/privacy', tone: 'violet', title: [{ text: 'Privacy policy' }] },
   ...Object.fromEntries(

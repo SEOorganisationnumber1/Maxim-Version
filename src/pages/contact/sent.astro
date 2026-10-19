@@ -5,11 +5,12 @@ import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
 import { site } from '../../data/site';
 import { proofLink } from '../../data/projects';
+import { bookingUrl } from '../../lib/integrations';
 ---
 
 <Base
-  title="Brief received"
-  description="Your brief reached us. We read every brief and reply by email."
+  title="Request received"
+  description="Your request reached us. We read every request and reply by email."
   current="/contact"
   noindex
 >
@@ -18,10 +19,10 @@ import { proofLink } from '../../data/projects';
       <span class="sent__icon" aria-hidden="true">
         <Icon name="check" size={28} strokeWidth={2.6} />
       </span>
-      <h1 class="sent__title">Brief received.</h1>
+      <h1 class="sent__title">Request received.</h1>
       <p class="sent__text">
-        Thanks for writing. We read every brief and reply by email {
-          site.responseTime ? `within ${site.responseTime}.` : 'with how we would approach it.'
+        Thanks for writing. We reply by email {site.responseTime ? `within ${site.responseTime}` : 'soon'}{
+          bookingUrl ? '.' : ', with a time for the call.'
         }
       </p>
       <div class="sent__actions">

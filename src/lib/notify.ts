@@ -4,7 +4,7 @@
 
 import { BRIEF_NOTIFY_FROM, BRIEF_NOTIFY_TO, RESEND_API_KEY } from 'astro:env/server';
 import { site } from '../data/site';
-import { TIMELINES, type Brief } from './briefs';
+import { TIMELINES, callTimeLabel, type Brief } from './briefs';
 
 /** Resend's shared sender: works without a domain, but only delivers to the Resend account's own address. */
 const DEFAULT_FROM = 'onboarding@resend.dev';
@@ -23,6 +23,7 @@ function body(brief: Brief, adminUrl: string): string {
     `Website:  ${brief.website || 'Not given'}`,
     `Needs:    ${brief.needs.join(', ') || 'Not specified'}`,
     `Start:    ${TIMELINES[brief.timeline]}`,
+    `Call:     ${callTimeLabel(brief) || 'Not asked'}${brief.timezone ? `, ${brief.timezone} time` : ''}`,
     '',
     brief.message || 'No message.',
     '',

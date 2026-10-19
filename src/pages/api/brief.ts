@@ -26,7 +26,7 @@ const formReply: Reply = {
   ok: () => new Response(null, { status: 303, headers: { Location: '/contact/sent', ...NO_STORE } }),
   error: (status, message) =>
     new Response(
-      `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>Brief not sent</title><style>body{margin:0;background:#F5FAFC;color:#0A1128;font:17px/1.6 system-ui,sans-serif}main{max-width:560px;margin:0 auto;padding:96px 24px}h1{margin:0 0 16px;font-size:40px;line-height:1.1}a{color:#0A1128;font-weight:700}</style></head><body><main><h1>Your brief was not sent.</h1><p>${escapeHtml(message)}</p><p>Go back to keep what you typed, or <a href="/contact">open the form again</a>.</p></main></body></html>`,
+      `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>Request not sent</title><style>body{margin:0;background:#F5FAFC;color:#0A1128;font:17px/1.6 system-ui,sans-serif}main{max-width:560px;margin:0 auto;padding:96px 24px}h1{margin:0 0 16px;font-size:40px;line-height:1.1}a{color:#0A1128;font-weight:700}</style></head><body><main><h1>Your request was not sent.</h1><p>${escapeHtml(message)}</p><p>Go back to keep what you typed, or <a href="/contact">open the form again</a>.</p></main></body></html>`,
       { status, headers: { 'Content-Type': 'text/html; charset=utf-8', ...NO_STORE } },
     ),
 };
@@ -40,6 +40,8 @@ function fromForm(form: FormData): Record<string, unknown> {
     website: text('website'),
     needs: form.getAll('needs').map(String),
     timeline: text('timeline'),
+    callTime: text('callTime'),
+    timezone: text('timezone'),
     message: text('message'),
     company: text('company'),
   };
@@ -55,20 +57,20 @@ export const POST: APIRoute = async (context) => {
   if (!sameOrigin(request)) return reply.error(403, 'This request was blocked. Reload the contact page and try again.');
   if (!isJson && !isForm) return jsonReply.error(415, 'Send JSON or a form.');
   if (Number(request.headers.get('content-length') ?? 0) > MAX_BODY_BYTES) {
-    return reply.error(413, 'Your brief is too long. Please shorten the message.');
+    return reply.error(413, 'Your request is too long. Please shorten the message.');
   }
 
   let body: unknown;
   try {
     if (isJson) {
       const raw = await request.text();
-      if (raw.length > MAX_BODY_BYTES) return reply.error(413, 'Your brief is too long. Please shorten the message.');
+      if (raw.length > MAX_BODY_BYTES) return reply.error(413, 'Your request is too long. Please shorten the message.');
       body = JSON.parse(raw);
     } else {
       body = fromForm(await request.formData());
     }
   } catch {
-    return reply.error(400, 'The brief could not be read. Please try again.');
+    return reply.error(400, 'Your request could not be read. Please try again.');
   }
 
   // Honeypot: the form hides a "company" field that only bots fill in. Answer OK, store nothing.
@@ -80,7 +82,7 @@ export const POST: APIRoute = async (context) => {
 
   // clientAddress is a getter that throws where the platform does not expose it: read it lazily.
   if (!(await withinLimit('brief', clientIp(() => context.clientAddress), 5, 10 * 60_000))) {
-    return reply.error(429, 'Too many briefs from this connection. Please try again in a few minutes.');
+    return reply.error(429, 'Too many requests from this connection. Please try again in a few minutes.');
   }
 
   const brief = await saveBrief(parsed.value);

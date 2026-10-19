@@ -18,7 +18,7 @@ interface Props {
 
 const {
   title,
-  text = 'Send a short brief. We reply with how we would approach it.',
+  text = 'A free 30-minute call about what you want to launch. You leave with a clear next step.',
   tone = 'ink',
   pad = 'full',
   borderTop = false,
@@ -50,10 +50,10 @@ const {
       <a
         href="/contact"
         class:list={['btn', 'btn--lg', tone === 'white' ? 'btn--light' : 'btn--dark']}
-        data-umami-event="Start a project"
+        data-umami-event="Book a call"
         data-umami-event-from="cta-band"
       >
-        Start a project<Icon name="arrow-right" />
+        Book a call<Icon name="arrow-right" />
       </a>
       {
         secondary && (

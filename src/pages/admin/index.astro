@@ -1,7 +1,7 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
 import { ADMIN_HEADERS, isSignedIn } from '../../lib/admin-auth';
-import { STATUSES, STATUS_LABEL, TIMELINES, listBriefs, websiteUrl, type Status } from '../../lib/briefs';
+import { STATUSES, STATUS_LABEL, TIMELINES, callTimeLabel, listBriefs, websiteUrl, type Status } from '../../lib/briefs';
 import { site } from '../../data/site';
 
 export const prerender = false;
@@ -113,6 +113,12 @@ const replySubject = encodeURIComponent(`Your brief for ${site.name}`);
                       <dt>Start</dt>
                       <dd>{TIMELINES[b.timeline]}</dd>
                     </div>
+                    {b.callTime && (
+                      <div>
+                        <dt>Call</dt>
+                        <dd>{callTimeLabel(b)}{b.timezone && <span class="muted">, {b.timezone} time</span>}</dd>
+                      </div>
+                    )}
                   </dl>
 
                   {b.message ? <p class="brief__message">{b.message}</p> : <p class="brief__message muted">No message.</p>}

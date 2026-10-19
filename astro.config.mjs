@@ -118,6 +118,8 @@ export default defineConfig({
       /** Search Console and Bing Webmaster Tools HTML-tag verification codes (the content="..." value). */
       GOOGLE_SITE_VERIFICATION: envField.string({ context: 'server', access: 'public', optional: true }),
       BING_SITE_VERIFICATION: envField.string({ context: 'server', access: 'public', optional: true }),
+      /** Your scheduling page (Cal.com, Calendly, ...): visitors then pick a time themselves on Contact. */
+      BOOKING_URL: envField.string({ context: 'server', access: 'public', optional: true }),
     },
   },
   integrations: [
