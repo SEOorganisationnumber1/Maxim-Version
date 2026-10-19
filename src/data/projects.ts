@@ -124,7 +124,7 @@ const seeds: Seed[] = [
     services: ['Web Apps & SaaS'],
     summary:
       'A crypto-to-fiat exchange: sign-up with email verification and KYC, a dashboard, exchanges with live status, wallet deposits by QR code, transaction history and an admin view. React and Supabase.',
-    image: { src: cryptoExchangeShot, alt: 'The exchange home page: "Convert Crypto to Real Money in Minutes" with its call to action' },
+    image: { src: cryptoExchangeShot, alt: 'The exchange home page: "Convert Crypto to Real Money in Minutes" next to a card of exchange rates' },
   },
   {
     slug: 'car-parts-store',
@@ -132,7 +132,7 @@ const seeds: Seed[] = [
     services: ['Websites & Landing Pages'],
     summary:
       'An online store for car parts and performance accessories: shop, product pages, cart, checkout and customer account. React and TypeScript, with automated tests, shipped in Docker.',
-    image: { src: carPartsShot, alt: 'The car parts store home page: a brake disc hero, search by year, make and model' },
+    image: { src: carPartsShot, alt: 'The car parts store home page: "Premium car parts for your vehicle" with a wheel, a brake disc and a search by year, make and model' },
   },
   {
     slug: 'electronics-store',
