@@ -16,7 +16,8 @@ export const GET: APIRoute = ({ site: base }) => {
   // Our own products and client work are listed apart, so nothing of ours reads as a client.
   const section = (title: string, list: Project[]) => (list.length ? `\n\n## ${title}\n\n${list.map(line).join('\n')}` : '');
   const own = section('Our own products', projects.filter((p) => p.own));
-  const clientWork = section('Clients', projects.filter((p) => !p.own));
+  const clientWork = section('Clients', projects.filter((p) => p.client && !p.own));
+  const otherWork = section('Other work we built', projects.filter((p) => !p.client && !p.own));
   const contact = site.email ? `\n\nEmail: ${site.email}` : '';
   const pricing = services
     .map((s) => `- ${s}: ${startingPrices[s].map((p) => `${p.item} from ${formatPrice(p)}`).join('; ')}`)
@@ -41,7 +42,7 @@ What we build: ${services.join(', ')}. UI and UX design is part of every project
 
 ${pricing}
 
-Every project gets a fixed price for a written scope. The estimate is free and arrives within two business days of a brief.${own}${clientWork}
+Every project gets a fixed price for a written scope. The estimate is free and arrives within two business days of a brief.${own}${clientWork}${otherWork}
 `;
   return new Response(body, { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
 };

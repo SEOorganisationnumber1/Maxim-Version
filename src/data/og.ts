@@ -19,7 +19,7 @@ export const ogCards: Record<string, OgCard> = {
     tone: 'cyan',
     title: [{ text: 'Digital Products,' }, { text: 'Built', mark: 'highlight' }, { text: 'to Launch.', mark: 'accent' }],
   },
-  work: { path: '/work', tone: 'cyan', title: [{ text: 'Products we' }, { text: 'launched.', mark: 'highlight' }] },
+  work: { path: '/work', tone: 'cyan', title: [{ text: 'Products we' }, { text: 'built.', mark: 'highlight' }] },
   services: {
     path: '/services',
     tone: 'blue',

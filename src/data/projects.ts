@@ -62,6 +62,12 @@ export type Project = {
   site: string | null;
   /** Our own product rather than a client's: labelled so on the cards, never counted or shown as a client. */
   own: boolean;
+  /**
+   * Confirmed client work, shown as a client ("Trusted by", the Clients page) only when true and with
+   * the client's agreement. Work that is neither `own` nor `client` is shown as something we built,
+   * with no claim about who it was for.
+   */
+  client: boolean;
   /** Lower-case line on the Clients page: "Web development and search & growth". */
   clientLine: string;
   look: Look;
@@ -85,7 +91,7 @@ const toClientLine = (services: Service[]): string => {
   return line.charAt(0).toUpperCase() + line.slice(1);
 };
 
-type Seed = Pick<Project, 'slug' | 'name' | 'services'> & Partial<Pick<Project, 'summary' | 'site' | 'own' | 'caseStudy'>>;
+type Seed = Pick<Project, 'slug' | 'name' | 'services'> & Partial<Pick<Project, 'summary' | 'site' | 'own' | 'client' | 'caseStudy'>>;
 
 // Real work only: every project here is shown on Home, Work and in llms.txt; clients (not `own`)
 // also on Clients. Add `summary` and `caseStudy` (shape: CaseStudy above) as they are written;
@@ -101,6 +107,36 @@ const seeds: Seed[] = [
     site: 'https://leadity.io',
     own: true,
   },
+  // From the owner's own repositories (2026-10-19). Shown without product names or links until the
+  // owner says whether each one was client work and whether it is live; summaries come from the code.
+  {
+    slug: 'crypto-exchange-platform',
+    name: 'Crypto exchange platform',
+    services: ['Web Apps & SaaS'],
+    summary:
+      'A crypto-to-fiat exchange: sign-up with email verification and KYC, a dashboard, exchanges with live status, wallet deposits by QR code, transaction history and an admin view. React and Supabase.',
+  },
+  {
+    slug: 'electronics-store',
+    name: 'Electronics store',
+    services: ['Websites & Landing Pages', 'Web Apps & SaaS'],
+    summary:
+      'An online electronics store in several languages: catalog, product pages, favorites, cart, accounts, orders and an admin page, with the catalog filled by import scripts we wrote. React and Supabase.',
+  },
+  {
+    slug: 'car-parts-store',
+    name: 'Car parts store',
+    services: ['Websites & Landing Pages'],
+    summary:
+      'An online store for car parts and performance accessories: shop, product pages, cart, checkout and customer account. React and TypeScript, with automated tests, shipped in Docker.',
+  },
+  {
+    slug: 'reviews-site',
+    name: 'Reviews site',
+    services: ['Websites & Landing Pages'],
+    summary:
+      'A reviews site for a crypto exchange service: visitors post star ratings with photos, and a password-protected admin panel moderates them. Next.js and Supabase.',
+  },
 ];
 
 export const projects: Project[] = seeds.map((seed, i) => ({
@@ -110,6 +146,7 @@ export const projects: Project[] = seeds.map((seed, i) => ({
   summary: seed.summary ?? null,
   site: seed.site ?? null,
   own: seed.own ?? false,
+  client: seed.client ?? false,
   clientLine: toClientLine(seed.services),
   look: looks[i % looks.length]!,
   caseStudy: seed.caseStudy ?? null,
@@ -128,8 +165,8 @@ export const projectUrl = (p: Project): string | null => (p.caseStudy ? `/work/$
  * clients. Below that it repeats the Work page with a line or two, which reads as thin proof.
  */
 export const CLIENTS_PAGE_MIN = 3;
-/** Client work only: our own products are never shown as clients ("Trusted by", the Clients page). */
-export const clients: Project[] = projects.filter((p) => !p.own);
+/** Confirmed client work only: our own products and unattributed work are never shown as clients. */
+export const clients: Project[] = projects.filter((p) => p.client && !p.own);
 export const showClientsPage = clients.length >= CLIENTS_PAGE_MIN;
 
 /** The small line above a card's name: "Our own product", or the services we delivered. */

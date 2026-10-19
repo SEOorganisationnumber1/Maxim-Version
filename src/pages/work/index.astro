@@ -15,7 +15,7 @@ const countLabel = (n: number) => (n === 1 ? '1 project' : `${n} projects`);
   title="Work"
   current="/work"
   og="work"
-  description="Websites, apps, bots and other products we designed, built and launched, and what we did for each of them."
+  description="Websites, web apps, stores and other products we designed and built, and what we did for each of them."
 >
   <section class="hero">
     <div class="hero__art" aria-hidden="true">
@@ -36,7 +36,7 @@ const countLabel = (n: number) => (n === 1 ? '1 project' : `${n} projects`);
       </svg>
     </div>
     <div class="container hero__inner">
-      <h1 class="h1 hero__title">Products we <span class="highlight">launched.</span></h1>
+      <h1 class="h1 hero__title">Products we <span class="highlight">built.</span></h1>
       <p class="lede hero__lede">Design, engineering and growth work.{showFilters && ' Filter by what we did.'}</p>
     </div>
   </section>
@@ -95,60 +95,41 @@ const countLabel = (n: number) => (n === 1 ? '1 project' : `${n} projects`);
           })
         }
       </div>
-      {/*
-        Inline (not bundled) so it runs during parsing: a ?service= deep link is
-        applied before first paint, with no flash of the unfiltered grid and no
-        aria-live announcement on load.
-      */}
-      {
-        showFilters && (
-          <script is:inline>
-            (function () {
-              var buttons = Array.prototype.slice.call(document.querySelectorAll('[data-filter]'));
-              var cards = Array.prototype.slice.call(document.querySelectorAll('[data-services]'));
-              var count = document.querySelector('[data-count]');
-              var valid = buttons
-                .map(function (b) { return b.getAttribute('data-filter') || ''; })
-                .filter(function (f) { return f && f !== 'All'; });
-
-              function apply(filter, updateUrl) {
-                buttons.forEach(function (b) {
-                  b.setAttribute('aria-pressed', String(b.getAttribute('data-filter') === filter));
-                });
-                var shown = 0;
-                cards.forEach(function (card) {
-                  var match =
-                    filter === 'All' || (card.getAttribute('data-services') || '').split('|').indexOf(filter) !== -1;
-                  card.hidden = !match;
-                  if (match) shown++;
-                });
-                if (count) count.textContent = shown === 1 ? '1 project' : shown + ' projects';
-
-                if (updateUrl) {
-                  var url = new URL(window.location.href);
-                  if (filter === 'All') url.searchParams.delete('service');
-                  else url.searchParams.set('service', filter);
-                  history.replaceState(history.state, '', url);
-                }
-              }
-
-              buttons.forEach(function (b) {
-                b.addEventListener('click', function () {
-                  apply(b.getAttribute('data-filter') || 'All', true);
-                });
-              });
-
-              var initial = new URLSearchParams(window.location.search).get('service');
-              if (initial && valid.indexOf(initial) !== -1) apply(initial, false);
-            })();
-          </script>
-        )
-      }
     </div>
   </section>
 
   <CtaBand title="Want to be the next one here?" pad="bottom" />
 </Base>
+
+<script>
+  // Service filters (rendered from two projects up). A processed script, not is:inline, so it is
+  // covered by the CSP hashes. A ?service= deep link is applied as soon as the page is parsed.
+  const buttons = [...document.querySelectorAll<HTMLButtonElement>('[data-filter]')];
+  const cards = [...document.querySelectorAll<HTMLElement>('[data-services]')];
+  const count = document.querySelector<HTMLElement>('[data-count]');
+  const valid = buttons.map((b) => b.dataset.filter ?? '').filter((f) => f && f !== 'All');
+
+  function apply(filter: string, updateUrl: boolean) {
+    for (const b of buttons) b.setAttribute('aria-pressed', String(b.dataset.filter === filter));
+    let shown = 0;
+    for (const card of cards) {
+      const match = filter === 'All' || (card.dataset.services ?? '').split('|').includes(filter);
+      card.hidden = !match;
+      if (match) shown++;
+    }
+    if (count) count.textContent = shown === 1 ? '1 project' : `${shown} projects`;
+    if (updateUrl) {
+      const url = new URL(window.location.href);
+      if (filter === 'All') url.searchParams.delete('service');
+      else url.searchParams.set('service', filter);
+      history.replaceState(history.state, '', url);
+    }
+  }
+
+  for (const b of buttons) b.addEventListener('click', () => apply(b.dataset.filter ?? 'All', true));
+  const initial = new URLSearchParams(window.location.search).get('service');
+  if (initial && valid.includes(initial)) apply(initial, false);
+</script>
 
 <style>
   /* ---------- Hero ---------- */
