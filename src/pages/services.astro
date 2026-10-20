@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import CtaBand from '../components/CtaBand.astro';
 import Icon from '../components/Icon.astro';
 import { type PlanName, type Service } from '../data/site';
+import { offersFor, offerUrl } from '../data/offers';
 
 type ServiceBlock = { name: Service; description: string; deliverables: string[] };
 type StackRow = { label: string; tools: string[] };
@@ -319,6 +320,18 @@ const faqPageJsonLd: Record<string, unknown> = {
                 ))}
               </ul>
             </div>
+            {offersFor(service.name).length > 0 && (
+              <ul class="service__pages" aria-label={`More on ${service.name}`}>
+                {offersFor(service.name).map((offer) => (
+                  <li>
+                    <a href={offerUrl(offer)} class="service__page">
+                      {offer.name}
+                      <Icon name="arrow-right" size={16} />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
           </article>
         ))
       }
@@ -626,6 +639,46 @@ const faqPageJsonLd: Record<string, unknown> = {
   .plan__list :global(svg) {
     margin-top: 4px;
     color: var(--teal);
+  }
+  /* Links to the offer pages of a block (src/data/offers.ts), at the foot of its tile. */
+  .service__pages {
+    list-style: none;
+    margin: auto 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .service__page {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 18px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface);
+    font-weight: 600;
+    font-size: 15px;
+    text-decoration: none;
+    transition:
+      border-color 160ms var(--ease-out),
+      transform 160ms var(--ease-out);
+  }
+  .service__page:hover {
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+  .service__page:active {
+    transform: scale(0.97);
+  }
+  .service__page :global(svg) {
+    transition: transform 200ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .service__page:hover :global(svg) {
+      transform: translateX(3px);
+    }
   }
 
   /* ---------- Stack ---------- */

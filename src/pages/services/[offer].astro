@@ -1,0 +1,543 @@
+---
+import Base from '../../layouts/Base.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import Icon from '../../components/Icon.astro';
+import OfferStage from '../../components/OfferStage.astro';
+import { offerPromises, offers, offerUrl, type Offer } from '../../data/offers';
+
+// One page per offer in src/data/offers.ts: /services/telegram-bots and so on.
+export function getStaticPaths() {
+  return offers.map((offer) => ({ params: { offer: offer.slug }, props: { offer } }));
+}
+
+interface Props {
+  offer: Offer;
+}
+
+const { offer } = Astro.props;
+const path = offerUrl(offer);
+const others = offers.filter((o) => o.slug !== offer.slug);
+
+const abs = (p: string) => new URL(p, Astro.site).href;
+const jsonLd: Record<string, unknown>[] = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    '@id': abs(`${path}#service`),
+    name: offer.title,
+    serviceType: offer.title,
+    description: offer.description,
+    url: abs(path),
+    provider: { '@id': abs('/#organization') },
+    category: offer.service,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: offer.faqs.items.map((faq) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+    })),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: abs('/') },
+      { '@type': 'ListItem', position: 2, name: 'Services', item: abs('/services') },
+      { '@type': 'ListItem', position: 3, name: offer.name, item: abs(path) },
+    ],
+  },
+];
+---
+
+<Base
+  title={offer.title}
+  description={offer.description}
+  current="/services"
+  og={`service-${offer.slug}`}
+  jsonLd={jsonLd}
+>
+  <section class="hero bg-paper">
+    <div class="container hero__inner">
+      <div class="hero__copy">
+        <a href="/services" class="back"><Icon name="arrow-left" />All services</a>
+        <h1 class="hero__title">
+          {offer.h1.lead} <span class="highlight">{offer.h1.mark}</span>
+        </h1>
+        <p class="hero__lede">{offer.lede}</p>
+        <div class="hero__actions">
+          <a
+            href="/contact"
+            class="btn btn--primary btn--lg"
+            data-book-call
+            data-book-from={`offer-${offer.slug}`}
+            data-book-need={offer.service}
+            data-umami-event="Book a call"
+            data-umami-event-from={`offer-${offer.slug}`}
+          >
+            Book a free call<Icon name="arrow-right" />
+          </a>
+          <a href="#examples" class="btn btn--outline btn--lg">See examples</a>
+        </div>
+        <ul class="hero__promises">
+          {
+            offerPromises.map((promise) => (
+              <li>
+                <Icon name="check" size={16} strokeWidth={2.8} />
+                {promise}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <div class="hero__stage">
+        <OfferStage kind={offer.stage} tone={offer.tone} />
+      </div>
+    </div>
+  </section>
+
+  <section id="examples" class="anchor bg-paper">
+    <div class="container block">
+      <div class="block__head">
+        <h2 class="h2">{offer.examples.title}</h2>
+        <p class="block__intro">{offer.examples.intro}</p>
+      </div>
+      <ul class="examples">
+        {
+          offer.examples.items.map((item) => (
+            <li class="example">
+              <h3 class="example__title">{item.title}</h3>
+              <p class="example__text">{item.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="bg-paper">
+    <div class="container block block--split">
+      <div class="block__head">
+        <h2 class="h2">What you get.</h2>
+        <p class="block__intro">{offer.deliverables.intro}</p>
+      </div>
+      <ul class="gets">
+        {
+          offer.deliverables.items.map((item) => (
+            <li>
+              <Icon name="check" size={16} strokeWidth={2.6} />
+              <span>{item}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="bg-paper">
+    <div class="container block">
+      <div class="block__head block__head--row">
+        <div class="block__title">
+          <h2 class="h2">How a project runs.</h2>
+          <p class="block__intro">{offer.steps.intro}</p>
+        </div>
+        <a href="/services#terms" class="text-link">All terms<Icon name="arrow-right" /></a>
+      </div>
+      <ol class="steps">
+        {
+          offer.steps.items.map((step) => (
+            <li class="steps__row">
+              <h3 class="steps__title">{step.title}</h3>
+              <p class="steps__text">{step.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section id="faq" class="anchor bg-paper">
+    <div class="container block">
+      <div class="block__head">
+        <h2 class="h2">{offer.faqs.title}</h2>
+      </div>
+      <div class="faq">
+        {
+          offer.faqs.items.map((faq, i) => (
+            <details name="faq" class="faq__item" open={i === 0}>
+              <summary class="faq__summary">
+                <h3 class="faq__question">{faq.question}</h3>
+                <Icon name="plus" size={24} strokeWidth={2.4} />
+              </summary>
+              <p class="faq__answer">{faq.answer}</p>
+            </details>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <nav aria-labelledby="more-title" class="bg-paper">
+    <div class="container more">
+      <h2 id="more-title" class="more__title">More we build</h2>
+      <ul class="more__list">
+        {
+          others.map((o) => (
+            <li>
+              <a href={offerUrl(o)} class="pill">
+                {o.name}
+                <Icon name="arrow-right" size={16} />
+              </a>
+            </li>
+          ))
+        }
+        <li>
+          <a href="/services" class="pill">
+            All services
+            <Icon name="arrow-right" size={16} />
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <CtaBand title={offer.cta.title} text={offer.cta.text} pad="bottom" need={offer.service} />
+</Base>
+
+<style>
+  .anchor {
+    scroll-margin-top: 16px;
+  }
+
+  /* ---------- Hero: the pitch on the left, a drawn example on the right ---------- */
+
+  .hero__inner {
+    padding-top: clamp(40px, 6vw, 72px);
+    padding-bottom: 24px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+    align-items: center;
+    gap: 40px 56px;
+  }
+  .hero__copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    margin-bottom: 12px;
+    font-weight: 700;
+    font-size: 15px;
+    text-decoration: none;
+  }
+  .hero__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(2.5rem, 4.6vw, 4.1rem);
+    line-height: 1.04;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+  .hero__lede {
+    margin: 22px 0 0;
+    max-width: 36em;
+    font-size: clamp(1.0625rem, 1.4vw, 1.1875rem);
+    line-height: 1.6;
+    color: var(--ink-2);
+    text-wrap: pretty;
+  }
+  .hero__actions {
+    margin-top: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .hero__promises {
+    list-style: none;
+    margin: 26px 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink-2);
+  }
+  .hero__promises li {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hero__promises :global(svg) {
+    color: var(--teal);
+  }
+  @media (max-width: 959.98px) {
+    .hero__inner {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* ---------- Sections ---------- */
+
+  .block {
+    padding-top: 64px;
+    padding-bottom: 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+  }
+  .block__head {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 760px;
+  }
+  .block__head--row {
+    max-width: none;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px 40px;
+  }
+  .block__title {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 760px;
+  }
+  .block__intro {
+    margin: 0;
+    max-width: 640px;
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+
+  /* Soft white tiles, as on Services and Home. */
+  .example,
+  .gets,
+  .steps,
+  .faq {
+    background: var(--surface);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius-tile);
+    box-shadow: var(--shadow-tile);
+  }
+
+  /* ---------- Examples: a tile each ---------- */
+
+  .examples {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr));
+    gap: 14px;
+  }
+  .example {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: clamp(22px, 2.6vw, 30px);
+  }
+  .example__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 22px;
+    line-height: 1.2;
+  }
+  .example__text {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+
+  /* ---------- What you get: heading beside one checklist tile ---------- */
+
+  .block--split {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    align-items: start;
+    gap: 32px 56px;
+  }
+  .gets {
+    list-style: none;
+    margin: 0;
+    padding: clamp(22px, 3vw, 36px);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 32px;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  .gets li {
+    display: grid;
+    grid-template-columns: 16px 1fr;
+    gap: 12px;
+  }
+  .gets :global(svg) {
+    margin-top: 4px;
+    color: var(--teal);
+  }
+  @media (max-width: 959.98px) {
+    .block--split {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 639.98px) {
+    .gets {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* ---------- Steps: rows in one tile, in order, without numbers ---------- */
+
+  .steps {
+    list-style: none;
+    margin: 0;
+    padding: 8px clamp(20px, 3vw, 36px);
+  }
+  .steps__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: 8px 40px;
+    padding: 22px 0;
+  }
+  .steps__row + .steps__row {
+    border-top: 1px solid var(--line-soft);
+  }
+  .steps__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 21px;
+    line-height: 1.25;
+  }
+  .steps__text {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+  @media (max-width: 720px) {
+    .steps__row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* ---------- FAQ (as on Services) ---------- */
+
+  .faq {
+    padding: 4px clamp(20px, 3vw, 36px);
+  }
+  .faq__item + .faq__item {
+    border-top: 1px solid var(--line-soft);
+  }
+  .faq__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    min-height: 68px;
+    padding: 14px 0;
+    list-style: none;
+    text-align: left;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.1rem, 1.6vw, 1.35rem);
+    line-height: 1.25;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .faq__summary::-webkit-details-marker {
+    display: none;
+  }
+  .faq__summary::marker {
+    content: '';
+  }
+  .faq__question {
+    margin: 0;
+    font: inherit;
+  }
+  .faq__summary :global(svg) {
+    flex: none;
+    transition: transform 240ms var(--ease-out);
+  }
+  .faq__item[open] > .faq__summary :global(svg) {
+    transform: rotate(45deg);
+  }
+  .faq__answer {
+    margin: 0;
+    padding: 0 0 24px;
+    max-width: 800px;
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--ink-2);
+  }
+
+  /* ---------- More we build ---------- */
+
+  .more {
+    padding-top: 8px;
+    padding-bottom: 64px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 20px;
+  }
+  .more__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 20px;
+  }
+  .more__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 18px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface);
+    font-weight: 600;
+    font-size: 15px;
+    text-decoration: none;
+    transition:
+      border-color 160ms var(--ease-out),
+      transform 160ms var(--ease-out);
+  }
+  .pill:hover {
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+  .pill:active {
+    transform: scale(0.97);
+  }
+  .pill :global(svg) {
+    transition: transform 200ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .pill:hover :global(svg) {
+      transform: translateX(3px);
+    }
+  }
+</style>

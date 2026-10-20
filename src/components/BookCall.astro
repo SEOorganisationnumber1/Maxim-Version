@@ -660,6 +660,14 @@ const briefHref = isDialog ? '/contact#brief' : '#brief';
       if (p.matches(':popover-open')) p.hidePopover();
     });
     dialog.classList.remove('is-closing');
+    // A link can name the kind of project it is about (data-book-need): tick it in the request
+    // form, unless the visitor has already picked something there.
+    const need = from.dataset.bookNeed;
+    const boxes = Array.from(dialog.querySelectorAll<HTMLInputElement>('input[name="needs"]'));
+    if (need && !boxes.some((box) => box.checked)) {
+      const box = boxes.find((b) => b.value === need);
+      if (box) box.checked = true;
+    }
     dialog.showModal();
     mount();
     track('Book a call opened', { from: from.dataset.bookFrom ?? from.dataset.umamiEventFrom ?? '' });

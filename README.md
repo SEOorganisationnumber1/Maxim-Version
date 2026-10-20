@@ -66,12 +66,13 @@ Until there are three clients (`CLIENTS_PAGE_MIN`), the Clients page stays out o
 | --- | --- |
 | Agency facts and content still to come | `src/data/site.ts` |
 | Projects and case studies | `src/data/projects.ts` |
+| Offer pages (Telegram bots, Mini Apps, browser extensions, desktop apps): copy, examples, steps, FAQ | `src/data/offers.ts` |
 | Share image titles (one per page) | `src/data/og.ts` |
 | Colours and shared styles | `src/styles/global.css` |
 | Fonts (self-hosted from the Fontsource packages) | `fonts` in `astro.config.mjs`, `integrations/fontsource-fonts.mjs` |
 | `<head>`, SEO meta, JSON-LD, analytics | `src/layouts/Base.astro`; the Umami ID and verification codes are cleaned up in `src/lib/integrations.ts` |
 | Header with the mobile menu, footer, CTA band, icons | `src/components/` |
-| Pages | `src/pages/` (case studies come from `work/[slug].astro`) |
+| Pages | `src/pages/` (case studies come from `work/[slug].astro`, offer pages from `services/[offer].astro`) |
 | Share images, favicon, app icons, manifest | `src/pages/og/[card].png.ts`, `favicon.ico.ts`, `apple-touch-icon.png.ts`, `icon-[size].png.ts`, `site.webmanifest.ts`, drawn by `src/lib/og.ts` |
 | Brief inbox: API, email alert, admin, storage, sign-in | `src/pages/api/`, `src/lib/notify.ts`, `src/pages/admin/`, `src/lib/briefs.ts`, `src/lib/admin-auth.ts` |
 | Security headers | `netlify.toml` (static files), `src/middleware.ts` (functions), CSP in `astro.config.mjs` |
@@ -99,6 +100,6 @@ Protections: server-side validation, a hidden spam trap, same-origin checks, at 
 ## SEO
 
 - `SITE_URL` (or Netlify's `URL`) sets canonical URLs, `sitemap-index.xml`, `robots.txt` and share image addresses.
-- Every page has a title, a description, Open Graph and Twitter tags with its own 1200 x 630 share image, and Organization JSON-LD. Home adds WebSite; Services adds FAQPage; case studies add Article and BreadcrumbList.
+- Every page has a title, a description, Open Graph and Twitter tags with its own 1200 x 630 share image, and Organization JSON-LD. Home adds WebSite; Services adds FAQPage; offer pages under `/services/` add Service, FAQPage and BreadcrumbList; case studies add Article and BreadcrumbList.
 - `/llms.txt` gives AI engines a plain-text map of the site.
 - `/admin`, `/contact/sent` and the 404 page stay out of the sitemap.

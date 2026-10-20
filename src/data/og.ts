@@ -1,6 +1,7 @@
 // Share images (Open Graph), one per page, generated at build time by src/pages/og/[card].png.ts.
 // Pages pass the card's key to Base as `og`; titles follow each page's h1.
 import { caseStudies, serviceLine, type Look } from './projects';
+import { offers, offerUrl } from './offers';
 
 export type OgRun = { text: string; mark?: 'highlight' | 'accent' };
 export type OgCard = {
@@ -37,6 +38,12 @@ export const ogCards: Record<string, OgCard> = {
     title: [{ text: 'Book a free' }, { text: 'call.', mark: 'highlight' }],
   },
   privacy: { path: '/privacy', tone: 'violet', title: [{ text: 'Privacy policy' }] },
+  ...Object.fromEntries(
+    offers.map((o): [string, OgCard] => [
+      `service-${o.slug}`,
+      { path: offerUrl(o), tone: o.tone, title: [{ text: o.h1.lead }, { text: o.h1.mark, mark: 'highlight' }] },
+    ]),
+  ),
   ...Object.fromEntries(
     caseStudies.map((p): [string, OgCard] => [
       `work-${p.slug}`,

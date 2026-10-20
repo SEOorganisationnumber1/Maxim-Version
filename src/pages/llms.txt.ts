@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { projects, projectUrl, serviceLine, showClientsPage, type Project } from '../data/projects';
 import { services, site } from '../data/site';
+import { offers, offerUrl } from '../data/offers';
 
 // A plain-text map of the site for AI engines (https://llmstxt.org).
 export const GET: APIRoute = ({ site: base }) => {
@@ -34,6 +35,10 @@ What we build: ${services.join(', ')}. UI and UX design is part of every project
 - [Services](${url('/services')}): Every kind of project we take on, our stack, plans and FAQ${clientsPage}
 - [Company](${url('/company')}): How we work and the rules we keep
 - [Contact](${url('/contact')}): Book a free 30-minute call or send a brief${contact}
+
+## Services in detail
+
+${offers.map((o) => `- [${o.title}](${url(offerUrl(o))}): ${o.description}`).join('\n')}
 
 ## How pricing works
 

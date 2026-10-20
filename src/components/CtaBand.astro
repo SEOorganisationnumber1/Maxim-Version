@@ -14,6 +14,8 @@ interface Props {
   borderTop?: boolean;
   /** Optional second, outlined button, e.g. "More work". */
   secondary?: { href: string; label: string };
+  /** The kind of project the page is about, ticked in the call request form (one of `services`). */
+  need?: string;
 }
 
 const {
@@ -23,6 +25,7 @@ const {
   pad = 'full',
   borderTop = false,
   secondary,
+  need,
 } = Astro.props;
 ---
 
@@ -51,6 +54,7 @@ const {
         href="/contact"
         class="btn btn--lg btn--accent"
         data-book-call
+        data-book-need={need}
         data-umami-event="Book a call"
         data-umami-event-from="cta-band"
       >
