@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { projects, projectUrl, serviceLine, showClientsPage, type Project } from '../data/projects';
-import { formatPrice, services, site, startingPrices } from '../data/site';
+import { services, site } from '../data/site';
 
 // A plain-text map of the site for AI engines (https://llmstxt.org).
 export const GET: APIRoute = ({ site: base }) => {
@@ -19,9 +19,6 @@ export const GET: APIRoute = ({ site: base }) => {
   const clientWork = section('Clients', projects.filter((p) => p.client && !p.own));
   const otherWork = section('Other work we built', projects.filter((p) => !p.client && !p.own));
   const contact = site.email ? `\n\nEmail: ${site.email}` : '';
-  const pricing = services
-    .map((s) => `- ${s}: ${startingPrices[s].map((p) => `${p.item} from ${formatPrice(p)}`).join('; ')}`)
-    .join('\n');
   const clientsPage = showClientsPage ? `\n- [Clients](${url('/clients')}): Teams we build with and what we built for each` : '';
 
   const body = `# ${site.name}
@@ -38,11 +35,9 @@ What we build: ${services.join(', ')}. UI and UX design is part of every project
 - [Company](${url('/company')}): How we work and the rules we keep
 - [Contact](${url('/contact')}): Book a free 30-minute call or send a brief${contact}
 
-## Starting prices (USD)
+## How pricing works
 
-${pricing}
-
-Every project gets a fixed price for a written scope. The estimate is free and arrives within two business days of the call or brief.${own}${clientWork}${otherWork}
+Every project is priced on its own, for a written scope. After a free 30-minute call, the fixed price arrives in writing within two business days. Payment is 50% to start and 50% at launch; larger projects pay in three stages. The client owns the code, designs and accounts after the final payment, and gets 30 days of free fixes after launch.${own}${clientWork}${otherWork}
 `;
   return new Response(body, { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
 };

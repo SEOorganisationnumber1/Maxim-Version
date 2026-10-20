@@ -43,6 +43,7 @@ const CURVE = 'M3 8 C 22 2, 38 2, 52 6.5 S 80 11, 97 4';
         href="/contact"
         class="header__cta"
         aria-current={isCurrent('/contact')}
+        data-book-call
         data-umami-event="Book a call"
         data-umami-event-from="header"
       >
@@ -92,8 +93,9 @@ const CURVE = 'M3 8 C 22 2, 38 2, 52 6.5 S 80 11, 97 4';
   <div class="menu__foot">
     <a
       href="/contact"
-      class="btn btn--primary btn--lg"
+      class="btn btn--light btn--lg"
       aria-current={isCurrent('/contact')}
+      data-book-call
       data-umami-event="Book a call"
       data-umami-event-from="menu"
     >
@@ -229,21 +231,27 @@ const CURVE = 'M3 8 C 22 2, 38 2, 52 6.5 S 80 11, 97 4';
     gap: 8px;
     min-height: 44px;
     margin-left: 8px;
-    padding: 0 18px;
-    background: var(--cyan);
-    color: var(--ink);
+    padding: 0 20px;
+    background: var(--ink);
+    color: var(--white);
     font-weight: 700;
     font-size: 15px;
-    border-radius: 8px;
+    border-radius: 999px;
     text-decoration: none;
+    transition:
+      transform 160ms var(--ease-out),
+      background-color 160ms var(--ease-out);
   }
   .header__cta:hover {
-    color: var(--ink);
-    background: #3fd5e1;
+    color: var(--white);
+    background: #1b2547;
+  }
+  .header__cta:active {
+    transform: scale(0.97);
   }
   .header__cta[aria-current='page'],
   .header__cta[aria-current='page']:hover {
-    background: var(--ink);
+    background: var(--teal-ink);
     color: var(--white);
   }
 
@@ -257,8 +265,8 @@ const CURVE = 'M3 8 C 22 2, 38 2, 52 6.5 S 80 11, 97 4';
     width: 44px;
     height: 44px;
     padding: 0;
-    border: 1.5px solid var(--ink);
-    border-radius: 8px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
     background: var(--white);
     color: var(--ink);
     cursor: pointer;

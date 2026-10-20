@@ -5,6 +5,7 @@ import '../styles/global.css';
 import { bingSiteVerification, googleSiteVerification, umamiWebsiteId } from '../lib/integrations';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import BookCall from '../components/BookCall.astro';
 import { services, site } from '../data/site';
 import { ogCards } from '../data/og';
 
@@ -132,5 +133,7 @@ const ld = [organization, ...(cleanPath === '/' ? [website] : []), ...jsonLd];
       </main>
       <Footer />
     </div>
+    {/* Every Book a call link opens this in place. /contact is the booking page itself, so it has none. */}
+    {current !== '/contact' && <BookCall mode="dialog" />}
   </body>
 </html>

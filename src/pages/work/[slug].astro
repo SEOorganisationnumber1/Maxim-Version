@@ -110,7 +110,7 @@ const jsonLd: Record<string, unknown>[] = [
     </div>
   </section>
 
-  <section aria-label="Results" class="bg-white border-top">
+  <section aria-label="Results" class="bg-paper">
     <dl class="container results">
       {
         cs.results.map((r) => (
@@ -123,7 +123,7 @@ const jsonLd: Record<string, unknown>[] = [
     </dl>
   </section>
 
-  <section class="bg-white">
+  <section class="bg-paper">
     <div class="container story">
       <div class="story__row">
         <h2 class="story__h2">The challenge</h2>
@@ -151,7 +151,7 @@ const jsonLd: Record<string, unknown>[] = [
 
   {
     cs.quote && (
-      <section class="bg-paper border-top">
+      <section class="bg-paper">
         <figure class="quote">
           <blockquote>{cs.quote.text}</blockquote>
           <figcaption>
@@ -211,7 +211,7 @@ const jsonLd: Record<string, unknown>[] = [
   .meta {
     margin: 16px 0 0;
     padding: 24px 0 0;
-    border-top: 1.5px solid var(--ink);
+    border-top: 1px solid var(--line-soft);
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
     gap: 24px;
@@ -300,7 +300,7 @@ const jsonLd: Record<string, unknown>[] = [
     gap: 16px 48px;
   }
   .story__row--rule {
-    border-top: 1.5px solid var(--ink);
+    border-top: 1px solid var(--line-soft);
     padding-top: 56px;
   }
   .story__h2 {

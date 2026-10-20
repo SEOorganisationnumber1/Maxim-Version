@@ -32,3 +32,15 @@ export const bookingUrl: string | null = (() => {
     return null;
   }
 })();
+
+/**
+ * "username/event" when the booking page is on Cal.com: the calendar is then embedded in the
+ * Book a call dialog and on /contact. Any other booking page (Calendly...) opens in a new tab.
+ */
+export const calLink: string | null = (() => {
+  if (!bookingUrl) return null;
+  const url = new URL(bookingUrl);
+  if (url.hostname !== 'cal.com' && url.hostname !== 'app.cal.com') return null;
+  const path = url.pathname.replace(/^\/+|\/+$/g, '');
+  return /^[\w.-]+(\/[\w.-]+)*$/.test(path) ? path : null;
+})();

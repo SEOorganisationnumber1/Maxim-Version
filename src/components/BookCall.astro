@@ -1,0 +1,711 @@
+---
+// Book a call: the site's one conversion. Two uses of the same content:
+// - mode "dialog": a native <dialog> in every page except /contact. Every [data-book-call] link
+//   opens it in place; without JavaScript the same links simply go to /contact.
+// - mode "page": the body of /contact.
+// With a Cal.com link (BOOKING_URL) the real calendar is embedded inline, loaded only on intent.
+// Another booking page (Calendly...) opens in a new tab. Without one, the call request form shows.
+import Icon from './Icon.astro';
+import CallForm from './CallForm.astro';
+import { bookingUrl, calLink } from '../lib/integrations';
+import { site } from '../data/site';
+
+interface Props {
+  mode: 'dialog' | 'page';
+}
+
+const { mode } = Astro.props;
+const isDialog = mode === 'dialog';
+const Wrapper = isDialog ? 'dialog' : 'section';
+const Title = isDialog ? 'h2' : 'h1';
+const wrapperProps = isDialog
+  ? { class: 'book book--dialog', 'aria-labelledby': 'book-title', 'data-book-dialog': '' }
+  : { class: 'book book--page', 'aria-labelledby': 'book-title' };
+
+const lede = bookingUrl
+  ? 'Pick a time for a 30-minute video call about what you want to launch. Free, with no obligation.'
+  : 'Tell us what you want to launch and when suits you. We set up a 30-minute video call, free and with no obligation.';
+
+const points = [
+  'We go through your idea, who it is for and what you have so far.',
+  `Within ${site.responseTime ?? 'two business days'} after the call you get our approach and a fixed price in writing.`,
+  'You own the code, the designs and the accounts after the final payment.',
+];
+// On /contact the written brief sits below the calendar; from the dialog it is one page away.
+const briefHref = isDialog ? '/contact#brief' : '#brief';
+---
+
+<Wrapper {...wrapperProps}>
+  <div class="book__panel">
+    {
+      isDialog && (
+        <button type="button" class="book__close" aria-label="Close" data-book-close autofocus>
+          <Icon name="close" size={18} />
+        </button>
+      )
+    }
+    <div class="book__info">
+      <Title id="book-title" class="book__title">Book a free <span class="highlight">call.</span></Title>
+      <p class="book__lede">{lede}</p>
+      <ul class="book__points">
+        {
+          points.map((point) => (
+            <li>
+              <Icon name="check" size={16} strokeWidth={2.6} />
+              <span>{point}</span>
+            </li>
+          ))
+        }
+      </ul>
+      {
+        bookingUrl && (
+          <p class="book__alt">
+            Prefer to write? <a href={briefHref}>Send a brief instead</a>
+          </p>
+        )
+      }
+    </div>
+
+    <div class="book__main">
+      {
+        calLink ? (
+          <div class="cal" data-cal data-cal-link={calLink} data-cal-mode={mode} data-state="idle">
+            <div class="cal__skeleton" aria-hidden="true">
+              <span class="sk sk--title" />
+              <span class="sk sk--line" />
+              <span class="cal__grid">
+                {Array.from({ length: 35 }, () => (
+                  <span class="sk sk--day" />
+                ))}
+              </span>
+            </div>
+            <p class="visually-hidden" role="status" data-cal-status />
+            <div class="cal__frame" id={`cal-${mode}`} data-cal-frame />
+            <div class="cal__state cal__error" data-cal-error hidden>
+              <h3 class="cal__state-title">The calendar did not load.</h3>
+              <p>It may be your connection or a blocker. You can book on the same calendar in a new tab.</p>
+              <a href={bookingUrl} class="btn btn--primary" target="_blank" rel="noopener" data-umami-event="Open calendar" data-umami-event-from="error">
+                Open the calendar<span class="visually-hidden"> (opens in a new tab)</span>
+                <Icon name="arrow-up-right" />
+              </a>
+            </div>
+            <div class="cal__state cal__done" data-cal-done hidden>
+              <span class="cal__done-icon" aria-hidden="true">
+                <Icon name="calendar" size={26} strokeWidth={2.2} />
+              </span>
+              <h3 class="cal__state-title" tabindex="-1" data-cal-done-title>You're booked.</h3>
+              <p data-cal-when />
+              <p>The invite with the video link is on its way to your inbox.</p>
+              {isDialog && (
+                <button type="button" class="btn btn--outline" data-book-close>
+                  Done
+                </button>
+              )}
+            </div>
+          </div>
+        ) : bookingUrl ? (
+          <div class="pick">
+            <h3 class="pick__title">Pick a time</h3>
+            <p>See the open times and book in a minute. The invite and the call link arrive by email.</p>
+            <a href={bookingUrl} class="btn btn--primary btn--lg" target="_blank" rel="noopener" data-umami-event="Open calendar">
+              Pick a time<span class="visually-hidden"> (opens in a new tab)</span>
+              <Icon name="arrow-up-right" />
+            </a>
+          </div>
+        ) : (
+          <CallForm />
+        )
+      }
+    </div>
+  </div>
+</Wrapper>
+
+<style>
+  [hidden] {
+    display: none !important;
+  }
+
+  /* ---------- Shared layout ---------- */
+
+  /* The dialog lives outside .site (it is a sibling in <body>), so it sets the site's type itself. */
+  .book {
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  .book__panel {
+    display: grid;
+    grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+    background: var(--surface);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius-tile);
+    box-shadow: var(--shadow-tile);
+  }
+  .book__info {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: clamp(24px, 3.4vw, 40px);
+    background: var(--paper);
+    border-right: 1px solid var(--line-soft);
+    border-radius: var(--radius-tile) 0 0 var(--radius-tile);
+  }
+  .book__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(2.1rem, 3.6vw, 3rem);
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+  }
+  .book--page .book__title {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+  }
+  .book__lede {
+    margin: 0;
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+  .book__points {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+  }
+  .book__points li {
+    display: grid;
+    grid-template-columns: 16px 1fr;
+    gap: 12px;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+  .book__points :global(svg) {
+    margin-top: 3px;
+    color: var(--teal);
+  }
+  .book__alt {
+    margin: auto 0 0;
+    padding-top: 8px;
+    font-size: 15px;
+    color: var(--ink-2);
+  }
+  .book__alt a {
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .book__main {
+    position: relative;
+    min-width: 0;
+    padding: clamp(20px, 3vw, 36px);
+  }
+
+  /* ---------- Calendar ---------- */
+
+  .cal {
+    position: relative;
+    min-height: 480px;
+  }
+  /* Our own skeleton covers Cal's loader until the calendar says it is ready. */
+  .cal__skeleton {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    pointer-events: none;
+    transition: opacity 240ms var(--ease-out);
+  }
+  .cal[data-state='ready'] .cal__skeleton,
+  .cal[data-state='done'] .cal__skeleton,
+  .cal[data-state='error'] .cal__skeleton {
+    opacity: 0;
+  }
+  .sk {
+    display: block;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #eef2f6 0%, #f7f9fb 50%, #eef2f6 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s ease-in-out infinite;
+  }
+  .sk--title {
+    height: 22px;
+    width: 46%;
+  }
+  .sk--line {
+    height: 14px;
+    width: 30%;
+    margin-bottom: 8px;
+  }
+  .cal__grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+  }
+  .sk--day {
+    aspect-ratio: 1;
+  }
+  @keyframes shimmer {
+    from {
+      background-position: 200% 0;
+    }
+    to {
+      background-position: -200% 0;
+    }
+  }
+  .cal__frame {
+    position: relative;
+    min-height: 480px;
+    opacity: 0;
+    transition: opacity 320ms var(--ease-out);
+  }
+  .cal[data-state='ready'] .cal__frame {
+    opacity: 1;
+  }
+  .cal[data-state='done'] .cal__frame,
+  .cal[data-state='error'] .cal__frame {
+    display: none;
+  }
+  .cal__state {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 24px 4px;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+  .cal__state p {
+    margin: 0;
+  }
+  .cal__state-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.8rem, 3vw, 2.4rem);
+    line-height: 1.08;
+    color: var(--ink);
+  }
+  .cal__state-title:focus {
+    outline: none;
+  }
+  .cal__done-icon {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--cyan);
+    color: var(--ink);
+    animation: pop-in 420ms var(--ease-pop) both;
+  }
+  .cal__done [data-cal-when] {
+    font-weight: 700;
+    color: var(--ink);
+  }
+  @keyframes pop-in {
+    from {
+      opacity: 0;
+      transform: scale(0.6);
+    }
+  }
+
+  .pick {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 12px 0;
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+  .pick p {
+    margin: 0;
+  }
+  .pick__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 30px;
+    line-height: 1.1;
+    color: var(--ink);
+  }
+
+  /* ---------- Dialog ---------- */
+
+  /* The dialog itself is a transparent full-screen layer: a click on it, outside the panel, closes. */
+  .book--dialog {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    overflow: hidden;
+  }
+  .book--dialog::backdrop {
+    background: rgb(10 17 40 / 0);
+    backdrop-filter: blur(0);
+    transition:
+      background-color 240ms var(--ease-out),
+      backdrop-filter 240ms var(--ease-out),
+      display 240ms allow-discrete,
+      overlay 240ms allow-discrete;
+  }
+  .book--dialog[open]::backdrop {
+    background: rgb(10 17 40 / 0.42);
+    backdrop-filter: blur(6px);
+  }
+  @starting-style {
+    .book--dialog[open]::backdrop {
+      background: rgb(10 17 40 / 0);
+      backdrop-filter: blur(0);
+    }
+  }
+  .book--dialog .book__panel {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: min(1220px, calc(100% - 32px));
+    max-height: calc(100dvh - 48px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    box-shadow: 0 30px 80px -30px rgb(10 17 40 / 0.45);
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.96);
+    transition:
+      opacity 240ms var(--ease-out),
+      transform 240ms var(--ease-out);
+  }
+  .book--dialog[open] .book__panel {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+  @starting-style {
+    .book--dialog[open] .book__panel {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.96);
+    }
+  }
+  /* Closing is quicker than opening, and scales less. */
+  .book--dialog.is-closing .book__panel {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.98);
+    transition-duration: 160ms;
+  }
+  .book--dialog.is-closing::backdrop {
+    background: rgb(10 17 40 / 0);
+    backdrop-filter: blur(0);
+    transition-duration: 160ms;
+  }
+  .book--dialog .book__info {
+    padding-right: clamp(24px, 3vw, 36px);
+  }
+  .book__close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: var(--surface);
+    color: var(--ink);
+    cursor: pointer;
+    transition:
+      transform 160ms var(--ease-out),
+      border-color 160ms var(--ease-out);
+  }
+  .book__close:hover {
+    border-color: var(--ink);
+  }
+  .book__close:active {
+    transform: scale(0.94);
+  }
+  /* The calendar wants about 800px to put the time slots beside the month; give it the room. */
+  @media (min-width: 861px) {
+    .book--dialog .book__panel:has(.cal) {
+      grid-template-columns: minmax(0, 0.56fr) minmax(0, 1.44fr);
+    }
+  }
+  .book--dialog .book__main {
+    padding-top: 64px;
+  }
+  .book__main:has(.cal) {
+    padding-left: clamp(12px, 1.6vw, 20px);
+    padding-right: clamp(12px, 1.6vw, 20px);
+  }
+
+  /* ---------- Page (/contact) ---------- */
+
+  .book--page {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: 56px var(--gutter) 32px;
+  }
+
+  /* ---------- Small screens: one column; the dialog becomes a bottom sheet ---------- */
+
+  @media (max-width: 860px) {
+    .book__panel {
+      grid-template-columns: 1fr;
+    }
+    .book__info {
+      border-right: 0;
+      border-bottom: 1px solid var(--line-soft);
+      border-radius: var(--radius-tile) var(--radius-tile) 0 0;
+    }
+    .book--dialog .book__panel {
+      left: 0;
+      right: 0;
+      top: auto;
+      bottom: 0;
+      width: 100%;
+      max-height: 92dvh;
+      border-radius: var(--radius-tile) var(--radius-tile) 0 0;
+      opacity: 1;
+      transform: translateY(100%);
+      transition: transform 320ms var(--ease-out);
+    }
+    .book--dialog[open] .book__panel {
+      transform: none;
+    }
+    @starting-style {
+      .book--dialog[open] .book__panel {
+        transform: translateY(100%);
+      }
+    }
+    .book--dialog.is-closing .book__panel {
+      opacity: 1;
+      transform: translateY(100%);
+      transition-duration: 220ms;
+    }
+    .book--dialog .book__info {
+      padding-top: 28px;
+      padding-right: 72px;
+    }
+    .book--dialog .book__main {
+      padding-top: 24px;
+      padding-bottom: max(24px, env(safe-area-inset-bottom));
+    }
+    .book--page {
+      padding-top: 32px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .book--dialog .book__panel,
+    .book--dialog[open] .book__panel {
+      transition-property: opacity;
+    }
+    .sk {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  // Opens the dialog from any [data-book-call] link, loads Cal.com only on intent, and reports the
+  // booking. Links keep href="/contact", so without JavaScript (or with a modified click) they navigate.
+  type Umami = { track: (event: string, data?: Record<string, string>) => void };
+  type CalApi = ((...args: unknown[]) => void) & {
+    q?: unknown[];
+    ns?: Record<string, CalApi>;
+    loaded?: boolean;
+    config?: Record<string, unknown>;
+  };
+  type CalEvent = { detail: { data: Record<string, unknown> } };
+
+  const CAL_ORIGIN = 'https://app.cal.com';
+  const CAL_SCRIPT = `${CAL_ORIGIN}/embed/embed.js`;
+  const NAMESPACE = 'launchery';
+  const READY_TIMEOUT_MS = 15000;
+
+  const track = (event: string, data?: Record<string, string>) => (window as Window & { umami?: Umami }).umami?.track(event, data);
+  const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const dialog = document.querySelector<HTMLDialogElement>('[data-book-dialog]');
+  const cal = document.querySelector<HTMLElement>('[data-cal]');
+
+  /** Cal.com's official loader, typed: a command queue that embed.js picks up once it loads. */
+  function calApi(): CalApi {
+    const w = window as Window & { Cal?: CalApi };
+    if (w.Cal) return w.Cal;
+    const push = (api: CalApi, args: unknown[]) => api.q!.push(args);
+    const Cal = function (...args: unknown[]) {
+      if (!Cal.loaded) {
+        Cal.ns = {};
+        Cal.q = Cal.q || [];
+        const script = document.createElement('script');
+        script.src = CAL_SCRIPT;
+        script.async = true;
+        script.addEventListener('error', () => setState('error'));
+        document.head.appendChild(script);
+        Cal.loaded = true;
+      }
+      if (args[0] === 'init') {
+        const api = function (...a: unknown[]) {
+          push(api, a);
+        } as CalApi;
+        const namespace = args[1];
+        api.q = api.q || [];
+        if (typeof namespace === 'string') {
+          Cal.ns![namespace] = Cal.ns![namespace] || api;
+          push(Cal.ns![namespace]!, args);
+          push(Cal, ['initNamespace', namespace]);
+        } else push(Cal, args);
+        return;
+      }
+      push(Cal, args);
+    } as CalApi;
+    Cal.q = [];
+    w.Cal = Cal;
+    return Cal;
+  }
+
+  function setState(state: 'idle' | 'loading' | 'ready' | 'error' | 'done') {
+    if (!cal) return;
+    cal.dataset.state = state;
+    const status = cal.querySelector<HTMLElement>('[data-cal-status]');
+    if (status) status.textContent = state === 'loading' ? 'Loading the calendar.' : state === 'ready' ? 'Calendar loaded.' : '';
+    cal.querySelector<HTMLElement>('[data-cal-error]')!.hidden = state !== 'error';
+    cal.querySelector<HTMLElement>('[data-cal-done]')!.hidden = state !== 'done';
+  }
+
+  let initialised = false;
+  /** Starts embed.js and warms the booking page in a hidden frame. Runs once, on the first sign of intent. */
+  function warm() {
+    if (!cal || initialised) return;
+    initialised = true;
+    const Cal = calApi();
+    Cal('init', NAMESPACE, { origin: CAL_ORIGIN });
+    // Campaign parameters (utm_*) on our page travel into the booking.
+    Cal.config = { ...(Cal.config ?? {}), forwardQueryParams: true };
+    Cal.ns![NAMESPACE]!('preload', { calLink: cal.dataset.calLink });
+  }
+
+  let mounted = false;
+  /** Renders the calendar inline in our own container, styled with the site's colours. */
+  function mount() {
+    if (!cal || mounted) return;
+    warm();
+    mounted = true;
+    setState('loading');
+    const ns = calApi().ns![NAMESPACE]!;
+    const ink = '#0A1128';
+    const vars = {
+      'cal-brand': ink,
+      'cal-brand-emphasis': '#1B2547',
+      'cal-brand-text': '#FFFFFF',
+      'cal-text': ink,
+      'cal-text-emphasis': ink,
+      'cal-text-subtle': '#3D4763',
+      'cal-text-muted': '#5F6984',
+      'cal-bg': '#FFFFFF',
+      'cal-bg-subtle': '#F2F6F9',
+      'cal-bg-muted': '#F5FAFC',
+      'cal-border': '#E3E8EF',
+      'cal-border-subtle': '#EEF2F6',
+    };
+    ns('ui', { theme: 'light', layout: 'month_view', hideEventTypeDetails: true, showTimezoneWhenEventDetailsHidden: true, cssVarsPerTheme: { light: vars, dark: vars } });
+    ns('on', { action: 'linkReady', callback: () => setState('ready') });
+    ns('on', { action: 'linkFailed', callback: () => setState('error') });
+    ns('on', {
+      action: 'bookingSuccessfulV2',
+      callback: (event: CalEvent) => {
+        const data = event.detail.data;
+        const when = cal.querySelector<HTMLElement>('[data-cal-when]')!;
+        const start = typeof data.startTime === 'string' ? new Date(data.startTime) : null;
+        when.textContent = start && !Number.isNaN(start.getTime())
+          ? new Intl.DateTimeFormat(undefined, { weekday: 'long', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' }).format(start)
+          : '';
+        // An event type that needs confirmation reports the booking before we accept it.
+        const pending = typeof data.status === 'string' && data.status.toUpperCase() !== 'ACCEPTED';
+        cal.querySelector<HTMLElement>('[data-cal-done-title]')!.textContent = pending ? 'Request sent.' : "You're booked.";
+        setState('done');
+        cal.querySelector<HTMLElement>('[data-cal-done-title]')!.focus();
+        track('Call booked', { from: cal.dataset.calMode ?? '' });
+      },
+    });
+    ns('inline', {
+      elementOrSelector: cal.querySelector<HTMLElement>('[data-cal-frame]'),
+      calLink: cal.dataset.calLink,
+      config: { layout: 'month_view', theme: 'light' },
+    });
+    window.setTimeout(() => {
+      if (cal.dataset.state === 'loading') setState('error');
+    }, READY_TIMEOUT_MS);
+  }
+
+  // ---------- Dialog ----------
+
+  let opener: HTMLElement | null = null;
+
+  function openDialog(from: HTMLElement) {
+    if (!dialog || dialog.open) return;
+    opener = from;
+    // The mobile menu sheet is a popover: close it so focus and the page behind stay sane.
+    document.querySelectorAll<HTMLElement>('[popover]').forEach((p) => {
+      if (p.matches(':popover-open')) p.hidePopover();
+    });
+    dialog.classList.remove('is-closing');
+    dialog.showModal();
+    mount();
+    track('Book a call opened', { from: from.dataset.bookFrom ?? from.dataset.umamiEventFrom ?? '' });
+  }
+
+  function closeDialog() {
+    if (!dialog || !dialog.open || dialog.classList.contains('is-closing')) return;
+    if (reduceMotion()) {
+      dialog.close();
+      return;
+    }
+    dialog.classList.add('is-closing');
+    const sheet = window.matchMedia('(max-width: 860px)').matches;
+    window.setTimeout(() => {
+      dialog.classList.remove('is-closing');
+      dialog.close();
+    }, sheet ? 220 : 160);
+  }
+
+  if (dialog) {
+    document.addEventListener('click', (event) => {
+      const link = (event.target as Element | null)?.closest<HTMLElement>('[data-book-call]');
+      if (!link || event.defaultPrevented) return;
+      const mouse = event as MouseEvent;
+      if (mouse.button !== 0 || mouse.metaKey || mouse.ctrlKey || mouse.shiftKey || mouse.altKey) return;
+      event.preventDefault();
+      openDialog(link);
+    });
+    // Intent: a pointer over a Book a call link, or keyboard focus on one, starts loading the calendar.
+    const intent = (event: Event) => {
+      if ((event.target as Element | null)?.closest?.('[data-book-call]')) warm();
+    };
+    document.addEventListener('pointerover', intent, { passive: true });
+    document.addEventListener('focusin', intent);
+
+    dialog.addEventListener('cancel', (event) => {
+      event.preventDefault();
+      closeDialog();
+    });
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) closeDialog();
+      else if ((event.target as Element).closest('[data-book-close]')) closeDialog();
+    });
+    dialog.addEventListener('close', () => opener?.focus());
+  } else if (cal) {
+    // /contact: the calendar is the page, so it loads right away.
+    mount();
+  }
+</script>

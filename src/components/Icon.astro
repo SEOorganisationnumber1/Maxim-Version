@@ -1,7 +1,7 @@
 ---
 // Stroke icons from the design. Decorative by default (aria-hidden);
 // pass `label` when the icon is the only content of a control.
-type Name = 'arrow-right' | 'arrow-left' | 'arrow-up-right' | 'plus' | 'check' | 'menu' | 'close';
+type Name = 'arrow-right' | 'arrow-left' | 'arrow-up-right' | 'plus' | 'check' | 'menu' | 'close' | 'calendar';
 
 interface Props {
   name: Name;
@@ -22,6 +22,7 @@ const paths: Record<Name, string[]> = {
   check: ['M5 12.5l4.5 4.5L19 7.5'],
   menu: ['M4 8.5h16', 'M4 15.5h16'],
   close: ['M6 6l12 12', 'M18 6L6 18'],
+  calendar: ['M8 3v3', 'M16 3v3', 'M4 10h16', 'M6 5h12a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z'],
 };
 ---
 

@@ -14,6 +14,14 @@ const SITE_URL = process.env.SITE_URL ?? process.env.URL ?? 'https://maxim-versi
 /** `astro dev` injects styles inline for hot reload, which a hash-based CSP blocks: the CSP is for builds. */
 const DEV = process.argv.includes('dev');
 
+/**
+ * A Cal.com booking page (BOOKING_URL) is embedded in the Book a call dialog. Only then does the
+ * policy below let Cal.com in: its script and iframe, and the inline styles its loader writes.
+ * Scripts stay hash-only either way.
+ */
+const BOOKING = (process.env.BOOKING_URL ?? '').match(/https:\/\/[^\s"'<>]+/)?.[0] ?? '';
+const CAL_EMBED = /^https:\/\/(app\.)?cal\.com\/[^/]+/.test(BOOKING);
+
 /** Pages that exist but are not for search engines. */
 const NOT_IN_SITEMAP = [/^\/admin(\/|$)/, /^\/contact\/sent$/, /^\/404$/];
 
@@ -57,7 +65,7 @@ export default defineConfig({
       directives: [
         "default-src 'self'",
         "img-src 'self' data:",
-        "font-src 'self' data:",
+        CAL_EMBED ? /** @type {const} */ ("font-src 'self' data: https://cal.com") : /** @type {const} */ ("font-src 'self' data:"),
         "connect-src 'self' https://gateway.umami.is",
         "manifest-src 'self'",
         "form-action 'self'",
@@ -65,8 +73,21 @@ export default defineConfig({
         "object-src 'none'",
         "frame-ancestors 'none'",
         'upgrade-insecure-requests',
+        ...(CAL_EMBED ? /** @type {const} */ (['frame-src https://app.cal.com https://cal.com']) : []),
       ],
-      scriptDirective: { resources: ["'self'", 'https://cloud.umami.is'] },
+      scriptDirective: { resources: ["'self'", 'https://cloud.umami.is', ...(CAL_EMBED ? ['https://app.cal.com'] : [])] },
+      ...(CAL_EMBED
+        ? {
+            styleDirective: {
+              resources: [
+                "'self'",
+                { resource: "'self'", kind: 'element' },
+                { resource: "'unsafe-inline'", kind: 'element' },
+                { resource: "'unsafe-inline'", kind: 'attribute' },
+              ],
+            },
+          }
+        : {}),
     },
   },
   // No Markdown on the site. Shiki, the default code highlighter, writes inline styles that the

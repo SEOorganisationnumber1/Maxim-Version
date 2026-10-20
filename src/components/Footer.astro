@@ -27,7 +27,7 @@ const hasContact = Boolean(site.email || site.socials.length || site.location);
         {site.email && <a href={`mailto:${site.email}`}>{site.email}</a>}
         {site.socials.map((s) => <><a href={s.url} rel="me noopener" target="_blank">{s.label}</a>{'\n'}</>)}
         {site.location && <span>{site.location}</span>}
-        {!hasContact && <a href="/contact">Book a call</a>}
+        {!hasContact && <a href="/contact" data-book-call data-umami-event="Book a call" data-umami-event-from="footer">Book a call</a>}
       </div>
     </div>
     <div class="footer__bottom">

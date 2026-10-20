@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 import CtaBand from '../components/CtaBand.astro';
 import Icon from '../components/Icon.astro';
-import { formatPrice, prices, startingPrices, type PlanName, type Service } from '../data/site';
+import { type PlanName, type Service } from '../data/site';
 
 type ServiceBlock = { name: Service; description: string; deliverables: string[] };
 type StackRow = { label: string; tools: string[] };
@@ -13,8 +13,7 @@ type Term = { title: string; text: string };
 const jumpLinks = [
   { href: '#services', label: 'What we do' },
   { href: '#stack', label: 'Stack & tools' },
-  // "Pricing" only once a price is published; until then the plans are what the section shows.
-  { href: '#pricing', label: Object.values(prices).some(Boolean) ? 'Pricing' : 'Plans' },
+  { href: '#plans', label: 'Plans' },
   { href: '#terms', label: 'Terms' },
   { href: '#faq', label: 'FAQ' },
 ];
@@ -32,7 +31,7 @@ const terms: Term[] = [
   },
   {
     title: 'Pay in stages',
-    text: '50% to start and 50% at launch. Above $5,000: 30% to start, 40% when the design is approved and 30% at launch.',
+    text: '50% to start and 50% at launch. Larger projects pay in three stages: 30% to start, 40% when the design is approved and 30% at launch.',
   },
   {
     title: 'You own everything',
@@ -42,7 +41,7 @@ const terms: Term[] = [
   { title: '30 days of free fixes', text: 'For 30 days after launch, we fix any bug in what we built, free.' },
   {
     title: 'Support if you want it',
-    text: "Monthly care for websites from $50 per month, optional. Cancel any time with 30 days' notice.",
+    text: "Monthly care for websites and apps, optional. Cancel any time with 30 days' notice.",
   },
   {
     title: 'No hidden costs',
@@ -145,7 +144,7 @@ const plans: Plan[] = [
   {
     name: 'Launch',
     summary: 'Design and build. A new website or product, ready on launch day.',
-    period: 'one-time',
+    period: 'One project',
     featured: false,
     items: [
       'Product and UI design in Figma',
@@ -158,7 +157,7 @@ const plans: Plan[] = [
   {
     name: 'Growth',
     summary: 'SEO, GEO and AEO, run every month on the product you have.',
-    period: 'per month',
+    period: 'Month to month',
     featured: true,
     items: [
       'Technical SEO audit and fixes',
@@ -171,7 +170,7 @@ const plans: Plan[] = [
   {
     name: 'Full stack',
     summary: 'Everything, as one ongoing product team for design, code, AI and growth.',
-    period: 'per month',
+    period: 'Month to month',
     featured: false,
     items: [
       'Everything in Launch and Growth',
@@ -217,12 +216,12 @@ const faqs: Faq[] = [
   {
     question: 'How much does a project cost?',
     answer:
-      'Every project gets a fixed price for a written scope. As a guide: landing pages from $600, websites from $1,500, Telegram bots from $300, mobile apps from $3,500 and web apps from $5,000. The starting prices for each kind of project are listed above.',
+      'It depends on what you need, so every project is priced on its own. After a free 30-minute call you get a fixed price for a written scope within two business days, before you commit to anything.',
   },
   {
     question: 'How do payments work?',
     answer:
-      '50% to start and 50% at launch. Projects above $5,000 pay in three stages: 30% to start, 40% when the design is approved and 30% at launch.',
+      '50% to start and 50% at launch. Larger projects pay in three stages: 30% to start, 40% when the design is approved and 30% at launch.',
   },
   {
     question: 'Who owns the code and the design?',
@@ -254,7 +253,7 @@ const faqPageJsonLd: Record<string, unknown> = {
   description="Websites, web apps and SaaS, mobile and desktop apps, Telegram bots and browser extensions, AI and automation, and search-led growth. One team designs, builds and grows your product."
   jsonLd={[faqPageJsonLd]}
 >
-  <section class="hero bg-paper border-bottom">
+  <section class="hero bg-paper">
     <div class="hero__art" aria-hidden="true">
       <svg viewBox="0 0 480 460" preserveAspectRatio="xMinYMid slice" fill="none">
         <defs>
@@ -300,7 +299,7 @@ const faqPageJsonLd: Record<string, unknown> = {
     </div>
   </section>
 
-  <section id="services" class="anchor bg-white">
+  <section id="services" class="anchor bg-paper">
     <div class="container services__inner">
       {
         serviceBlocks.map((service) => (
@@ -308,20 +307,15 @@ const faqPageJsonLd: Record<string, unknown> = {
             <div class="service__col">
               <h2 class="service__title">{service.name}</h2>
               <p class="service__text">{service.description}</p>
-              <dl class="service__prices">
-                {startingPrices[service.name].map((price) => (
-                  <div>
-                    <dt>{price.item}</dt>
-                    <dd>From {formatPrice(price)}</dd>
-                  </div>
-                ))}
-              </dl>
             </div>
             <div class="service__col">
               <h3 class="service__label">What you get</h3>
               <ul class="service__list">
                 {service.deliverables.map((item) => (
-                  <li>{item}</li>
+                  <li>
+                    <Icon name="check" size={16} strokeWidth={2.6} />
+                    <span>{item}</span>
+                  </li>
                 ))}
               </ul>
             </div>
@@ -331,7 +325,7 @@ const faqPageJsonLd: Record<string, unknown> = {
     </div>
   </section>
 
-  <section id="stack" class="anchor bg-paper border-top">
+  <section id="stack" class="anchor bg-paper">
     <div class="container stack__inner">
       <div class="section-head">
         <h2 class="h2">A modern stack, chosen for speed.</h2>
@@ -359,7 +353,7 @@ const faqPageJsonLd: Record<string, unknown> = {
     </div>
   </section>
 
-  <section id="pricing" class="anchor bg-white border-top">
+  <section id="plans" class="anchor bg-paper">
     <div class="container pricing__inner">
       <div class="section-head">
         <h2 class="h2">Three ways to work with us.</h2>
@@ -372,25 +366,20 @@ const faqPageJsonLd: Record<string, unknown> = {
                 <h3 class="plan__name">{plan.name}</h3>
                 <p class="plan__summary">{plan.summary}</p>
               </div>
-              <p class="plan__price">
-                {prices[plan.name] ? (
-                  <>
-                    <span class="plan__from">From</span>
-                    <span class="plan__amount">{prices[plan.name]}</span>
-                  </>
-                ) : (
-                  <span class="plan__amount plan__amount--quote">Custom quote</span>
-                )}
-                <span class="plan__period">{plan.period}</span>
-              </p>
+              <p class="plan__period">{plan.period}</p>
               <ul class="plan__list">
                 {plan.items.map((item) => (
-                  <li>{item}</li>
+                  <li>
+                    <Icon name="check" size={16} strokeWidth={2.6} />
+                    <span>{item}</span>
+                  </li>
                 ))}
               </ul>
               <a
                 href="/contact"
                 class:list={['btn', 'btn--sm', 'plan__cta', plan.featured ? 'btn--primary' : 'btn--outline']}
+                data-book-call
+                data-book-from={`plan-${plan.name}`}
               >
                 Ask about {plan.name}
               </a>
@@ -401,7 +390,7 @@ const faqPageJsonLd: Record<string, unknown> = {
     </div>
   </section>
 
-  <section id="terms" class="anchor bg-paper border-top">
+  <section id="terms" class="anchor bg-paper">
     <div class="container terms__inner">
       <div class="section-head">
         <h2 class="h2">Clear terms. No surprises.</h2>
@@ -420,7 +409,7 @@ const faqPageJsonLd: Record<string, unknown> = {
     </div>
   </section>
 
-  <section id="faq" class="anchor bg-white border-top">
+  <section id="faq" class="anchor bg-paper">
     <div class="container faq__inner">
       <div class="section-head section-head--wide">
         <h2 class="h2">Questions we hear first.</h2>
@@ -444,9 +433,7 @@ const faqPageJsonLd: Record<string, unknown> = {
   <CtaBand
     title="Not sure which one fits?"
     text="Tell us where you are. We will point you to the smallest scope that gets results."
-    tone="ink"
-    pad="full"
-    borderTop
+    pad="bottom"
   />
 </Base>
 
@@ -499,93 +486,27 @@ const faqPageJsonLd: Record<string, unknown> = {
   .jump__link {
     display: inline-flex;
     align-items: center;
-    min-height: 44px;
-    padding: 0 16px;
-    border: 1.5px solid var(--ink);
-    border-radius: 6px;
-    background: var(--white);
-    font-weight: 700;
+    min-height: 42px;
+    padding: 0 18px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface);
+    font-weight: 600;
     font-size: 15px;
     text-decoration: none;
+    transition:
+      border-color 160ms var(--ease-out),
+      transform 160ms var(--ease-out);
+  }
+  .jump__link:hover {
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+  .jump__link:active {
+    transform: scale(0.97);
   }
 
-  /* ---------- Services ---------- */
-
-  .services__inner {
-    padding-top: 48px;
-    padding-bottom: 96px;
-    display: flex;
-    flex-direction: column;
-  }
-  .service {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 24px 64px;
-    padding: 48px 0;
-    border-bottom: 1.5px solid var(--ink);
-  }
-  .service:last-child {
-    border-bottom: 0;
-  }
-  .service__col {
-    flex: 1 1 380px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  .service__title {
-    margin: 0;
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: clamp(2rem, 3.4vw, 3rem);
-    line-height: 1.08;
-  }
-  .service__text {
-    margin: 0;
-    max-width: 520px;
-    font-size: 18px;
-    line-height: 1.6;
-    color: var(--ink-2);
-  }
-  .service__label {
-    margin: 0;
-    font-size: 16px;
-    font-weight: 700;
-  }
-  .service__list {
-    margin: 0;
-    padding-left: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    font-size: 17px;
-    line-height: 1.5;
-  }
-  /* Starting prices under each description: item on the left, price on the right. */
-  .service__prices {
-    margin: 8px 0 0;
-    max-width: 520px;
-    border-top: 1.5px solid var(--ink);
-  }
-  .service__prices > div {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 4px 16px;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--line);
-  }
-  .service__prices dt {
-    font-size: 16px;
-    color: var(--ink-2);
-  }
-  .service__prices dd {
-    margin: 0;
-    font-weight: 700;
-    font-size: 16px;
-  }
-
-  /* ---------- Shared section head ---------- */
+  /* ---------- Shared: section heads and tiles ---------- */
 
   .section-head {
     display: flex;
@@ -593,7 +514,6 @@ const faqPageJsonLd: Record<string, unknown> = {
     gap: 12px;
     max-width: 760px;
   }
-  /* The FAQ heading wrapper has no width cap in the design. */
   .section-head--wide {
     max-width: none;
   }
@@ -603,30 +523,129 @@ const faqPageJsonLd: Record<string, unknown> = {
     line-height: 1.6;
     color: var(--ink-2);
   }
+  .services__inner,
+  .stack__inner,
+  .pricing__inner,
+  .terms__inner,
+  .faq__inner {
+    padding-top: 64px;
+    padding-bottom: 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+  }
+  .service,
+  .stack,
+  .plan,
+  .terms,
+  .faq {
+    background: var(--surface);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius-tile);
+    box-shadow: var(--shadow-tile);
+  }
+  .checks-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  .checks-list li {
+    display: grid;
+    grid-template-columns: 16px 1fr;
+    gap: 12px;
+  }
+  .checks-list :global(svg) {
+    margin-top: 4px;
+    color: var(--teal);
+  }
+
+  /* ---------- Services: a tile each, two to a row ---------- */
+
+  .services__inner {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(460px, 100%), 1fr));
+    gap: 14px;
+    padding-top: 16px;
+  }
+  .service {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    padding: clamp(24px, 3vw, 36px);
+  }
+  .service__col {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .service__col + .service__col {
+    padding-top: 20px;
+    border-top: 1px solid var(--line-soft);
+  }
+  .service__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.8rem, 2.6vw, 2.3rem);
+    line-height: 1.08;
+  }
+  .service__text {
+    margin: 0;
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+  .service__label {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .service__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  .service__list li,
+  .plan__list li {
+    display: grid;
+    grid-template-columns: 16px 1fr;
+    gap: 12px;
+  }
+  .service__list :global(svg),
+  .plan__list :global(svg) {
+    margin-top: 4px;
+    color: var(--teal);
+  }
 
   /* ---------- Stack ---------- */
 
-  .stack__inner {
-    padding-top: 96px;
-    padding-bottom: 96px;
-    display: flex;
-    flex-direction: column;
-    gap: 56px;
-  }
   .stack {
     margin: 0;
-    border-bottom: 1.5px solid var(--ink);
+    padding: 6px clamp(20px, 3vw, 36px);
   }
   .stack__row {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 12px 32px;
-    padding: 20px 0;
-    border-top: 1.5px solid var(--ink);
+    padding: 18px 0;
+  }
+  .stack__row + .stack__row {
+    border-top: 1px solid var(--line-soft);
   }
   .stack__label {
-    flex: 0 0 200px;
+    flex: 0 0 180px;
     font-size: 16px;
     font-weight: 700;
   }
@@ -638,32 +657,23 @@ const faqPageJsonLd: Record<string, unknown> = {
     gap: 8px;
   }
 
-  /* ---------- Pricing ---------- */
+  /* ---------- Plans ---------- */
 
-  .pricing__inner {
-    padding-top: 96px;
-    padding-bottom: 96px;
-    display: flex;
-    flex-direction: column;
-    gap: 48px;
-  }
   .plans {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
-    gap: 24px;
+    gap: 14px;
     align-items: stretch;
   }
   .plan {
     display: flex;
     flex-direction: column;
-    gap: 24px;
-    background: var(--white);
-    border: 1.5px solid var(--ink);
-    border-radius: 20px;
+    gap: 20px;
     padding: 32px;
   }
   .plan--featured {
-    background: var(--tint-cyan);
+    border-color: var(--teal);
+    box-shadow: 0 0 0 1px var(--teal), var(--shadow-tile);
   }
   .plan__head {
     display: flex;
@@ -683,113 +693,81 @@ const faqPageJsonLd: Record<string, unknown> = {
     line-height: 1.5;
     color: var(--ink-2);
   }
-  .plan__price {
-    margin: 0;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 8px;
-  }
-  .plan__amount {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 40px;
-    line-height: 1;
-  }
-  /* No price set yet (src/data/site.ts): a quieter line that still reads as the price slot. */
-  .plan__amount--quote {
-    font-size: 28px;
-    line-height: 1.15;
-  }
-  .plan__from {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--ink-2);
-  }
   .plan__period {
-    font-size: 15px;
-    font-weight: 600;
+    align-self: flex-start;
+    margin: 0;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: var(--paper);
+    font-size: 13px;
+    font-weight: 700;
     color: var(--ink-2);
   }
   .plan__list {
     flex: 1 1 auto;
+    list-style: none;
     margin: 0;
-    padding-left: 20px;
+    padding: 0;
     display: flex;
     flex-direction: column;
     gap: 10px;
     font-size: 16px;
     line-height: 1.5;
   }
-
-  /* The design's plan buttons inherit the root line-height (1.5), not .btn's 1.2. */
   .plan__cta {
-    line-height: 1.5;
+    align-self: flex-start;
   }
-
-  /* ---------- FAQ ---------- */
 
   /* ---------- Terms ---------- */
 
-  .terms__inner {
-    padding-top: 96px;
-    padding-bottom: 96px;
-    display: flex;
-    flex-direction: column;
-    gap: 48px;
-  }
   .terms {
     margin: 0;
-    border-bottom: 1.5px solid var(--ink);
+    padding: 6px clamp(20px, 3vw, 36px);
   }
   .terms__row {
     display: flex;
     flex-wrap: wrap;
     gap: 6px 40px;
-    padding: 22px 0;
-    border-top: 1.5px solid var(--ink);
+    padding: 20px 0;
+  }
+  .terms__row + .terms__row {
+    border-top: 1px solid var(--line-soft);
   }
   .terms__title {
     flex: 1 1 260px;
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: 22px;
+    font-size: 20px;
     line-height: 1.25;
   }
   .terms__text {
     flex: 2 1 380px;
     margin: 0;
-    font-size: 17px;
+    font-size: 16px;
     line-height: 1.6;
     color: var(--ink-2);
   }
 
-  .faq__inner {
-    max-width: 1000px;
-    padding-top: 96px;
-    padding-bottom: 96px;
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-  }
+  /* ---------- FAQ ---------- */
+
   .faq {
-    border-bottom: 1.5px solid var(--ink);
+    padding: 4px clamp(20px, 3vw, 36px);
   }
-  .faq__item {
-    border-top: 1.5px solid var(--ink);
+  .faq__item + .faq__item {
+    border-top: 1px solid var(--line-soft);
   }
   .faq__summary {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 24px;
-    min-height: 72px;
-    padding: 16px 0;
+    min-height: 68px;
+    padding: 14px 0;
     list-style: none;
     text-align: left;
     font-family: var(--font-display);
     font-weight: 600;
-    font-size: clamp(1.125rem, 1.8vw, 1.5rem);
+    font-size: clamp(1.1rem, 1.6vw, 1.35rem);
     line-height: 1.25;
     color: var(--ink);
     cursor: pointer;
@@ -806,16 +784,16 @@ const faqPageJsonLd: Record<string, unknown> = {
   }
   .faq__summary :global(svg) {
     flex: none;
-    transition: transform 0.2s;
+    transition: transform 240ms var(--ease-out);
   }
   .faq__item[open] > .faq__summary :global(svg) {
     transform: rotate(45deg);
   }
   .faq__answer {
     margin: 0;
-    padding: 0 0 28px;
+    padding: 0 0 24px;
     max-width: 800px;
-    font-size: 17px;
+    font-size: 16px;
     line-height: 1.65;
     color: var(--ink-2);
   }

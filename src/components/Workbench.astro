@@ -1,0 +1,1051 @@
+---
+// Home's "What we build": one tile per kind of project, each a small working piece of that kind
+// of thing. Nothing moves until a visitor touches it; the one tile with live numbers measures this
+// very page in the visitor's browser. Demo content is labelled as such (an invented café, a sample lead).
+import Icon from './Icon.astro';
+
+const home = new URL('/', Astro.site).href;
+const pagespeed = `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(home)}`;
+
+const replies = [
+  { say: 'Two flat whites, please', reply: 'Two flat whites, ready in 10 minutes. Pay now or at pick-up?' },
+  { say: 'Are you open now?', reply: 'Yes, until 6 pm today. Want to order ahead?' },
+  { say: 'Talk to a person', reply: "Sure, I've passed you to the team. They reply right here." },
+];
+
+const steps = [
+  'A new enquiry arrives from your website',
+  'AI reads it and tags it: redesign, this month',
+  'It lands in your CRM with the details filled in',
+  'A reply is drafted for you to approve',
+];
+---
+
+<div class="bench" data-bench>
+  <!-- Websites: one layout that works at every width -->
+  <article class="tile tile--web">
+    <div class="tile__stage tile__stage--web">
+      <div class="web__frame" data-web-frame>
+        <div class="web__bar" aria-hidden="true"><i></i><i></i><i></i><span>yourbrand.com</span></div>
+        <div class="mini" data-size="desktop" aria-hidden="true">
+          <div class="mini__nav"><b></b><span class="mini__links"><i></i><i></i><i></i></span><span class="mini__burger"><i></i><i></i></span></div>
+          <div class="mini__hero"><span class="mini__h"></span><span class="mini__h mini__h--short"></span><span class="mini__p"></span><span class="mini__btn"></span></div>
+          <div class="mini__cards"><span></span><span></span><span></span></div>
+        </div>
+      </div>
+      <div class="web__control">
+        <label for="web-width" class="web__label">Screen width <output for="web-width" data-web-out>Desktop, 1280 px</output></label>
+        <input id="web-width" type="range" min="320" max="1280" step="1" value="1280" data-web-range />
+      </div>
+    </div>
+    <div class="tile__meta">
+      <h3 class="tile__title">Websites & Landing Pages</h3>
+      <p class="tile__text">Drag the width. One design that holds up on every screen, fast and ready for search.</p>
+    </div>
+  </article>
+
+  <!-- Telegram: a bot that answers -->
+  <article class="tile tile--bot">
+    <div class="tile__stage tile__stage--bot">
+      <div class="chat">
+        <div class="chat__head">
+          <span class="chat__avatar" aria-hidden="true">L</span>
+          <span><b>Lumen Coffee</b><small>bot · demo</small></span>
+        </div>
+        <div class="chat__log" data-chat-log aria-live="polite">
+          <p class="msg msg--bot">Hi! I take orders for Lumen Coffee. What would you like?</p>
+        </div>
+        <div class="chat__chips" data-chat-chips>
+          {
+            replies.map((r) => (
+              <button type="button" class="chat__chip" data-say={r.say} data-reply={r.reply}>
+                {r.say}
+              </button>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+    <div class="tile__meta">
+      <h3 class="tile__title">Telegram Bots & Extensions</h3>
+      <p class="tile__text">Tap a reply. Bots and Mini Apps that take orders and answer customers, plus browser extensions.</p>
+    </div>
+  </article>
+
+  <!-- Web apps: states done properly -->
+  <article class="tile tile--app">
+    <div class="tile__stage">
+      <div class="settings">
+        <p class="settings__title">Notifications</p>
+        <label class="switch">
+          <input type="checkbox" role="switch" data-app-toggle />
+          <span class="switch__track" aria-hidden="true"></span>
+          <span>Weekly report by email</span>
+        </label>
+        <button type="button" class="save" data-app-save disabled data-state="idle">
+          <span class="save__label" data-app-label>Save changes</span>
+        </button>
+      </div>
+    </div>
+    <div class="tile__meta">
+      <h3 class="tile__title">Web Apps & SaaS</h3>
+      <p class="tile__text">Flip it, then save. Every state designed: changed, saving, saved.</p>
+    </div>
+  </article>
+
+  <!-- Mobile: a screen that follows the system theme -->
+  <article class="tile tile--phone">
+    <div class="tile__stage">
+      <div class="phone" data-phone data-theme="light">
+        <div class="phone__screen" aria-hidden="true">
+          <span class="phone__notch"></span>
+          <span class="phone__h"></span>
+          <span class="phone__row"><i></i><b></b></span>
+          <span class="phone__row"><i></i><b></b></span>
+          <span class="phone__row"><i></i><b></b></span>
+        </div>
+      </div>
+      <label class="switch switch--center">
+        <input type="checkbox" role="switch" data-phone-toggle />
+        <span class="switch__track" aria-hidden="true"></span>
+        <span>Dark mode</span>
+      </label>
+    </div>
+    <div class="tile__meta">
+      <h3 class="tile__title">Mobile & Desktop Apps</h3>
+      <p class="tile__text">iOS, Android, Windows, macOS and Linux, designed down to the dark mode.</p>
+    </div>
+  </article>
+
+  <!-- AI: an automation you can run -->
+  <article class="tile tile--ai">
+    <div class="tile__stage tile__stage--ai">
+      <ol class="flow" data-flow>
+        {
+          steps.map((step) => (
+            <li class="flow__step" data-state="waiting">
+              <span class="flow__dot" aria-hidden="true">
+                <Icon name="check" size={14} strokeWidth={3} />
+              </span>
+              <span>{step}</span>
+            </li>
+          ))
+        }
+      </ol>
+      <button type="button" class="run" data-flow-run>Run it</button>
+      <p class="visually-hidden" aria-live="polite" data-flow-status></p>
+    </div>
+    <div class="tile__meta">
+      <h3 class="tile__title">AI & Automation</h3>
+      <p class="tile__text">Run it. AI that does real work on your own data, with a person approving what goes out.</p>
+    </div>
+  </article>
+
+  <!-- Search: this page, measured now -->
+  <article class="tile tile--seo">
+    <div class="tile__stage tile__stage--seo">
+      <p class="seo__intro">This page, measured in your browser just now:</p>
+      <dl class="seo__stats">
+        <div><dt>Loaded in</dt><dd data-stat="load">...</dd></div>
+        <div><dt>Page weight</dt><dd data-stat="weight">...</dd></div>
+        <div><dt>Requests</dt><dd data-stat="requests">...</dd></div>
+      </dl>
+      <a href={pagespeed} class="seo__link" target="_blank" rel="noopener" data-umami-event="Site check" data-umami-event-check="PageSpeed from tile">
+        Check it on PageSpeed<span class="visually-hidden"> (opens in a new tab)</span>
+        <Icon name="arrow-up-right" size={16} />
+      </a>
+    </div>
+    <div class="tile__meta">
+      <h3 class="tile__title">Search & Growth</h3>
+      <p class="tile__text">SEO, GEO and AEO: fast pages that Google and AI assistants can find, read and recommend.</p>
+    </div>
+  </article>
+</div>
+
+<style>
+  /* ---------- Grid: one wide tile, one tall tile, the rest standard ---------- */
+
+  .bench {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-areas:
+      'web web bot'
+      'app phone bot'
+      'ai ai seo';
+    gap: 14px;
+  }
+  .tile--web { grid-area: web; }
+  .tile--bot { grid-area: bot; }
+  .tile--app { grid-area: app; }
+  .tile--phone { grid-area: phone; }
+  .tile--ai { grid-area: ai; }
+  .tile--seo { grid-area: seo; }
+  @media (max-width: 1023.98px) {
+    .bench {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-areas:
+        'web web'
+        'bot app'
+        'bot phone'
+        'ai ai'
+        'seo seo';
+    }
+  }
+  @media (max-width: 639.98px) {
+    .bench {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: 'web' 'bot' 'app' 'phone' 'ai' 'seo';
+    }
+  }
+
+  .tile {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background: var(--surface);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius-tile);
+    box-shadow: var(--shadow-tile);
+    overflow: hidden;
+  }
+  .tile__stage {
+    flex: 1;
+    display: grid;
+    place-items: center;
+    gap: 16px;
+    min-height: 220px;
+    padding: 24px;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .tile__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 20px 24px 22px;
+  }
+  .tile__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 21px;
+    line-height: 1.2;
+  }
+  .tile__text {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+
+  /* ---------- Websites ---------- */
+
+  .tile__stage--web {
+    align-content: center;
+    min-height: 300px;
+  }
+  .web__frame {
+    width: 100%;
+    max-width: 640px;
+    justify-self: center;
+    background: var(--white);
+    border: 1px solid rgb(10 17 40 / 0.12);
+    border-radius: 14px;
+    box-shadow: 0 18px 40px -26px rgb(10 17 40 / 0.4);
+    overflow: hidden;
+    transition: width 120ms linear;
+  }
+  .web__bar {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--line-soft);
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .web__bar i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--line);
+  }
+  .web__bar span {
+    margin-left: 6px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: var(--paper);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  /* The mini site takes the layout of the width the slider simulates, like a real responsive page. */
+  .mini {
+    padding: 12px 14px 16px;
+    display: grid;
+    gap: 12px;
+  }
+  .mini__nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .mini__nav b {
+    width: 44px;
+    height: 10px;
+    border-radius: 999px;
+    background: var(--ink);
+  }
+  .mini__links {
+    display: flex;
+    gap: 10px;
+  }
+  .mini__links i {
+    width: 34px;
+    height: 7px;
+    border-radius: 999px;
+    background: var(--line);
+  }
+  .mini__burger {
+    display: none;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .mini__burger i {
+    width: 16px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--ink);
+  }
+  .mini__hero {
+    display: grid;
+    gap: 7px;
+    padding: 14px;
+    border-radius: 10px;
+    background: var(--tint-cyan);
+  }
+  .mini__h {
+    height: 12px;
+    width: 70%;
+    border-radius: 999px;
+    background: var(--ink);
+  }
+  .mini__h--short {
+    width: 45%;
+  }
+  .mini__p {
+    height: 7px;
+    width: 60%;
+    border-radius: 999px;
+    background: rgb(10 17 40 / 0.18);
+  }
+  .mini__btn {
+    margin-top: 4px;
+    height: 16px;
+    width: 64px;
+    border-radius: 999px;
+    background: var(--teal);
+  }
+  .mini__cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .mini__cards span {
+    height: 46px;
+    border-radius: 8px;
+    background: var(--paper);
+    border: 1px solid var(--line-soft);
+  }
+  .mini[data-size='phone'] .mini__links {
+    display: none;
+  }
+  .mini[data-size='phone'] .mini__burger {
+    display: flex;
+  }
+  .mini[data-size='phone'] .mini__cards {
+    grid-template-columns: 1fr;
+  }
+  .mini[data-size='phone'] .mini__cards span {
+    height: 26px;
+  }
+  .mini[data-size='phone'] .mini__h {
+    width: 85%;
+  }
+  .mini[data-size='tablet'] .mini__cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .mini[data-size='tablet'] .mini__cards span:last-child {
+    display: none;
+  }
+  .web__control {
+    width: 100%;
+    max-width: 640px;
+    justify-self: center;
+    display: grid;
+    gap: 8px;
+  }
+  .web__label {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .web__label output {
+    font-weight: 600;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  input[type='range'] {
+    width: 100%;
+    height: 28px;
+    margin: 0;
+    background: transparent;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  input[type='range']::-webkit-slider-runnable-track {
+    height: 6px;
+    border-radius: 999px;
+    background: var(--line);
+  }
+  input[type='range']::-moz-range-track {
+    height: 6px;
+    border-radius: 999px;
+    background: var(--line);
+  }
+  input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    margin-top: -8px;
+    border-radius: 50%;
+    background: var(--ink);
+    border: 3px solid var(--white);
+    box-shadow: 0 1px 4px rgb(10 17 40 / 0.35);
+    transition: transform 160ms var(--ease-pop);
+  }
+  input[type='range']::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--ink);
+    border: 3px solid var(--white);
+    box-shadow: 0 1px 4px rgb(10 17 40 / 0.35);
+  }
+  input[type='range']:active::-webkit-slider-thumb {
+    transform: scale(1.15);
+  }
+  input[type='range']:focus-visible {
+    outline: 3px solid var(--teal);
+    outline-offset: 2px;
+    border-radius: 999px;
+  }
+
+  /* ---------- Telegram chat ---------- */
+
+  .tile__stage--bot {
+    align-content: stretch;
+    place-items: stretch;
+  }
+  .chat {
+    display: flex;
+    flex-direction: column;
+    min-height: 420px;
+    background: #e7eef4;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid var(--line-soft);
+  }
+  .chat__head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--white);
+    border-bottom: 1px solid var(--line-soft);
+    font-size: 14px;
+  }
+  .chat__head b {
+    display: block;
+    line-height: 1.2;
+  }
+  .chat__head small {
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .chat__avatar {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--teal);
+    color: var(--white);
+    font-weight: 800;
+  }
+  .chat__log {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 6px;
+    padding: 14px 12px;
+    overflow: hidden;
+  }
+  .chat__log :global(.msg) {
+    margin: 0;
+    max-width: 84%;
+    padding: 8px 12px;
+    border-radius: 16px;
+    font-size: 14px;
+    line-height: 1.4;
+    animation: msg-in 260ms var(--ease-out) both;
+  }
+  .chat__log :global(.msg--bot) {
+    align-self: flex-start;
+    background: var(--white);
+    border-bottom-left-radius: 6px;
+    transform-origin: bottom left;
+  }
+  .chat__log :global(.msg--me) {
+    align-self: flex-end;
+    background: #d6f2df;
+    border-bottom-right-radius: 6px;
+    transform-origin: bottom right;
+  }
+  @keyframes msg-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px) scale(0.96);
+    }
+  }
+  .chat__log :global(.typing) {
+    display: inline-flex;
+    gap: 4px;
+    padding: 12px 14px;
+  }
+  .chat__log :global(.typing i) {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--muted);
+    animation: dot 1s infinite ease-in-out;
+  }
+  .chat__log :global(.typing i:nth-child(2)) {
+    animation-delay: 0.15s;
+  }
+  .chat__log :global(.typing i:nth-child(3)) {
+    animation-delay: 0.3s;
+  }
+  @keyframes dot {
+    0%,
+    60%,
+    100% {
+      opacity: 0.35;
+      transform: translateY(0);
+    }
+    30% {
+      opacity: 1;
+      transform: translateY(-3px);
+    }
+  }
+  .chat__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 10px 12px 12px;
+    background: var(--white);
+    border-top: 1px solid var(--line-soft);
+  }
+  .chat__chip {
+    min-height: 36px;
+    padding: 0 12px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--white);
+    color: var(--ink);
+    font: 600 13px/1 var(--font-body);
+    cursor: pointer;
+    transition:
+      transform 160ms var(--ease-out),
+      border-color 160ms var(--ease-out);
+  }
+  .chat__chip:hover {
+    border-color: var(--ink);
+  }
+  .chat__chip:active {
+    transform: scale(0.96);
+  }
+  .chat__chip:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+
+  /* ---------- Switches (app and phone tiles) ---------- */
+
+  .switch {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .switch input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+  }
+  .switch__track {
+    position: relative;
+    flex: none;
+    width: 46px;
+    height: 28px;
+    border-radius: 999px;
+    background: #cfd7e2;
+    transition: background-color 200ms var(--ease-out);
+  }
+  .switch__track::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--white);
+    box-shadow: 0 1px 3px rgb(10 17 40 / 0.3);
+    transition: transform 260ms var(--ease-pop);
+  }
+  .switch input:checked + .switch__track {
+    background: var(--teal);
+  }
+  .switch input:checked + .switch__track::after {
+    transform: translateX(18px);
+  }
+  .switch input:focus-visible + .switch__track {
+    outline: 3px solid var(--teal);
+    outline-offset: 2px;
+  }
+
+  /* ---------- Web app settings ---------- */
+
+  .settings {
+    width: 100%;
+    max-width: 300px;
+    display: grid;
+    gap: 10px;
+    padding: 18px;
+    background: var(--white);
+    border: 1px solid var(--line-soft);
+    border-radius: 18px;
+    box-shadow: 0 12px 30px -22px rgb(10 17 40 / 0.4);
+  }
+  .settings__title {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .save {
+    justify-self: start;
+    min-width: 150px;
+    min-height: 42px;
+    padding: 0 18px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--white);
+    font: 700 14px/1 var(--font-body);
+    cursor: pointer;
+    transition:
+      background-color 200ms var(--ease-out),
+      color 200ms var(--ease-out),
+      transform 160ms var(--ease-out),
+      opacity 200ms var(--ease-out);
+  }
+  .save:active {
+    transform: scale(0.97);
+  }
+  .save:disabled {
+    cursor: default;
+    opacity: 0.35;
+  }
+  .save[data-state='saving'] {
+    opacity: 1;
+    background: #cfd7e2;
+    color: var(--ink);
+  }
+  .save[data-state='saved'] {
+    opacity: 1;
+    background: var(--cyan);
+    color: var(--ink);
+  }
+  .save__label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .save :global(.spin) {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    animation: spin 700ms linear infinite;
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* ---------- Phone ---------- */
+
+  .phone {
+    width: 132px;
+    padding: 6px;
+    border-radius: 28px;
+    background: var(--ink);
+    box-shadow: 0 18px 40px -24px rgb(10 17 40 / 0.6);
+  }
+  .phone__screen {
+    position: relative;
+    display: grid;
+    gap: 8px;
+    align-content: start;
+    height: 200px;
+    padding: 26px 12px 12px;
+    border-radius: 22px;
+    background: #f5fafc;
+    transition: background-color 320ms var(--ease-out);
+  }
+  .phone__notch {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    width: 40px;
+    height: 8px;
+    margin-left: -20px;
+    border-radius: 999px;
+    background: var(--ink);
+  }
+  .phone__h {
+    height: 10px;
+    width: 64%;
+    border-radius: 999px;
+    background: var(--ink);
+    transition: background-color 320ms var(--ease-out);
+  }
+  .phone__row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 10px;
+    background: var(--white);
+    transition: background-color 320ms var(--ease-out);
+  }
+  .phone__row i {
+    width: 18px;
+    height: 18px;
+    border-radius: 6px;
+    background: var(--teal);
+  }
+  .phone__row b {
+    flex: 1;
+    height: 7px;
+    border-radius: 999px;
+    background: #cfd7e2;
+    transition: background-color 320ms var(--ease-out);
+  }
+  .phone[data-theme='dark'] .phone__screen {
+    background: #0e1530;
+  }
+  .phone[data-theme='dark'] .phone__h {
+    background: #e8edf7;
+  }
+  .phone[data-theme='dark'] .phone__row {
+    background: #1b2547;
+  }
+  .phone[data-theme='dark'] .phone__row b {
+    background: #3a4568;
+  }
+  .switch--center {
+    justify-self: center;
+  }
+
+  /* ---------- AI flow ---------- */
+
+  .tile__stage--ai {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    justify-items: start;
+    gap: 20px 28px;
+  }
+  .flow {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 10px;
+  }
+  .flow__step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--muted);
+    transition: color 200ms var(--ease-out);
+  }
+  .flow__dot {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1.5px dashed #b9c4d3;
+    color: transparent;
+    transition:
+      background-color 200ms var(--ease-out),
+      border-color 200ms var(--ease-out),
+      color 200ms var(--ease-out);
+  }
+  .flow__step[data-state='running'] {
+    color: var(--ink);
+  }
+  .flow__step[data-state='running'] .flow__dot {
+    border: 2px solid var(--teal);
+    border-right-color: transparent;
+    animation: spin 700ms linear infinite;
+  }
+  .flow__step[data-state='done'] {
+    color: var(--ink);
+  }
+  .flow__step[data-state='done'] .flow__dot {
+    border: 0;
+    background: var(--teal);
+    color: var(--white);
+    animation: pop 320ms var(--ease-pop);
+  }
+  @keyframes pop {
+    from {
+      transform: scale(0.6);
+    }
+  }
+  .run {
+    min-height: 44px;
+    padding: 0 22px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--white);
+    font: 700 15px/1 var(--font-body);
+    cursor: pointer;
+    transition:
+      transform 160ms var(--ease-out),
+      opacity 160ms var(--ease-out);
+  }
+  .run:active {
+    transform: scale(0.97);
+  }
+  .run:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+  @media (max-width: 639.98px) {
+    .tile__stage--ai {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* ---------- Search ---------- */
+
+  .tile__stage--seo {
+    place-items: stretch;
+    align-content: center;
+  }
+  .seo__intro {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .seo__stats {
+    margin: 0;
+    display: grid;
+    gap: 2px;
+  }
+  .seo__stats div {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .seo__stats dt {
+    font-size: 14px;
+    color: var(--ink-2);
+  }
+  .seo__stats dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .seo__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    font-weight: 700;
+    font-size: 15px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .chat__log :global(.msg),
+    .flow__step .flow__dot,
+    .chat__log :global(.typing i) {
+      animation: none !important;
+    }
+  }
+</style>
+
+<script>
+  const bench = document.querySelector<HTMLElement>('[data-bench]');
+  if (bench) initBench(bench);
+
+  function initBench(root: HTMLElement) {
+    const reduce = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const wait = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, reduce() ? Math.min(ms, 120) : ms));
+
+    // ---------- Websites: the slider sets the frame width; the mini site reflows by container query.
+    const range = root.querySelector<HTMLInputElement>('[data-web-range]');
+    const frame = root.querySelector<HTMLElement>('[data-web-frame]');
+    const out = root.querySelector<HTMLOutputElement>('[data-web-out]');
+    const mini = root.querySelector<HTMLElement>('.mini');
+    if (range && frame && out && mini) {
+      const update = () => {
+        const px = Number(range.value);
+        const min = Number(range.min);
+        const max = Number(range.max);
+        frame.style.width = `${32 + ((px - min) / (max - min)) * 68}%`;
+        const device = px < 600 ? 'Phone' : px < 1000 ? 'Tablet' : 'Desktop';
+        out.textContent = `${device}, ${px} px`;
+        mini.dataset.size = device.toLowerCase();
+      };
+      range.addEventListener('input', update);
+      update();
+    }
+
+    // ---------- Telegram: a reply, a typing indicator, the bot's answer.
+    const log = root.querySelector<HTMLElement>('[data-chat-log]');
+    const chips = root.querySelector<HTMLElement>('[data-chat-chips]');
+    if (log && chips) {
+      const buttons = [...chips.querySelectorAll<HTMLButtonElement>('button')];
+      const bubble = (text: string, who: 'me' | 'bot') => {
+        const p = document.createElement('p');
+        p.className = `msg msg--${who}`;
+        p.textContent = text;
+        log.appendChild(p);
+        while (log.children.length > 5) log.firstElementChild?.remove();
+        return p;
+      };
+      chips.addEventListener('click', async (event) => {
+        const b = (event.target as Element).closest<HTMLButtonElement>('button');
+        if (!b || b.disabled) return;
+        buttons.forEach((x) => (x.disabled = true));
+        bubble(b.dataset.say ?? '', 'me');
+        await wait(260);
+        const typing = bubble('', 'bot');
+        typing.classList.add('typing');
+        typing.setAttribute('aria-hidden', 'true');
+        typing.innerHTML = '<i></i><i></i><i></i>';
+        await wait(900);
+        typing.remove();
+        bubble(b.dataset.reply ?? '', 'bot');
+        buttons.forEach((x) => (x.disabled = false));
+      });
+    }
+
+    // ---------- Web app: changed, saving, saved.
+    const toggle = root.querySelector<HTMLInputElement>('[data-app-toggle]');
+    const save = root.querySelector<HTMLButtonElement>('[data-app-save]');
+    const label = root.querySelector<HTMLElement>('[data-app-label]');
+    if (toggle && save && label) {
+      let savedValue = toggle.checked;
+      toggle.addEventListener('change', () => {
+        if (save.dataset.state !== 'idle') return;
+        save.disabled = toggle.checked === savedValue;
+      });
+      save.addEventListener('click', async () => {
+        if (save.dataset.state !== 'idle') return;
+        save.dataset.state = 'saving';
+        label.innerHTML = '<i class="spin" aria-hidden="true"></i>Saving';
+        await wait(900);
+        save.dataset.state = 'saved';
+        label.textContent = 'Saved';
+        savedValue = toggle.checked;
+        await wait(1400);
+        save.dataset.state = 'idle';
+        label.textContent = 'Save changes';
+        save.disabled = toggle.checked === savedValue;
+      });
+    }
+
+    // ---------- Mobile: the screen follows its dark mode switch.
+    const phone = root.querySelector<HTMLElement>('[data-phone]');
+    const phoneToggle = root.querySelector<HTMLInputElement>('[data-phone-toggle]');
+    phoneToggle?.addEventListener('change', () => {
+      if (phone) phone.dataset.theme = phoneToggle.checked ? 'dark' : 'light';
+    });
+
+    // ---------- AI: four steps run in order.
+    const flow = root.querySelector<HTMLElement>('[data-flow]');
+    const run = root.querySelector<HTMLButtonElement>('[data-flow-run]');
+    const status = root.querySelector<HTMLElement>('[data-flow-status]');
+    if (flow && run) {
+      const steps = [...flow.querySelectorAll<HTMLElement>('.flow__step')];
+      run.addEventListener('click', async () => {
+        run.disabled = true;
+        steps.forEach((s) => (s.dataset.state = 'waiting'));
+        for (const step of steps) {
+          step.dataset.state = 'running';
+          await wait(650);
+          step.dataset.state = 'done';
+        }
+        if (status) status.textContent = 'All four steps are done.';
+        run.textContent = 'Run again';
+        run.disabled = false;
+      });
+    }
+
+    // ---------- Search: real numbers for this page load, from the browser's own timing data.
+    const set = (key: string, value: string) => {
+      const el = root.querySelector<HTMLElement>(`[data-stat="${key}"]`);
+      if (el) el.textContent = value;
+    };
+    const kb = (bytes: number) => (bytes >= 1048576 ? `${(bytes / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`);
+    const measure = () => {
+      const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+      const resources = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
+      if (nav && nav.loadEventStart > 0) set('load', `${(nav.loadEventStart / 1000).toFixed(2)} s`);
+      const bytes = (nav?.transferSize ?? 0) + resources.reduce((sum, r) => sum + (r.transferSize || 0), 0);
+      set('weight', bytes > 0 ? kb(bytes) : 'from cache');
+      set('requests', String(resources.length + 1));
+    };
+    if (document.readyState === 'complete') window.setTimeout(measure, 0);
+    else window.addEventListener('load', () => window.setTimeout(measure, 0), { once: true });
+  }
+</script>

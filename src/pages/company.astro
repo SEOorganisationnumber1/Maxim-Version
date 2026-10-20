@@ -70,7 +70,7 @@ const tints = ['cyan', 'blue', 'violet'] as const;
 
   {
     facts.length > 0 && (
-      <section aria-label="Facts" class="bg-white border-top border-bottom">
+      <section aria-label="Facts" class="bg-paper">
         <dl class="stats">
           {facts.map((fact) => (
             <div>
@@ -83,7 +83,7 @@ const tints = ['cyan', 'blue', 'violet'] as const;
     )
   }
 
-  <section class:list={['bg-paper', { 'border-top': facts.length === 0 }]}>
+  <section class="bg-paper">
     <div class="container story">
       <div class="story__head">
         <h2 class="h2">Most agencies sell hours. We sell outcomes.</h2>
@@ -106,7 +106,7 @@ const tints = ['cyan', 'blue', 'violet'] as const;
     </div>
   </section>
 
-  <section class="bg-white border-top">
+  <section class="bg-paper">
     <div class="container block block--rules">
       <div class="block__head">
         <h2 class="h2">Four rules we do not bend.</h2>
@@ -126,7 +126,7 @@ const tints = ['cyan', 'blue', 'violet'] as const;
 
   {
     team.length > 0 && (
-      <section class="bg-paper border-top">
+      <section class="bg-paper">
         <div class="container block block--team">
           <div class="block__head">
             <h2 class="h2">The people who do the work.</h2>
@@ -159,7 +159,7 @@ const tints = ['cyan', 'blue', 'violet'] as const;
     )
   }
 
-  <CtaBand title="Work with a team that ships." borderTop pad="full" />
+  <CtaBand title="Work with a team that ships." pad="bottom" />
 </Base>
 
 <style>

@@ -35,6 +35,19 @@
 
   --error: #B42318;
 
+  /* Workbench surfaces: soft white tiles on paper. The ink borders of V1 are kept for frames only. */
+  --surface: #FFFFFF;
+  --line-soft: #E3E8EF;
+  --muted: #5F6984;
+  --shadow-tile: 0 1px 2px rgb(10 17 40 / 0.04), 0 10px 30px -18px rgb(10 17 40 / 0.18);
+  --shadow-lift: 0 1px 2px rgb(10 17 40 / 0.05), 0 18px 40px -20px rgb(10 17 40 / 0.28);
+  --radius-tile: 28px;
+  --radius-inner: 16px;
+
+  /* Motion: one easing set for the whole site. Small pops use the overshoot, everything else eases out. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-pop: cubic-bezier(0.28, 1.3, 0.36, 1);
+
   /* Type: --font-display and --font-body come from the Fonts API (astro.config.mjs); --font-mono is admin-only. */
 
   --container: 1240px;
@@ -48,6 +61,8 @@ html { scroll-behavior: smooth; }
 @media (max-width: 899.98px) {
   html:has(#site-menu:popover-open) { overflow: hidden; }
 }
+/* The Book a call dialog covers the page too. */
+html:has(dialog[data-book-dialog][open]) { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition: none !important; }
@@ -163,37 +178,50 @@ img, svg { max-width: 100%; }
 
 /* ---------- Buttons and links ---------- */
 
+/* Pill buttons. Press scales to 0.97; the trailing arrow nudges on hover. */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  min-height: 52px;
+  min-height: 50px;
   padding: 0 24px;
   border: 0;
-  border-radius: 8px;
+  border-radius: 999px;
   font-family: inherit;
   font-weight: 700;
-  font-size: 17px;
+  font-size: 16px;
   line-height: 1.5;
   text-decoration: none;
   cursor: pointer;
+  transition:
+    transform 160ms var(--ease-out),
+    background-color 160ms var(--ease-out),
+    border-color 160ms var(--ease-out),
+    color 160ms var(--ease-out);
 }
-.btn--lg { min-height: 56px; padding: 0 28px; }
-.btn--sm { font-size: 16px; }
+.btn:active { transform: scale(0.97); }
+.btn :where(svg) { transition: transform 200ms var(--ease-out); }
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover :where(svg) { transform: translateX(3px); }
+}
+.btn--lg { min-height: 56px; padding: 0 28px; font-size: 17px; }
+.btn--sm { min-height: 44px; padding: 0 18px; font-size: 15px; }
 
-/* Only the outlined button has a border, as in the design. */
-.btn--primary { background: var(--cyan); color: var(--ink); }
-.btn--primary:hover { color: var(--ink); background: #3FD5E1; }
+.btn--primary { background: var(--ink); color: var(--white); }
+.btn--primary:hover { color: var(--white); background: #1B2547; }
 
 .btn--dark { background: var(--ink); color: var(--white); }
 .btn--dark:hover { color: var(--white); background: #1B2547; }
 
-.btn--outline { background: var(--white); color: var(--ink); border: 1.5px solid var(--ink); }
-.btn--outline:hover { color: var(--ink); background: var(--tint-cyan); }
+.btn--outline { background: var(--surface); color: var(--ink); border: 1px solid var(--line); }
+.btn--outline:hover { color: var(--ink); border-color: var(--ink); background: var(--surface); }
 
 .btn--light { background: var(--white); color: var(--ink); }
 .btn--light:hover { color: var(--ink); background: var(--tint-cyan); }
+
+.btn--accent { background: var(--cyan); color: var(--ink); }
+.btn--accent:hover { color: var(--ink); background: #3FD5E1; }
 
 /* Bold text link with a trailing arrow: "All services →" */
 .text-link {
@@ -209,12 +237,12 @@ img, svg { max-width: 100%; }
 
 .chip {
   display: inline-block;
-  border: 1.5px solid var(--ink);
-  border-radius: 6px;
-  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
   color: var(--ink);
-  padding: 6px 12px;
-  font-weight: 700;
+  padding: 6px 14px;
+  font-weight: 600;
   font-size: 14px;
 }
 .chip--dark {
@@ -236,16 +264,23 @@ img, svg { max-width: 100%; }
 /* Pressable pill used by the Work filter and the Contact "What do you need?" */
 .toggle {
   min-height: 44px;
-  padding: 0 16px;
-  border: 1.5px solid var(--ink);
-  border-radius: 6px;
-  background: var(--white);
+  padding: 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
   color: var(--ink);
   font-family: inherit;
-  font-weight: 700;
+  font-weight: 600;
   font-size: 15px;
   cursor: pointer;
+  transition:
+    transform 160ms var(--ease-out),
+    background-color 160ms var(--ease-out),
+    border-color 160ms var(--ease-out),
+    color 160ms var(--ease-out);
 }
+.toggle:hover { border-color: var(--ink); }
+.toggle:active { transform: scale(0.97); }
 .toggle[aria-pressed='true'] {
   background: var(--ink);
   color: var(--white);
@@ -275,10 +310,11 @@ img, svg { max-width: 100%; }
   height: calc(100% - 24px);
   object-fit: cover;
   object-position: top center;
-  border: 1.5px solid var(--ink);
+  border: 1px solid rgb(10 17 40 / 0.14);
   border-bottom: 0;
-  border-radius: 12px 12px 0 0;
+  border-radius: 14px 14px 0 0;
   background: var(--white);
+  box-shadow: 0 -1px 0 rgb(255 255 255 / 0.6) inset, 0 18px 40px -24px rgb(10 17 40 / 0.35);
 }
 .shot--cyan { background: var(--tint-cyan); }
 .shot--blue { background: var(--tint-blue); }
@@ -286,17 +322,26 @@ img, svg { max-width: 100%; }
 
 /* ---------- Cards ---------- */
 
+/* A tile: white, a hairline edge and a soft shadow. Linked tiles lift a little on hover. */
 .card {
   display: flex;
   flex-direction: column;
-  background: var(--white);
-  border: 1.5px solid var(--ink);
-  border-radius: 20px;
+  background: var(--surface);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-tile);
+  box-shadow: var(--shadow-tile);
   overflow: hidden;
   color: var(--ink);
   text-decoration: none;
+  transition:
+    box-shadow 240ms var(--ease-out),
+    transform 240ms var(--ease-out),
+    border-color 240ms var(--ease-out);
 }
 .card:hover { color: var(--ink); }
+@media (hover: hover) and (pointer: fine) {
+  a.card:hover { box-shadow: var(--shadow-lift); border-color: var(--line); transform: translateY(-2px); }
+}
 
 /* ---------- Stats ---------- */
 
@@ -327,33 +372,41 @@ img, svg { max-width: 100%; }
   line-height: 1;
 }
 
-/* ---------- Rule grid (Home "Modern methods", Company "Four rules") ---------- */
+/* ---------- Rule grid (Company "Four rules"): rows in one tile, title beside its text ---------- */
 
 .rule-grid {
   list-style: none;
   margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
-  gap: 32px;
+  padding: 6px clamp(20px, 3vw, 36px);
+  background: var(--surface);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-tile);
+  box-shadow: var(--shadow-tile);
 }
 .rule-grid > li {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  border-top: 2px solid var(--cyan);
-  padding-top: 20px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: 8px 40px;
+  padding: 22px 0;
+}
+.rule-grid > li + li {
+  border-top: 1px solid var(--line-soft);
 }
 .rule-grid h3 {
   margin: 0;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 28px;
-  line-height: 1.1;
+  font-size: 22px;
+  line-height: 1.2;
 }
 .rule-grid p {
   margin: 0;
   font-size: 16px;
   line-height: 1.6;
   color: var(--ink-2);
+}
+@media (max-width: 720px) {
+  .rule-grid > li {
+    grid-template-columns: 1fr;
+  }
 }

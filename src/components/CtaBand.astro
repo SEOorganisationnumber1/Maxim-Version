@@ -49,7 +49,8 @@ const {
     <div class="cta__actions">
       <a
         href="/contact"
-        class:list={['btn', 'btn--lg', tone === 'white' ? 'btn--light' : 'btn--dark']}
+        class="btn btn--lg btn--accent"
+        data-book-call
         data-umami-event="Book a call"
         data-umami-event-from="cta-band"
       >
@@ -57,7 +58,7 @@ const {
       </a>
       {
         secondary && (
-          <a href={secondary.href} class="btn btn--lg btn--outline">
+          <a href={secondary.href} class="btn btn--lg cta__secondary">
             {secondary.label}
           </a>
         )
@@ -74,13 +75,15 @@ const {
   .cta--bottom {
     padding-top: 0;
   }
+  /* One closing tile in ink, on every page; the button is the site's only cyan pill. */
   .cta__band {
     position: relative;
     overflow: hidden;
     max-width: 1192px;
     margin: 0 auto;
-    background: var(--cyan);
-    border-radius: 24px;
+    background: var(--ink);
+    color: var(--white);
+    border-radius: var(--radius-tile);
     padding: 64px clamp(24px, 5%, 72px);
     display: flex;
     flex-wrap: wrap;
@@ -116,8 +119,21 @@ const {
     line-height: 1.6;
     font-weight: 500;
   }
-  .cta__band--white .cta__copy {
+  .cta__copy p {
+    color: var(--footer-text);
+  }
+  .cta__art :global(path) {
+    stroke: var(--cyan);
+    stroke-opacity: 0.14;
+  }
+  .cta__secondary {
+    background: transparent;
     color: var(--white);
+    border: 1px solid rgb(255 255 255 / 0.35);
+  }
+  .cta__secondary:hover {
+    color: var(--white);
+    border-color: var(--white);
   }
   .cta__actions {
     position: relative;

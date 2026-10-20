@@ -2,10 +2,10 @@
 import Base from '../layouts/Base.astro';
 import CtaBand from '../components/CtaBand.astro';
 import Icon from '../components/Icon.astro';
+import Workbench from '../components/Workbench.astro';
 import { Image } from 'astro:assets';
-import { filled, formatPrice, lowestPrice, numbers, services, site, type Service } from '../data/site';
+import { filled, numbers, site } from '../data/site';
 import { cardLine, clients, projects, projectUrl, proofLink } from '../data/projects';
-import { ribbonPath } from '../scripts/hero-ribbons';
 
 /** "Trusted by:" chips, clients only (never our own products). Past CHIP_LIMIT the rest are behind "+ more brands". */
 const CHIP_LIMIT = 4;
@@ -19,21 +19,22 @@ const stats = filled([
   { value: numbers.retention, label: 'clients who stay past year one' },
 ]);
 
-// Home keeps its own copy for each kind of project (it differs slightly from the Services page).
-const disciplineCopy: Record<Service, string> = {
-  'Websites & Landing Pages':
-    'Company websites, landing pages and blogs on modern frameworks. Fast by default, ready for search, with a CMS your team can edit.',
-  'Web Apps & SaaS':
-    'Custom web applications and SaaS products, from the first version to scale. Accounts, payments, dashboards, data and deploys done properly.',
-  'Mobile & Desktop Apps':
-    'Mobile apps for iOS and Android and desktop apps for Windows, macOS and Linux, designed and built from the first version to release.',
-  'Telegram Bots & Extensions':
-    'Telegram bots and Mini Apps that take orders, answer customers or run a workflow inside the chat, and browser extensions for Chrome, Firefox and Edge.',
-  'AI & Automation':
-    'AI features that do real work: assistants, answers from your own data, and automations that remove manual steps. Shipped with evaluation and guardrails, not as demos.',
-  'Search & Growth':
-    'SEO, GEO and AEO. We make sure people, Google and AI assistants such as ChatGPT and Gemini can find, understand and recommend what we launch.',
-};
+/** Written promises from the Services terms: the trust we can offer without faces or logos. */
+const promises = ['Fixed price in writing', 'You own the code', '30 days of free fixes'];
+
+/** The terms that matter most before a first call. The full list lives on Services. */
+const terms = [
+  {
+    title: 'A fixed price, in writing',
+    text: 'After a free call you get our approach and a fixed price for a written scope within two business days. Anything new gets its own price, and you approve it first.',
+  },
+  { title: 'Pay in stages', text: '50% to start and 50% at launch. Larger projects pay in three stages, tied to the design and the launch.' },
+  {
+    title: 'Everything is yours',
+    text: 'Code, design files and accounts are yours after the final payment. Domain, hosting and store accounts are in your name from day one.',
+  },
+  { title: '30 days of free fixes', text: 'For 30 days after launch we fix any bug in what we built, at no cost.' },
+];
 
 // The first project gets the large card with its own art; the next two get small cards in the
 // Work page looks. Cards link once their case study is written.
@@ -42,25 +43,6 @@ const featuredUrl = featured ? projectUrl(featured) : null;
 const featuredResult = featured?.caseStudy?.results[0];
 const FeaturedCard = featuredUrl ? 'a' : 'article';
 const smallCards = others.slice(0, 2).map((project) => ({ project, url: projectUrl(project) }));
-
-const methods = [
-  {
-    title: 'Scope',
-    text: 'A short discovery: who it is for, what it must do, and the smallest version worth launching.',
-  },
-  {
-    title: 'Design',
-    text: 'Flows and interfaces in Figma, tested with real content before production code starts.',
-  },
-  {
-    title: 'Build',
-    text: 'A typed, tested, modern stack: fast pages, clean APIs and structured data from the first commit.',
-  },
-  {
-    title: 'Launch',
-    text: "Release, measure, improve. Analytics, search and AI visibility are part of launch day. What works gets more budget. What doesn't gets cut.",
-  },
-];
 
 // Public tools a visitor can point at this site. They always show live results, so no score is
 // typed into the page and nothing can go stale. The URL follows the site's own address.
@@ -92,124 +74,55 @@ const checks = [
   fullTitle
   description={`${site.name} designs and builds websites, web and mobile apps, desktop apps, Telegram bots and browser extensions, then helps them grow through search.`}
 >
-  <!-- Hero -->
-  <section class="hero bg-paper border-bottom" data-hero-ribbons>
-    <div aria-hidden="true" class="hero__art hero__art--left" data-ribbon-art="left">
-      <svg viewBox="0 0 400 640" preserveAspectRatio="xMaxYMid slice" fill="none">
-        <defs>
-          <linearGradient id="hero-a" data-ribbon-gradient x1="0" y1="0" x2="400" y2="640" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stop-color="#22D3DD"></stop>
-            <stop offset="0.6" stop-color="#2FB4F0"></stop>
-            <stop offset="1" stop-color="#2F8CF6"></stop>
-          </linearGradient>
-          <linearGradient id="hero-b" data-ribbon-gradient x1="0" y1="440" x2="220" y2="660" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stop-color="#2F8CF6"></stop>
-            <stop offset="1" stop-color="#5B4FE9"></stop>
-          </linearGradient>
-        </defs>
-        <path data-ribbon="left-blob" d={ribbonPath('left-blob')} fill="#DFF6F9"></path>
-        <path
-          data-ribbon="left-ribbon"
-          d={ribbonPath('left-ribbon')}
-          stroke="url(#hero-a)"
-          stroke-width="78"
-          stroke-linecap="round"></path>
-        <path
-          data-ribbon="left-accent"
-          d={ribbonPath('left-accent')}
-          stroke="url(#hero-b)"
-          stroke-width="104"
-          stroke-linecap="round"></path>
-      </svg>
-    </div>
-    <div aria-hidden="true" class="hero__art hero__art--right" data-ribbon-art="right">
-      <svg viewBox="0 0 260 640" preserveAspectRatio="xMinYMid slice" fill="none">
-        <defs>
-          <linearGradient id="hero-c" data-ribbon-gradient x1="260" y1="0" x2="60" y2="640" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stop-color="#2F8CF6"></stop>
-            <stop offset="0.5" stop-color="#2FB4F0"></stop>
-            <stop offset="1" stop-color="#22D3DD"></stop>
-          </linearGradient>
-        </defs>
-        <path data-ribbon="right-blob" d={ribbonPath('right-blob')} fill="#E4EEFF"></path>
-        <path
-          data-ribbon="right-ribbon"
-          d={ribbonPath('right-ribbon')}
-          stroke="url(#hero-c)"
-          stroke-width="70"
-          stroke-linecap="round"></path>
-      </svg>
-    </div>
-
-    <div class="hero__content">
-      <h1 class="hero__title">We design, build and launch <span class="highlight">digital products.</span></h1>
+  <!-- Hero: one sentence, two actions, three written promises -->
+  <section class="hero bg-paper">
+    <div class="container hero__inner">
+      <h1 class="hero__title">We build the parts of your product <span class="highlight">people touch.</span></h1>
       <p class="hero__lede">
-        Websites, web and mobile apps, desktop apps, Telegram bots and browser extensions, from first sketch to launch
-        day. After launch, we help them grow in search.
+        Websites, web and mobile apps, Telegram bots, browser extensions and AI features. One team designs them, builds
+        them and launches them, then helps them get found.
       </p>
-
       <div class="hero__actions">
-        <a href="/contact" class="btn btn--primary" data-umami-event="Book a call" data-umami-event-from="hero">
-          Book a call<Icon name="arrow-right" />
+        <a href="/contact" class="btn btn--primary btn--lg" data-book-call data-umami-event="Book a call" data-umami-event-from="hero">
+          Book a free call<Icon name="arrow-right" />
         </a>
-        <a href={proofLink.href} class="btn btn--outline" data-motion-fallback>{proofLink.label}</a>
+        <a href={proofLink.href} class="btn btn--outline btn--lg">{proofLink.label}</a>
       </div>
-
+      <ul class="hero__promises">
+        {
+          promises.map((promise) => (
+            <li>
+              <Icon name="check" size={16} strokeWidth={2.8} />
+              {promise}
+            </li>
+          ))
+        }
+      </ul>
       {
         chips.length > 0 && (
           <div class="hero__proof">
             <span>Trusted by</span>
             <ul class="chip-list">
-              {chips.map((project) => <><li class="chip chip--dark">{project.name}</li>{'\n'}</>)}
+              {chips.map((project) => <><li class="chip">{project.name}</li>{'\n'}</>)}
             </ul>
             {clients.length > chips.length && <a href="/clients" class="hero__more">+ more brands</a>}
           </div>
         )
       }
     </div>
-
-    <!-- Pause control for the ambient ribbon motion (WCAG 2.2.2). Revealed by the script only when motion can run. -->
-    <button
-      type="button"
-      class="hero__motion"
-      data-motion-toggle
-      data-state="playing"
-      aria-label="Pause background animation"
-      hidden
-    >
-      <svg class="hero__motion-pause" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round">
-        <path d="M9 6v12"></path>
-        <path d="M15 6v12"></path>
-      </svg>
-      <svg class="hero__motion-play" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M8 5.5v13a1 1 0 0 0 1.5.86l11-6.5a1 1 0 0 0 0-1.72l-11-6.5A1 1 0 0 0 8 5.5z"></path>
-      </svg>
-    </button>
   </section>
 
-  <!-- What we do: the kinds of projects we take on, right after the hero -->
-  <section id="what-we-do" class="bg-white">
-    <div class="container block">
+  <!-- What we build: a working piece of each kind of project -->
+  <section id="what-we-do" class="bg-paper">
+    <div class="container block block--bench">
       <div class="block__head">
         <div class="block__title">
           <h2 class="h2">What we build.</h2>
-          <p class="block__intro">UI and UX design is part of every project, not an extra.</p>
+          <p class="block__intro">Each tile is a small working piece of the kind of thing we make. Go ahead, touch them.</p>
         </div>
         <a href="/services" class="text-link">All services<Icon name="arrow-right" /></a>
       </div>
-      <ol class="disciplines">
-        {
-          services.map((service) => (
-            <li class="discipline">
-              <h3 class="discipline__name">{service}</h3>
-              <div class="discipline__body">
-                <p class="discipline__text">{disciplineCopy[service]}</p>
-                <p class="discipline__price">From {formatPrice(lowestPrice(service))}</p>
-              </div>
-            </li>
-          ))
-        }
-      </ol>
+      <Workbench />
     </div>
   </section>
 
@@ -229,21 +142,10 @@ const checks = [
     )
   }
 
-  <!-- Statement -->
-  <section class="bg-paper border-top">
-    <div class="container statement">
-      <p class="statement__text">
-        Most products stall somewhere between design, code and launch. We do all three as one team, so
-        <span class="statement__accent">the plan becomes the product.</span>
-      </p>
-      <a href="/company" class="text-link statement__link">About the company<Icon name="arrow-right" /></a>
-    </div>
-  </section>
-
   <!-- Recent work -->
   {
     featured && (
-      <section class="bg-paper border-top">
+      <section class="bg-paper">
         <div class="container block">
           <div class="block__head">
             <div class="block__title">
@@ -366,7 +268,7 @@ const checks = [
   }
 
   <!-- Checks a visitor can run on this site: proof that needs no client permission -->
-  <section class="bg-white border-top">
+  <section class="bg-paper">
     <div class="container block">
       <div class="block__head">
         <div class="block__title">
@@ -401,115 +303,38 @@ const checks = [
     </div>
   </section>
 
-  <!-- Modern methods -->
-  <section class="bg-white border-top">
-    <div class="container block block--methods">
-      <div class="methods__head">
-        <h2 class="h2">Modern methods. Nothing wasted.</h2>
-        <p class="methods__intro">
-          We only use approaches that work right now, and we drop them the moment they stop.
-        </p>
+  <!-- Terms: what is promised in writing before anyone pays -->
+  <section class="bg-paper">
+    <div class="container block">
+      <div class="block__head">
+        <div class="block__title">
+          <h2 class="h2">What you get in writing.</h2>
+          <p class="block__intro">How every project works, before you sign anything.</p>
+        </div>
+        <a href="/services#terms" class="text-link">All terms<Icon name="arrow-right" /></a>
       </div>
-      <ol class="rule-grid">
+      <dl class="terms">
         {
-          methods.map((step) => (
-            <li>
-              <h3>{step.title}</h3>
-              <p>{step.text}</p>
-            </li>
+          terms.map((term) => (
+            <div class="terms__row">
+              <dt class="terms__title">{term.title}</dt>
+              <dd class="terms__text">{term.text}</dd>
+            </div>
           ))
         }
-      </ol>
+      </dl>
     </div>
   </section>
 
-  <CtaBand title="Tell us what you want to launch." tone="white" pad="full" />
+  <CtaBand title="Tell us what you want to launch." text="A free 30-minute call. You leave with a clear next step, and a fixed price follows in writing." pad="bottom" />
 </Base>
-
-<script>
-  import { startHeroRibbons } from '../scripts/hero-ribbons';
-
-  const hero = document.querySelector<HTMLElement>('[data-hero-ribbons]');
-  if (hero) startHeroRibbons(hero);
-</script>
 
 <style>
   /* ---------- Hero ---------- */
 
-  .hero {
-    position: relative;
-    overflow: hidden;
-  }
-  .hero__art {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-  }
-  .hero__art--left {
-    left: 0;
-    width: max(0px, calc((100% - 820px) * 0.6));
-  }
-  .hero__art--right {
-    right: 0;
-    width: max(0px, calc((100% - 820px) * 0.4));
-  }
-  .hero__art svg {
-    display: block;
-    width: 100%;
-    height: 100%;
-  }
-  /* Pause control for the ribbon motion: an opaque disc so the moving art never shows through it. */
-  .hero__motion {
-    position: absolute;
-    right: 20px;
-    bottom: 20px;
-    z-index: 2;
-    display: grid;
-    place-items: center;
-    width: 44px;
-    height: 44px;
-    padding: 0;
-    border: 1.5px solid rgb(10 17 40 / 0.72);
-    border-radius: 50%;
-    background: var(--white);
-    color: rgb(10 17 40 / 0.72);
-    cursor: pointer;
-    transition:
-      color 160ms ease,
-      border-color 160ms ease,
-      transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
-  }
-  .hero__motion[hidden] {
-    display: none;
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .hero__motion:hover {
-      color: var(--ink);
-      border-color: var(--ink);
-    }
-  }
-  /* Two-tone ring: readable over paper and every stop of the ribbon gradient. */
-  .hero__motion:focus-visible {
-    color: var(--ink);
-    border-color: var(--ink);
-    outline: 3px solid var(--ink);
-    outline-offset: 2px;
-    box-shadow: 0 0 0 2px var(--white);
-  }
-  .hero__motion:active {
-    transform: scale(0.96);
-  }
-  .hero__motion[data-state='playing'] .hero__motion-play,
-  .hero__motion[data-state='paused'] .hero__motion-pause {
-    display: none;
-  }
-
-  .hero__content {
-    position: relative;
-    z-index: 1;
-    max-width: 820px;
-    margin-left: max(0px, calc((100% - 820px) * 0.6));
-    padding: 96px var(--gutter) 104px;
+  .hero__inner {
+    padding-top: clamp(64px, 9vw, 112px);
+    padding-bottom: 24px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -517,24 +342,49 @@ const checks = [
   /* One sentence; as in every page title, its last words sit in the highlight. */
   .hero__title {
     margin: 0;
-    max-width: 12.5em;
+    max-width: 14em;
     font-family: var(--font-display);
-    font-weight: 700;
-    font-size: clamp(2.5rem, 4.8vw, 4.25rem);
-    line-height: 1.05;
-    letter-spacing: -0.025em;
+    font-weight: 800;
+    font-size: clamp(2.6rem, 6vw, 5rem);
+    line-height: 1.02;
+    letter-spacing: -0.035em;
     text-wrap: balance;
   }
   .hero__lede {
     margin: 24px 0 0;
-    max-width: 34em;
+    max-width: 38em;
     font-size: clamp(1.0625rem, 1.5vw, 1.25rem);
     line-height: 1.6;
     color: var(--ink-2);
     text-wrap: pretty;
   }
+  .hero__actions {
+    margin-top: 32px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .hero__promises {
+    list-style: none;
+    margin: 28px 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink-2);
+  }
+  .hero__promises li {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hero__promises :global(svg) {
+    color: var(--teal);
+  }
   .hero__proof {
-    margin-top: 28px;
+    margin-top: 24px;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -550,50 +400,18 @@ const checks = [
     font-weight: 700;
     font-size: 15px;
   }
-  .hero__actions {
-    margin-top: 36px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-
-  /* ---------- Statement ---------- */
-
-  .statement {
-    padding-top: 112px;
-    padding-bottom: 112px;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-  }
-  .statement__text {
-    margin: 0;
-    max-width: 1040px;
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: clamp(1.75rem, 3.6vw, 3.25rem);
-    line-height: 1.15;
-    letter-spacing: -0.015em;
-    text-wrap: pretty;
-  }
-  .statement__accent {
-    color: var(--teal);
-  }
-  .statement__link {
-    align-self: flex-start;
-  }
 
   /* ---------- Section blocks ---------- */
 
   .block {
-    padding-top: 96px;
-    padding-bottom: 96px;
+    padding-top: 72px;
+    padding-bottom: 72px;
     display: flex;
     flex-direction: column;
     gap: 48px;
   }
-  .block--methods {
-    gap: 56px;
+  .block--bench {
+    padding-top: 40px;
   }
   .block__head {
     display: flex;
@@ -606,48 +424,6 @@ const checks = [
     display: flex;
     flex-direction: column;
     gap: 12px;
-  }
-
-  /* ---------- What we build ---------- */
-
-  .disciplines {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    border-bottom: 1.5px solid var(--ink);
-  }
-  .discipline {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 12px 40px;
-    padding: 28px 0;
-    border-top: 1.5px solid var(--ink);
-  }
-  .discipline__name {
-    flex: 1 1 300px;
-    margin: 0;
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: clamp(1.75rem, 3vw, 2.5rem);
-    line-height: 1.1;
-  }
-  .discipline__body {
-    flex: 2 1 360px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .discipline__price {
-    margin: 0;
-    font-weight: 700;
-    font-size: 16px;
-  }
-  .discipline__text {
-    margin: 0;
-    font-size: 17px;
-    line-height: 1.6;
-    color: var(--ink-2);
   }
 
   /* ---------- Recent work ---------- */
@@ -775,16 +551,21 @@ const checks = [
   .checks {
     list-style: none;
     margin: 0;
-    padding: 0;
-    border-bottom: 1.5px solid var(--ink);
+    padding: 8px clamp(20px, 3vw, 36px);
+    background: var(--surface);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius-tile);
+    box-shadow: var(--shadow-tile);
+  }
+  .checks li + li .checks__link {
+    border-top: 1px solid var(--line-soft);
   }
   .checks__link {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
     gap: 8px 40px;
-    padding: 24px 0;
-    border-top: 1.5px solid var(--ink);
+    padding: 22px 0;
     color: var(--ink);
     text-decoration: none;
   }
@@ -815,18 +596,40 @@ const checks = [
     }
   }
 
-  /* ---------- Modern methods ---------- */
+  /* ---------- Terms ---------- */
 
-  .methods__head {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    max-width: 760px;
-  }
-  .methods__intro {
+  .terms {
     margin: 0;
-    font-size: 18px;
+    background: var(--surface);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius-tile);
+    box-shadow: var(--shadow-tile);
+    padding: 8px clamp(20px, 3vw, 36px);
+  }
+  .terms__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: 8px 40px;
+    padding: 22px 0;
+  }
+  .terms__row + .terms__row {
+    border-top: 1px solid var(--line-soft);
+  }
+  .terms__title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 21px;
+    line-height: 1.25;
+  }
+  .terms__text {
+    margin: 0;
+    font-size: 16px;
     line-height: 1.6;
     color: var(--ink-2);
+  }
+  @media (max-width: 720px) {
+    .terms__row {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
