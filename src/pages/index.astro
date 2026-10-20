@@ -5,7 +5,8 @@ import Icon from '../components/Icon.astro';
 import Workbench from '../components/Workbench.astro';
 import { Image } from 'astro:assets';
 import { filled, numbers, site } from '../data/site';
-import { cardLine, clients, projects, projectUrl, proofLink } from '../data/projects';
+import { cardLine, clients, projects, projectUrl } from '../data/projects';
+import { ribbonPath } from '../scripts/hero-ribbons';
 
 /** "Trusted by:" chips, clients only (never our own products). Past CHIP_LIMIT the rest are behind "+ more brands". */
 const CHIP_LIMIT = 4;
@@ -20,22 +21,15 @@ const stats = filled([
 ]);
 
 /** Written promises from the Services terms: the trust we can offer without faces or logos. */
-const promises = ['Fixed price in writing', 'You own the code', '30 days of free fixes'];
+const promises = ['Free 30-minute call', 'Fixed price in writing', 'You own the code'];
 
 /** The terms that matter most before a first call. The full list lives on Services. */
 const terms = [
-  {
-    title: 'A fixed price, in writing',
-    text: 'After a free call you get our approach and a fixed price for a written scope within two business days. Anything new gets its own price, and you approve it first.',
-  },
-  { title: 'Pay in stages', text: '50% to start and 50% at launch. Larger projects pay in three stages, tied to the design and the launch.' },
-  {
-    title: 'Everything is yours',
-    text: 'Code, design files and accounts are yours after the final payment. Domain, hosting and store accounts are in your name from day one.',
-  },
-  { title: '30 days of free fixes', text: 'For 30 days after launch we fix any bug in what we built, at no cost.' },
+  { title: 'A fixed price, in writing', text: 'Agreed before any work starts.' },
+  { title: 'Pay in stages', text: 'Half to start, half at launch.' },
+  { title: 'Everything is yours', text: 'Code, designs and accounts, in your name.' },
+  { title: '30 days of free fixes', text: 'Any bug after launch, fixed at no cost.' },
 ];
-
 // The first project gets the large card with its own art; the next two get small cards in the
 // Work page looks. Cards link once their case study is written.
 const [featured, ...others] = projects;
@@ -44,29 +38,6 @@ const featuredResult = featured?.caseStudy?.results[0];
 const FeaturedCard = featuredUrl ? 'a' : 'article';
 const smallCards = others.slice(0, 2).map((project) => ({ project, url: projectUrl(project) }));
 
-// Public tools a visitor can point at this site. They always show live results, so no score is
-// typed into the page and nothing can go stale. The URL follows the site's own address.
-const home = new URL('/', Astro.site).href;
-const checks = [
-  {
-    name: 'Speed and Core Web Vitals',
-    text: 'Google PageSpeed Insights, run on this page now.',
-    href: `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(home)}`,
-    external: true,
-  },
-  {
-    name: 'Structured data',
-    text: 'The Schema.org validator reads what this page tells search engines about us.',
-    href: `https://validator.schema.org/#url=${encodeURIComponent(home)}`,
-    external: true,
-  },
-  {
-    name: 'Ready for AI assistants',
-    text: 'Our llms.txt: a plain-text map of the site for AI assistants and crawlers.',
-    href: '/llms.txt',
-    external: false,
-  },
-];
 ---
 
 <Base
@@ -74,19 +45,69 @@ const checks = [
   fullTitle
   description={`${site.name} designs and builds websites, web and mobile apps, desktop apps, Telegram bots and browser extensions, then helps them grow through search.`}
 >
-  <!-- Hero: one sentence, two actions, three written promises -->
-  <section class="hero bg-paper">
-    <div class="container hero__inner">
-      <h1 class="hero__title">We build the parts of your product <span class="highlight">people touch.</span></h1>
-      <p class="hero__lede">
-        Websites, web and mobile apps, Telegram bots, browser extensions and AI features. One team designs them, builds
-        them and launches them, then helps them get found.
-      </p>
+  <!-- Hero: the brand's ribbons, one sentence, two actions, three written promises -->
+  <section class="hero" data-hero-ribbons>
+    <div aria-hidden="true" class="hero__art hero__art--left" data-ribbon-art="left">
+      <svg viewBox="0 0 400 640" preserveAspectRatio="xMaxYMid slice" fill="none">
+        <defs>
+          <linearGradient id="hero-a" data-ribbon-gradient x1="0" y1="0" x2="400" y2="640" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#22D3DD"></stop>
+            <stop offset="0.6" stop-color="#2FB4F0"></stop>
+            <stop offset="1" stop-color="#2F8CF6"></stop>
+          </linearGradient>
+          <linearGradient id="hero-b" data-ribbon-gradient x1="0" y1="440" x2="220" y2="660" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#2F8CF6"></stop>
+            <stop offset="1" stop-color="#5B4FE9"></stop>
+          </linearGradient>
+        </defs>
+        <path data-ribbon="left-blob" d={ribbonPath('left-blob')} fill="#DFF6F9"></path>
+        <path
+          data-ribbon="left-ribbon"
+          pathLength="1"
+          class="ribbon-stroke"
+          d={ribbonPath('left-ribbon')}
+          stroke="url(#hero-a)"
+          stroke-width="78"
+          stroke-linecap="round"></path>
+        <path
+          data-ribbon="left-accent"
+          pathLength="1"
+          class="ribbon-stroke"
+          d={ribbonPath('left-accent')}
+          stroke="url(#hero-b)"
+          stroke-width="104"
+          stroke-linecap="round"></path>
+      </svg>
+    </div>
+    <div aria-hidden="true" class="hero__art hero__art--right" data-ribbon-art="right">
+      <svg viewBox="0 0 260 640" preserveAspectRatio="xMinYMid slice" fill="none">
+        <defs>
+          <linearGradient id="hero-c" data-ribbon-gradient x1="260" y1="0" x2="60" y2="640" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#2F8CF6"></stop>
+            <stop offset="0.5" stop-color="#2FB4F0"></stop>
+            <stop offset="1" stop-color="#22D3DD"></stop>
+          </linearGradient>
+        </defs>
+        <path data-ribbon="right-blob" d={ribbonPath('right-blob')} fill="#E4EEFF"></path>
+        <path
+          data-ribbon="right-ribbon"
+          pathLength="1"
+          class="ribbon-stroke"
+          d={ribbonPath('right-ribbon')}
+          stroke="url(#hero-c)"
+          stroke-width="70"
+          stroke-linecap="round"></path>
+      </svg>
+    </div>
+
+    <div class="hero__content">
+      <h1 class="hero__title">We design, build and launch <span class="highlight hero__mark">websites and apps.</span></h1>
+      <p class="hero__lede">Plus Telegram bots, browser extensions and AI tools. One team, from first sketch to launch day.</p>
       <div class="hero__actions">
         <a href="/contact" class="btn btn--primary btn--lg" data-book-call data-umami-event="Book a call" data-umami-event-from="hero">
-          Book a free call<Icon name="arrow-right" />
+          Book a call<Icon name="arrow-right" />
         </a>
-        <a href={proofLink.href} class="btn btn--outline btn--lg">{proofLink.label}</a>
+        <a href="/work" class="btn btn--outline btn--lg" data-motion-fallback>See our work</a>
       </div>
       <ul class="hero__promises">
         {
@@ -110,6 +131,24 @@ const checks = [
         )
       }
     </div>
+
+    <!-- Pause control for the ambient ribbon motion (WCAG 2.2.2). Revealed by the script only when motion can run. -->
+    <button
+      type="button"
+      class="hero__motion"
+      data-motion-toggle
+      data-state="playing"
+      aria-label="Pause background animation"
+      hidden
+    >
+      <svg class="hero__motion-pause" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round">
+        <path d="M9 6v12"></path>
+        <path d="M15 6v12"></path>
+      </svg>
+      <svg class="hero__motion-play" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M8 5.5v13a1 1 0 0 0 1.5.86l11-6.5a1 1 0 0 0 0-1.72l-11-6.5A1 1 0 0 0 8 5.5z"></path>
+      </svg>
+    </button>
   </section>
 
   <!-- What we build: a working piece of each kind of project -->
@@ -118,7 +157,7 @@ const checks = [
       <div class="block__head">
         <div class="block__title">
           <h2 class="h2">What we build.</h2>
-          <p class="block__intro">Each tile is a small working piece of the kind of thing we make. Go ahead, touch them.</p>
+          <p class="block__intro">Try them. They work.</p>
         </div>
         <a href="/services" class="text-link">All services<Icon name="arrow-right" /></a>
       </div>
@@ -188,7 +227,7 @@ const checks = [
                 <div class="featured__copy">
                   <span class="tagline">{cardLine(featured)}</span>
                   <h3 class="featured__name">{featured.name}</h3>
-                  {featured.summary && <p class="featured__summary">{featured.summary}</p>}
+                  {featured.summary && <p class="featured__summary">{featured.summary.split(/(?<=\.)\s/)[0]}</p>}
                 </div>
                 {(featuredResult || featuredUrl || featured.site) && (
                   <div class="featured__foot">
@@ -247,7 +286,6 @@ const checks = [
                       <div class="small__body">
                         <span class="tagline">{cardLine(project)}</span>
                         <h3 class="small__name">{project.name}</h3>
-                        {project.summary && <p class="small__summary">{project.summary}</p>}
                         {!url && project.site && (
                           <a href={project.site} class="small__visit" target="_blank" rel="noopener">
                             Visit {new URL(project.site).hostname}
@@ -267,42 +305,6 @@ const checks = [
     )
   }
 
-  <!-- Checks a visitor can run on this site: proof that needs no client permission -->
-  <section class="bg-paper">
-    <div class="container block">
-      <div class="block__head">
-        <div class="block__title">
-          <h2 class="h2">Check our work on this site.</h2>
-          <p class="block__intro">Don't take our word for it. Run the checks a developer would, on this site, live.</p>
-        </div>
-      </div>
-      <ul class="checks">
-        {
-          checks.map((check) => (
-            <li>
-              <a
-                href={check.href}
-                class="checks__link"
-                {...(check.external ? { target: '_blank', rel: 'noopener' } : {})}
-                data-umami-event="Site check"
-                data-umami-event-check={check.name}
-              >
-                <span class="checks__name">{check.name}</span>
-                <span class="checks__text">
-                  <span>
-                    {check.text}
-                    {check.external && <span class="visually-hidden"> (opens in a new tab)</span>}
-                  </span>
-                  <Icon name={check.external ? 'arrow-up-right' : 'arrow-right'} />
-                </span>
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </div>
-  </section>
-
   <!-- Terms: what is promised in writing before anyone pays -->
   <section class="bg-paper">
     <div class="container block">
@@ -317,7 +319,10 @@ const checks = [
         {
           terms.map((term) => (
             <div class="terms__row">
-              <dt class="terms__title">{term.title}</dt>
+              <dt class="terms__title">
+                <Icon name="check" size={18} strokeWidth={2.8} />
+                {term.title}
+              </dt>
               <dd class="terms__text">{term.text}</dd>
             </div>
           ))
@@ -326,51 +331,162 @@ const checks = [
     </div>
   </section>
 
-  <CtaBand title="Tell us what you want to launch." text="A free 30-minute call. You leave with a clear next step, and a fixed price follows in writing." pad="bottom" />
+  <CtaBand title="Tell us what you want to launch." text="Free 30-minute call. A fixed price follows, in writing." pad="bottom" />
 </Base>
+
+<script>
+  import { startHeroRibbons } from '../scripts/hero-ribbons';
+
+  const hero = document.querySelector<HTMLElement>('[data-hero-ribbons]');
+  if (hero) {
+    startHeroRibbons(hero);
+    // The ribbons lean a few pixels toward the pointer (fine pointers only, never with reduced motion).
+    // Only two custom properties change; CSS eases the panels after them.
+    const fine = window.matchMedia('(hover: hover) and (pointer: fine)');
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let queued = false;
+    let x = 0;
+    let y = 0;
+    hero.addEventListener('pointermove', (event) => {
+      if (!fine.matches || still.matches) return;
+      const r = hero.getBoundingClientRect();
+      x = ((event.clientX - r.left) / r.width) * 2 - 1;
+      y = ((event.clientY - r.top) / r.height) * 2 - 1;
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => {
+        queued = false;
+        hero.style.setProperty('--hx', x.toFixed(3));
+        hero.style.setProperty('--hy', y.toFixed(3));
+      });
+    });
+    hero.addEventListener('pointerleave', () => {
+      hero.style.setProperty('--hx', '0');
+      hero.style.setProperty('--hy', '0');
+    });
+  }
+</script>
 
 <style>
   /* ---------- Hero ---------- */
 
-  .hero__inner {
-    padding-top: clamp(64px, 9vw, 112px);
-    padding-bottom: 24px;
+  /* The brand's ribbons on both sides, the sentence centred between them, tall enough to own the first screen. */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    min-height: clamp(620px, calc(100svh - 77px), 940px);
+    background: var(--paper);
+  }
+  .hero__art {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+  }
+  /* Wide panels that run in behind the sentence and fade out before they reach it. They drift a
+     few pixels with the pointer, left and right in opposite directions. */
+  .hero__art--left {
+    left: -24px;
+    width: min(664px, max(0px, calc((100% - 940px) / 2 + 244px)));
+    -webkit-mask-image: linear-gradient(to right, #000 52%, transparent 96%);
+    mask-image: linear-gradient(to right, #000 52%, transparent 96%);
+    transform: translate3d(calc(var(--hx, 0) * 14px), calc(var(--hy, 0) * 10px), 0);
+  }
+  .hero__art--right {
+    right: -24px;
+    width: min(584px, max(0px, calc((100% - 940px) / 2 + 194px)));
+    -webkit-mask-image: linear-gradient(to left, #000 50%, transparent 96%);
+    mask-image: linear-gradient(to left, #000 50%, transparent 96%);
+    transform: translate3d(calc(var(--hx, 0) * -12px), calc(var(--hy, 0) * -8px), 0);
+  }
+  .hero__art--left,
+  .hero__art--right {
+    transition: transform 1200ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  /* The ribbons draw themselves in on load, before the highlight sweeps in. */
+  .hero__art :global(.ribbon-stroke) {
+    stroke-dasharray: 1;
+    animation: ribbon-draw 1300ms cubic-bezier(0.65, 0, 0.35, 1) both;
+  }
+  .hero__art--left :global(.ribbon-stroke + .ribbon-stroke) {
+    animation-delay: 140ms;
+  }
+  .hero__art--right :global(.ribbon-stroke) {
+    animation-delay: 220ms;
+  }
+  @keyframes ribbon-draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  .hero__art :global(svg) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .hero__content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 940px;
+    padding: 72px var(--gutter);
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    text-align: center;
   }
-  /* One sentence; as in every page title, its last words sit in the highlight. */
   .hero__title {
     margin: 0;
-    max-width: 14em;
+    max-width: 11.5em;
     font-family: var(--font-display);
     font-weight: 800;
-    font-size: clamp(2.6rem, 6vw, 5rem);
-    line-height: 1.02;
-    letter-spacing: -0.035em;
+    font-size: clamp(2.9rem, 7vw, 6rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
     text-wrap: balance;
   }
+  /* The one authored moment: the highlight sweeps in behind its words like a marker. The words are
+     readable from the first frame (ink), and turn white as the teal arrives. */
+  .hero__mark {
+    background: linear-gradient(var(--teal), var(--teal)) no-repeat 0 0 / 100% 100%;
+    animation: mark 900ms 250ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes mark {
+    from {
+      background-size: 0% 100%;
+      color: var(--ink);
+    }
+    55% {
+      color: var(--ink);
+    }
+  }
   .hero__lede {
-    margin: 24px 0 0;
-    max-width: 38em;
-    font-size: clamp(1.0625rem, 1.5vw, 1.25rem);
-    line-height: 1.6;
+    margin: 26px 0 0;
+    max-width: 34em;
+    font-size: clamp(1.0625rem, 1.5vw, 1.3rem);
+    line-height: 1.55;
     color: var(--ink-2);
-    text-wrap: pretty;
+    text-wrap: balance;
   }
   .hero__actions {
-    margin-top: 32px;
+    margin-top: 34px;
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 12px;
   }
   .hero__promises {
     list-style: none;
-    margin: 28px 0 0;
+    margin: 26px 0 0;
     padding: 0;
     display: flex;
     flex-wrap: wrap;
-    gap: 10px 24px;
+    justify-content: center;
+    gap: 10px 22px;
     font-size: 15px;
     font-weight: 600;
     color: var(--ink-2);
@@ -383,10 +499,25 @@ const checks = [
   .hero__promises :global(svg) {
     color: var(--teal);
   }
+  /* After the highlight lands, the three checks draw in, one after another. */
+  .hero__promises :global(svg path) {
+    stroke-dasharray: 24;
+    stroke-dashoffset: 0;
+    animation: check-draw 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .hero__promises li:nth-child(1) :global(svg path) { animation-delay: 900ms; }
+  .hero__promises li:nth-child(2) :global(svg path) { animation-delay: 1000ms; }
+  .hero__promises li:nth-child(3) :global(svg path) { animation-delay: 1100ms; }
+  @keyframes check-draw {
+    from {
+      stroke-dashoffset: 24;
+    }
+  }
   .hero__proof {
     margin-top: 24px;
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     align-items: center;
     gap: 10px 12px;
     font-weight: 700;
@@ -399,6 +530,79 @@ const checks = [
     min-height: 44px;
     font-weight: 700;
     font-size: 15px;
+  }
+  /* Pause control for the ribbon motion (WCAG 2.2.2): an opaque disc so the moving art never shows through. */
+  .hero__motion {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: var(--surface);
+    color: var(--ink-2);
+    cursor: pointer;
+    transition:
+      color 160ms var(--ease-out),
+      border-color 160ms var(--ease-out),
+      transform 160ms var(--ease-out);
+  }
+  .hero__motion[hidden] {
+    display: none;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .hero__motion:hover {
+      color: var(--ink);
+      border-color: var(--ink);
+    }
+  }
+  .hero__motion:active {
+    transform: scale(0.96);
+  }
+  .hero__motion[data-state='playing'] .hero__motion-play,
+  .hero__motion[data-state='paused'] .hero__motion-pause {
+    display: none;
+  }
+  /* Phones: the ribbons become a band under the sentence instead of framing it. */
+  @media (max-width: 899.98px) {
+    .hero {
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .hero__content {
+      order: 1;
+      padding-top: 56px;
+      padding-bottom: 8px;
+    }
+    .hero__art--left {
+      order: 2;
+      position: relative;
+      width: 100%;
+      height: 190px;
+      -webkit-mask-image: none;
+      mask-image: none;
+      transform: none;
+    }
+    .hero__art--right {
+      display: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero__mark,
+    .hero__promises :global(svg path),
+    .hero__art :global(.ribbon-stroke) {
+      animation: none;
+    }
+    .hero__art--left,
+    .hero__art--right {
+      transform: none;
+    }
   }
 
   /* ---------- Section blocks ---------- */
@@ -506,8 +710,17 @@ const checks = [
     grid-template-columns: repeat(auto-fit, minmax(min(360px, 100%), 1fr));
     gap: 24px;
   }
+  /* A 2:1 well keeps the screenshot's sides in view at every width; only the bottom bleeds off. */
   .small__shot {
-    min-height: 240px;
+    min-height: 0;
+    aspect-ratio: 2 / 1;
+  }
+  @media (max-width: 799.98px) {
+    .featured__shot {
+      flex-basis: 100%;
+      min-height: 0;
+      aspect-ratio: 2 / 1;
+    }
   }
   .small__body {
     display: flex;
@@ -548,88 +761,48 @@ const checks = [
     line-height: 1.6;
     color: var(--ink-2);
   }
-  .checks {
-    list-style: none;
-    margin: 0;
-    padding: 8px clamp(20px, 3vw, 36px);
-    background: var(--surface);
-    border: 1px solid var(--line-soft);
-    border-radius: var(--radius-tile);
-    box-shadow: var(--shadow-tile);
-  }
-  .checks li + li .checks__link {
-    border-top: 1px solid var(--line-soft);
-  }
-  .checks__link {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 8px 40px;
-    padding: 22px 0;
-    color: var(--ink);
-    text-decoration: none;
-  }
-  .checks__name {
-    flex: 1 1 300px;
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: clamp(1.5rem, 2.4vw, 2rem);
-    line-height: 1.15;
-  }
-  .checks__text {
-    flex: 2 1 360px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    font-size: 17px;
-    line-height: 1.6;
-    color: var(--ink-2);
-  }
-  .checks__text :global(svg) {
-    flex: none;
-    color: var(--ink);
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .checks__link:hover .checks__name {
-      color: var(--teal-ink);
-    }
-  }
-
-  /* ---------- Terms ---------- */
+  /* ---------- Terms: four short promises, two by two ---------- */
 
   .terms {
     margin: 0;
-    background: var(--surface);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    background: var(--line-soft);
     border: 1px solid var(--line-soft);
     border-radius: var(--radius-tile);
     box-shadow: var(--shadow-tile);
-    padding: 8px clamp(20px, 3vw, 36px);
+    overflow: hidden;
   }
   .terms__row {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-    gap: 8px 40px;
-    padding: 22px 0;
-  }
-  .terms__row + .terms__row {
-    border-top: 1px solid var(--line-soft);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 26px clamp(20px, 3vw, 34px);
+    background: var(--surface);
   }
   .terms__title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     font-family: var(--font-display);
     font-weight: 700;
     font-size: 21px;
     line-height: 1.25;
   }
-  .terms__text {
-    margin: 0;
-    font-size: 16px;
-    line-height: 1.6;
-    color: var(--ink-2);
+  .terms__title :global(svg) {
+    flex: none;
+    color: var(--teal);
   }
-  @media (max-width: 720px) {
-    .terms__row {
+  @media (max-width: 719.98px) {
+    .terms {
       grid-template-columns: 1fr;
     }
+  }
+  .terms__text {
+    margin: 0 0 0 28px;
+    font-size: 16px;
+    line-height: 1.55;
+    color: var(--ink-2);
   }
 </style>

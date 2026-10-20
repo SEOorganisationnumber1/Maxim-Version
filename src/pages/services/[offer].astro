@@ -64,7 +64,7 @@ const jsonLd: Record<string, unknown>[] = [
       <div class="hero__copy">
         <a href="/services" class="back"><Icon name="arrow-left" />All services</a>
         <h1 class="hero__title">
-          {offer.h1.lead} <span class="highlight">{offer.h1.mark}</span>
+          {`${offer.h1.lead} `}<span class="highlight">{offer.h1.mark}</span>
         </h1>
         <p class="hero__lede">{offer.lede}</p>
         <div class="hero__actions">
@@ -476,10 +476,29 @@ const jsonLd: Record<string, unknown>[] = [
   .faq__item[open] > .faq__summary :global(svg) {
     transform: rotate(45deg);
   }
+  /* Answers open smoothly where the browser can animate <details>; elsewhere they simply appear. */
+  @supports selector(::details-content) {
+    .faq__item {
+      interpolate-size: allow-keywords;
+    }
+    .faq__item::details-content {
+      height: 0;
+      overflow: clip;
+      opacity: 0;
+      transition:
+        height 300ms var(--ease-out),
+        opacity 240ms var(--ease-out),
+        content-visibility 300ms allow-discrete;
+    }
+    .faq__item[open]::details-content {
+      height: auto;
+      opacity: 1;
+    }
+  }
   .faq__answer {
     margin: 0;
     padding: 0 0 24px;
-    max-width: 800px;
+    max-width: 68ch;
     font-size: 16px;
     line-height: 1.65;
     color: var(--ink-2);

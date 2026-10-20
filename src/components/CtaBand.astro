@@ -30,7 +30,8 @@ const {
 ---
 
 <section class:list={['cta', `cta--${pad}`, { 'border-top': borderTop }]}>
-  <div class:list={['cta__band', `cta__band--${tone}`]}>
+  <div class:list={['cta__band', `cta__band--${tone}`]} data-cta-band>
+    <span class="cta__dots" aria-hidden="true"></span>
     <svg
       aria-hidden="true"
       viewBox="0 0 600 300"
@@ -95,6 +96,15 @@ const {
     justify-content: space-between;
     gap: 32px;
   }
+  /* A field of ink-blue dots, lit only around the pointer (resting on the right when there is none). */
+  .cta__dots {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(circle, rgb(255 255 255 / 0.22) 0.9px, transparent 1.1px) 0 0 / 14px 14px;
+    -webkit-mask-image: radial-gradient(circle 260px at var(--mx, 78%) var(--my, 50%), #000, transparent 75%);
+    mask-image: radial-gradient(circle 260px at var(--mx, 78%) var(--my, 50%), #000, transparent 75%);
+  }
   .cta__art {
     position: absolute;
     right: 0;
@@ -146,3 +156,31 @@ const {
     gap: 12px;
   }
 </style>
+
+<script>
+  // Moves the dots' light with the pointer: two custom properties, at most once a frame.
+  const fine = window.matchMedia('(hover: hover) and (pointer: fine)');
+  const still = window.matchMedia('(prefers-reduced-motion: reduce)');
+  document.querySelectorAll<HTMLElement>('[data-cta-band]').forEach((band) => {
+    let queued = false;
+    let x = 0;
+    let y = 0;
+    band.addEventListener('pointermove', (event) => {
+      if (!fine.matches || still.matches) return;
+      const r = band.getBoundingClientRect();
+      x = event.clientX - r.left;
+      y = event.clientY - r.top;
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => {
+        queued = false;
+        band.style.setProperty('--mx', `${Math.round(x)}px`);
+        band.style.setProperty('--my', `${Math.round(y)}px`);
+      });
+    });
+    band.addEventListener('pointerleave', () => {
+      band.style.removeProperty('--mx');
+      band.style.removeProperty('--my');
+    });
+  });
+</script>

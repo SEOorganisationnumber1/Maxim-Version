@@ -81,8 +81,18 @@ body {
   line-height: 1.5;
 }
 
-a { color: var(--ink); }
+a {
+  color: var(--ink);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.2em;
+  transition: color 160ms var(--ease-out), text-decoration-color 160ms var(--ease-out);
+}
 a:hover { color: var(--teal-ink); }
+
+/* The parts the browser draws, themed from the palette. */
+::selection { background: rgb(28 202 216 / 0.32); color: var(--ink); }
+html { scrollbar-color: #b9c4d3 transparent; accent-color: var(--teal); }
+input, textarea { caret-color: var(--teal); }
 footer a { color: var(--footer-text); }
 footer a:hover { color: var(--white); }
 
@@ -198,9 +208,10 @@ img, svg { max-width: 100%; }
     transform 160ms var(--ease-out),
     background-color 160ms var(--ease-out),
     border-color 160ms var(--ease-out),
-    color 160ms var(--ease-out);
+    color 160ms var(--ease-out),
+    box-shadow 300ms var(--ease-out);
 }
-.btn:active { transform: scale(0.97); }
+.btn:active { transform: scale(0.97); transition-duration: 120ms; }
 .btn :where(svg) { transition: transform 200ms var(--ease-out); }
 @media (hover: hover) and (pointer: fine) {
   .btn:hover :where(svg) { transform: translateX(3px); }
@@ -208,8 +219,16 @@ img, svg { max-width: 100%; }
 .btn--lg { min-height: 56px; padding: 0 28px; font-size: 17px; }
 .btn--sm { min-height: 44px; padding: 0 18px; font-size: 15px; }
 
-.btn--primary { background: var(--ink); color: var(--white); }
-.btn--primary:hover { color: var(--white); background: #1B2547; }
+.btn--primary {
+  background: var(--ink);
+  color: var(--white);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.14), 0 1px 2px rgb(10 17 40 / 0.2);
+}
+.btn--primary:hover {
+  color: var(--white);
+  background: #1B2547;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.24), 0 8px 20px -10px rgb(10 17 40 / 0.55);
+}
 
 .btn--dark { background: var(--ink); color: var(--white); }
 .btn--dark:hover { color: var(--white); background: #1B2547; }
@@ -315,6 +334,16 @@ img, svg { max-width: 100%; }
   border-radius: 14px 14px 0 0;
   background: var(--white);
   box-shadow: 0 -1px 0 rgb(255 255 255 / 0.6) inset, 0 18px 40px -24px rgb(10 17 40 / 0.35);
+  transition:
+    object-position 1200ms var(--ease-out),
+    transform 400ms var(--ease-out);
+}
+/* Hovering a project card scrolls its screenshot a little, as if you were browsing the site. */
+@media (hover: hover) and (pointer: fine) {
+  .card:hover .shot__img {
+    object-position: 50% 32%;
+    transform: translateY(-4px);
+  }
 }
 .shot--cyan { background: var(--tint-cyan); }
 .shot--blue { background: var(--tint-blue); }
@@ -342,6 +371,7 @@ img, svg { max-width: 100%; }
 @media (hover: hover) and (pointer: fine) {
   a.card:hover { box-shadow: var(--shadow-lift); border-color: var(--line); transform: translateY(-2px); }
 }
+a.card:active { transform: scale(0.985); transition-duration: 120ms; }
 
 /* ---------- Stats ---------- */
 

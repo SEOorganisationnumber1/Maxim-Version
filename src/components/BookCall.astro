@@ -23,13 +23,13 @@ const wrapperProps = isDialog
   : { class: 'book book--page', 'aria-labelledby': 'book-title' };
 
 const lede = bookingUrl
-  ? 'Pick a time for a 30-minute video call about what you want to launch. Free, with no obligation.'
-  : 'Tell us what you want to launch and when suits you. We set up a 30-minute video call, free and with no obligation.';
+  ? 'Pick a time for a free 30-minute video call. No obligation.'
+  : 'Tell us when suits you. We send a calendar invite for a free 30-minute video call.';
 
 const points = [
-  'We go through your idea, who it is for and what you have so far.',
-  `Within ${site.responseTime ?? 'two business days'} after the call you get our approach and a fixed price in writing.`,
-  'You own the code, the designs and the accounts after the final payment.',
+  'We talk through your idea and what you have so far.',
+  `A fixed price in writing within ${site.responseTime ?? 'two business days'}.`,
+  'No obligation to go ahead.',
 ];
 // On /contact the written brief sits below the calendar; from the dialog it is one page away.
 const briefHref = isDialog ? '/contact#brief' : '#brief';
@@ -45,7 +45,7 @@ const briefHref = isDialog ? '/contact#brief' : '#brief';
       )
     }
     <div class="book__info">
-      <Title id="book-title" class="book__title">Book a free <span class="highlight">call.</span></Title>
+      <Title id="book-title" class="book__title">{bookingUrl ? 'Book a free ' : 'Request a '}<span class="highlight">call.</span></Title>
       <p class="book__lede">{lede}</p>
       <ul class="book__points">
         {
@@ -380,6 +380,8 @@ const briefHref = isDialog ? '/contact#brief' : '#brief';
     box-shadow: 0 30px 80px -30px rgb(10 17 40 / 0.45);
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.96);
+    /* Set by the script from the button that opened the dialog, so the panel grows out of it. */
+    transform-origin: var(--from-x, 50%) var(--from-y, 50%);
     transition:
       opacity 240ms var(--ease-out),
       transform 240ms var(--ease-out);
@@ -476,7 +478,7 @@ const briefHref = isDialog ? '/contact#brief' : '#brief';
       border-radius: var(--radius-tile) var(--radius-tile) 0 0;
       opacity: 1;
       transform: translateY(100%);
-      transition: transform 320ms var(--ease-out);
+      transition: transform 420ms cubic-bezier(0.32, 0.72, 0, 1);
     }
     .book--dialog[open] .book__panel {
       transform: none;
@@ -669,6 +671,18 @@ const briefHref = isDialog ? '/contact#brief' : '#brief';
       if (box) box.checked = true;
     }
     dialog.showModal();
+    // Grow the panel out of the button that opened it: its centre, as a point on the panel.
+    const panel = dialog.querySelector<HTMLElement>('.book__panel');
+    if (panel) {
+      const b = from.getBoundingClientRect();
+      const w = Math.min(1220, window.innerWidth - 32);
+      const h = Math.min(panel.scrollHeight, window.innerHeight - 48);
+      const left = (window.innerWidth - w) / 2;
+      const top = (window.innerHeight - h) / 2;
+      const clamp = (v: number) => Math.min(100, Math.max(0, v));
+      panel.style.setProperty('--from-x', `${clamp(((b.left + b.width / 2 - left) / w) * 100).toFixed(1)}%`);
+      panel.style.setProperty('--from-y', `${clamp(((b.top + b.height / 2 - top) / h) * 100).toFixed(1)}%`);
+    }
     mount();
     track('Book a call opened', { from: from.dataset.bookFrom ?? from.dataset.umamiEventFrom ?? '' });
   }

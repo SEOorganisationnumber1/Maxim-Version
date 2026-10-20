@@ -46,13 +46,8 @@ const sendErrorText = `Something went wrong sending your request. Please try aga
       </div>
     </div>
 
-    <div class="field">
-      <label for="c-site" class="field__label">Website <span class="field__hint">(optional)</span></label>
-      <input id="c-site" name="website" type="text" inputmode="url" autocomplete="url" maxlength="300" placeholder="yourdomain.com" class="field__control" />
-    </div>
-
     <fieldset class="needs">
-      <legend class="needs__legend">What do you need?</legend>
+      <legend class="needs__legend">What do you need? <span class="field__hint">(optional)</span></legend>
       <div class="needs__list">
         {
           services.map((service) => (
@@ -66,39 +61,29 @@ const sendErrorText = `Something went wrong sending your request. Please try aga
       </div>
     </fieldset>
 
-    <div class:list={[{ form__pair: !bookingUrl }]}>
-      <div class="field">
-        <label for="c-when" class="field__label">When do you want to start?</label>
-        <select id="c-when" name="timeline" class="field__control">
-          <option value="asap">As soon as possible</option>
-          <option value="1-3">In 1 to 3 months</option>
-          <option value="exploring">Just exploring</option>
-        </select>
-      </div>
-      {
-        !bookingUrl && (
-          <div class="field">
-            <label for="c-call" class="field__label">Best time for a call</label>
-            <select id="c-call" name="callTime" class="field__control" aria-describedby="c-call-hint">
-              {Object.entries(CALL_TIMES).map(([value, label]) => (
-                <option value={value}>{label}</option>
-              ))}
-            </select>
-            <p id="c-call-hint" class="field__note" data-tz-hint>In your time zone.</p>
-            <input type="hidden" name="timezone" value="" data-tz />
-          </div>
-        )
-      }
-    </div>
+    {
+      !bookingUrl && (
+        <div class="field">
+          <label for="c-call" class="field__label">Best time for a call</label>
+          <select id="c-call" name="callTime" class="field__control" aria-describedby="c-call-hint">
+            {Object.entries(CALL_TIMES).map(([value, label]) => (
+              <option value={value}>{label}</option>
+            ))}
+          </select>
+          <p id="c-call-hint" class="field__note" data-tz-hint>In your time zone.</p>
+          <input type="hidden" name="timezone" value="" data-tz />
+        </div>
+      )
+    }
 
     <div class="field">
-      <label for="c-msg" class="field__label">What should we know?</label>
+      <label for="c-msg" class="field__label">Anything we should know? <span class="field__hint">(optional)</span></label>
       <textarea
         id="c-msg"
         name="message"
         rows="4"
         maxlength="5000"
-        placeholder="What you are building, who it is for, and where things stand today."
+        placeholder="A line or two about your idea is plenty."
         class="field__control field__control--area"></textarea>
     </div>
 
@@ -227,6 +212,27 @@ const sendErrorText = `Something went wrong sending your request. Please try aga
   }
   .field__control[aria-invalid='true'] {
     border-color: var(--error);
+  }
+  .field__control.is-shaking {
+    animation: shake 300ms var(--ease-out);
+  }
+  @keyframes shake {
+    10%,
+    90% {
+      transform: translateX(-2px);
+    }
+    30%,
+    70% {
+      transform: translateX(4px);
+    }
+    50% {
+      transform: translateX(-4px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .field__control.is-shaking {
+      animation: none;
+    }
   }
   .field__control--area {
     min-height: 120px;
@@ -361,8 +367,7 @@ const sendErrorText = `Something went wrong sending your request. Please try aga
 
     const nameInput = $<HTMLInputElement>(form, '#c-name');
     const emailInput = $<HTMLInputElement>(form, '#c-email');
-    const siteInput = $<HTMLInputElement>(form, '#c-site');
-    const whenSelect = $<HTMLSelectElement>(form, '#c-when');
+
     // Only there while the form is the call request (no scheduling page set).
     const callSelect = form.querySelector<HTMLSelectElement>('#c-call');
     const zoneInput = form.querySelector<HTMLInputElement>('[data-tz]');
@@ -403,6 +408,12 @@ const sendErrorText = `Something went wrong sending your request. Please try aga
     let sending = false;
 
     function setInvalid(field: Field, invalid: boolean) {
+      if (invalid && field.input.getAttribute('aria-invalid') !== 'true') {
+        // A short shake beside the message, so the eye finds the field; never with reduced motion.
+        field.input.classList.remove('is-shaking');
+        void field.input.offsetWidth;
+        field.input.classList.add('is-shaking');
+      }
       field.input.setAttribute('aria-invalid', String(invalid));
       if (invalid) field.input.setAttribute('aria-describedby', field.error.id);
       else field.input.removeAttribute('aria-describedby');
@@ -451,9 +462,7 @@ const sendErrorText = `Something went wrong sending your request. Please try aga
       const payload = {
         name: nameInput.value.trim(),
         email: emailInput.value.trim(),
-        website: siteInput.value.trim(),
         needs: needs.filter((box) => box.checked).map((box) => box.value),
-        timeline: whenSelect.value,
         ...(callSelect ? { callTime: callSelect.value, timezone } : {}),
         message: messageInput.value.trim(),
       };

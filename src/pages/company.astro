@@ -12,22 +12,9 @@ const facts = filled([
 ]);
 
 const rules = [
-  {
-    title: 'Modern or nothing',
-    text: 'Current frameworks and current tooling. No legacy playbooks.',
-  },
-  {
-    title: 'Efficient by design',
-    text: 'Reusable systems, automation for the repetitive parts, people for the judgment calls.',
-  },
-  {
-    title: 'Outcomes over output',
-    text: 'Code is a means. We report on what shipped and what it changed for the business.',
-  },
-  {
-    title: 'Show the numbers',
-    text: 'Every month you see what we did, what it changed and what comes next.',
-  },
+  { title: 'Current tools', text: 'We use what works today and drop what stops working.' },
+  { title: 'Steady releases', text: 'You see working software early and often, not at the end.' },
+  { title: 'A report every month', text: 'What shipped, what changed and what comes next, in plain words.' },
 ];
 
 // Photo wells without a photo cycle through the three tints.
@@ -38,7 +25,7 @@ const tints = ['cyan', 'blue', 'violet'] as const;
   title="Company"
   current="/company"
   og="company"
-  description="A product studio for design, engineering and launch. We exist for one outcome: products that launch on time and keep working after they do."
+  description="A product studio for design, engineering and launch. We help products launch on time and keep working after they do."
 >
   <section class="hero bg-paper">
     <div class="hero__art" aria-hidden="true">
@@ -63,7 +50,7 @@ const tints = ['cyan', 'blue', 'violet'] as const;
         A product studio for design, engineering and <span class="highlight">launch.</span>
       </h1>
       <p class="lede hero__lede">
-        We exist for one outcome: products that launch on time and keep working after they do.
+        We help products launch on time and keep working after they do.
       </p>
     </div>
   </section>
@@ -86,22 +73,14 @@ const tints = ['cyan', 'blue', 'violet'] as const;
   <section class="bg-paper">
     <div class="container story">
       <div class="story__head">
-        <h2 class="h2">Most agencies sell hours. We sell outcomes.</h2>
+        <h2 class="h2">One team, from sketch to launch.</h2>
       </div>
       <div class="story__body">
         <p>
-          Design, engineering and growth sit in one team here, on purpose. A product that looks good
-          but breaks is a cost. A product that works but nobody finds is a leak. We build for both
-          from the first sketch.
+          Design, code and search work sit in one team here. Nothing gets lost between agencies, and the product that
+          launches is the one that was designed.
         </p>
-        <p>
-          We also keep our methods current. Frameworks, AI tooling and search all change every
-          quarter. We test what works today, keep what performs and drop the rest.
-        </p>
-        <p>
-          That is the whole model: modern tools, short release cycles, and a report every month that
-          shows what shipped and what moved.
-        </p>
+        <p>Frameworks, AI tools and search change every quarter. We test what works now, keep it, and drop the rest.</p>
       </div>
     </div>
   </section>
@@ -109,7 +88,7 @@ const tints = ['cyan', 'blue', 'violet'] as const;
   <section class="bg-paper">
     <div class="container block block--rules">
       <div class="block__head">
-        <h2 class="h2">Four rules we do not bend.</h2>
+        <h2 class="h2">How we work.</h2>
       </div>
       <ol class="rule-grid">
         {

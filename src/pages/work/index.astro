@@ -213,8 +213,10 @@ const countLabel = (n: number) => (n === 1 ? '1 project' : `${n} projects`);
   .work-card[hidden] {
     display: none;
   }
+  /* A 2:1 well keeps the screenshot's sides in view at every width; only the bottom bleeds off. */
   .work-card__shot {
-    min-height: 220px;
+    min-height: 0;
+    aspect-ratio: 2 / 1;
   }
   .work-card__body {
     display: flex;

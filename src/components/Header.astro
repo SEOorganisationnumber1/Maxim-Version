@@ -15,7 +15,7 @@ const isCurrent = (href: string) => (href === current ? 'page' : undefined);
 const CURVE = 'M3 8 C 22 2, 38 2, 52 6.5 S 80 11, 97 4';
 ---
 
-<header class="header">
+<header class="header" data-header>
   {/* The brand gradient for every nav curve, defined once (header and menu sheet). */}
   <svg class="nav-curve-defs" aria-hidden="true" focusable="false" width="0" height="0">
     <defs>
@@ -112,6 +112,27 @@ const CURVE = 'M3 8 C 22 2, 38 2, 52 6.5 S 80 11, 97 4';
 </div>
 
 <script>
+  // Marks the header once the page has scrolled, for its shadow. One passive listener, at most once a frame.
+  const header = document.querySelector<HTMLElement>('[data-header]');
+  if (header) {
+    let queued = false;
+    const mark = () => {
+      queued = false;
+      header.toggleAttribute('data-scrolled', window.scrollY > 8);
+    };
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (!queued) {
+          queued = true;
+          requestAnimationFrame(mark);
+        }
+      },
+      { passive: true },
+    );
+    mark();
+  }
+
   // The sheet covers the page, so while it is open the page behind it is inert for keyboard and
   // screen reader users. It also closes when the window grows past the breakpoint and when a
   // page comes back from the back/forward cache with the sheet still open.
@@ -135,9 +156,19 @@ const CURVE = 'M3 8 C 22 2, 38 2, 52 6.5 S 80 11, 97 4';
 </script>
 
 <style>
+  /* Sticky, so Book a call is always one tap away. A soft shadow appears once the page moves. */
   .header {
-    background: var(--white);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgb(255 255 255 / 0.9);
+    -webkit-backdrop-filter: saturate(1.5) blur(12px);
+    backdrop-filter: saturate(1.5) blur(12px);
     border-bottom: 1px solid var(--line);
+    transition: box-shadow 240ms var(--ease-out);
+  }
+  .header[data-scrolled] {
+    box-shadow: 0 10px 30px -22px rgb(10 17 40 / 0.45);
   }
   .header__inner {
     display: flex;
@@ -188,7 +219,7 @@ const CURVE = 'M3 8 C 22 2, 38 2, 52 6.5 S 80 11, 97 4';
     height: 10px;
     overflow: visible;
     pointer-events: none;
-    clip-path: inset(-4px 100% -4px -4px);
+    clip-path: inset(-4px calc(100% + 4px) -4px -4px);
     transition: clip-path 160ms cubic-bezier(0.23, 1, 0.32, 1);
   }
   .nav-curve path {
