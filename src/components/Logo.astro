@@ -12,7 +12,7 @@ const { id, class: className } = Astro.props;
 const descriptor = site.name.slice(site.shortName.length).trim();
 ---
 
-<a href="/" class:list={['logo', className]}>
+<a href="/" class:list={['logo', className]} aria-label={site.name}>
   <svg aria-hidden="true" width="30" height="30" viewBox="0 0 30 30" fill="none">
     <defs>
       <linearGradient id={id} x1="0" y1="0" x2="30" y2="30" gradientUnits="userSpaceOnUse">
@@ -27,8 +27,10 @@ const descriptor = site.name.slice(site.shortName.length).trim();
       stroke-width="6"
       stroke-linecap="round"></path>
   </svg>
-  <span>{site.shortName}</span>
-  {descriptor && <span class="logo__descriptor">{descriptor}</span>}
+  <span class="logo__words">
+    <span>{site.shortName}</span>
+    {descriptor && <span class="logo__descriptor">{descriptor}</span>}
+  </span>
 </a>
 
 <style>
@@ -44,6 +46,11 @@ const descriptor = site.name.slice(site.shortName.length).trim();
   }
   .logo svg {
     flex: none;
+  }
+  .logo__words {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
   }
   .logo__descriptor {
     margin-left: -4px;

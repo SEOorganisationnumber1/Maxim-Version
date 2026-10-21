@@ -1,7 +1,9 @@
 ---
+import { Image } from 'astro:assets';
 import Logo from './Logo.astro';
 import Icon from './Icon.astro';
 import { mainNav, site } from '../data/site';
+import { projects } from '../data/projects';
 
 interface Props {
   /** href of the nav item to mark as the current page, e.g. '/work'. */
@@ -13,10 +15,19 @@ const isCurrent = (href: string) => (href === current ? 'page' : undefined);
 
 /** The nav underline: one soft wave that ends rising, the hero ribbons in miniature. */
 const CURVE = 'M3 8 C 22 2, 38 2, 52 6.5 S 80 11, 97 4';
+
+/** The phone menu shows a small picture next to each page: real work for Work. */
+const workShot = projects.find((project) => !project.own && project.image)?.image ?? null;
 ---
 
+{/*
+  The header is an open bar at the top of the page. Once the page moves it gathers into a small
+  floating pill: the words of the logo step aside, the mark and the links slide to meet in the
+  middle (transforms only) and a clip draws the white layer in around them. On phones the pill
+  closes in around the bar, and the menu button grows it into a card.
+*/}
 <header class="header" data-header>
-  {/* The brand gradient for every nav curve, defined once (header and menu sheet). */}
+  {/* The brand gradient for every nav curve and the menu's marks, defined once. */}
   <svg class="nav-curve-defs" aria-hidden="true" focusable="false" width="0" height="0">
     <defs>
       <linearGradient id="nav-curve-gradient" x1="0" y1="0" x2="1" y2="0">
@@ -26,15 +37,16 @@ const CURVE = 'M3 8 C 22 2, 38 2, 52 6.5 S 80 11, 97 4';
       </linearGradient>
     </defs>
   </svg>
+  <div class="header__bg" aria-hidden="true"><div class="header__pill"></div></div>
   <div class="header__inner">
     <Logo id="logo-h" />
-    <nav aria-label="Main" class="header__nav">
+    <nav aria-label="Main" class="header__nav" data-header-nav>
       {
         mainNav.map((item) => (
           <a href={item.href} class="header__link" aria-current={isCurrent(item.href)}>
             {item.label}
             <svg class="nav-curve" aria-hidden="true" focusable="false" viewBox="0 0 100 12" preserveAspectRatio="none">
-              <path d={CURVE}></path>
+              <path d={CURVE} />
             </svg>
           </a>
         ))
@@ -50,9 +62,8 @@ const CURVE = 'M3 8 C 22 2, 38 2, 52 6.5 S 80 11, 97 4';
         Book a call
       </a>
     </nav>
-    {/* Below 900px the links move into the menu sheet. The Popover API opens and closes it,
-        Esc and the back button included, without JavaScript. */}
-    {/* Phones keep Book a call in the sticky bar, next to the menu, so it is never out of reach. */}
+    {/* Below 900px the links move into the menu card. The Popover API opens and closes it,
+        Esc and the back button included, without JavaScript. Book a call stays in the bar. */}
     <div class="header__end">
       <a
         href="/contact"
@@ -73,17 +84,33 @@ const CURVE = 'M3 8 C 22 2, 38 2, 52 6.5 S 80 11, 97 4';
 
 <div id="site-menu" class="menu" popover>
   <div class="menu__top">
-    <Logo id="logo-m" class="menu__logo" />
-    <button
-      type="button"
-      class="menu__close"
-      popovertarget="site-menu"
-      popovertargetaction="hide"
-      aria-label="Close menu"
-      autofocus
-    >
-      <Icon name="close" size={20} />
-    </button>
+    <a href="/" class="menu__home" aria-label={site.name}>
+      <svg aria-hidden="true" width="28" height="28" viewBox="0 0 30 30" fill="none">
+        <path d="M6 8 C 14 2, 26 8, 18 15 C 10 22, 20 28, 25 22" stroke="url(#nav-curve-gradient)" stroke-width="6" stroke-linecap="round"></path>
+      </svg>
+    </a>
+    <div class="menu__top-end">
+      <a
+        href="/contact"
+        class="header__cta header__cta--phone"
+        aria-current={isCurrent('/contact')}
+        data-book-call
+        data-umami-event="Book a call"
+        data-umami-event-from="menu-top"
+      >
+        Book a call
+      </a>
+      <button
+        type="button"
+        class="menu__close"
+        popovertarget="site-menu"
+        popovertargetaction="hide"
+        aria-label="Close menu"
+        autofocus
+      >
+        <Icon name="close" size={20} />
+      </button>
+    </div>
   </div>
   <nav aria-label="Main">
     <ul class="menu__links">
@@ -94,8 +121,23 @@ const CURVE = 'M3 8 C 22 2, 38 2, 52 6.5 S 80 11, 97 4';
               <span class="menu__label">
                 {item.label}
                 <svg class="nav-curve nav-curve--menu" aria-hidden="true" focusable="false" viewBox="0 0 100 12" preserveAspectRatio="none">
-                  <path d={CURVE}></path>
+                  <path d={CURVE} />
                 </svg>
+              </span>
+              <span class="menu__thumb" aria-hidden="true">
+                {item.href === '/work' && workShot && <Image src={workShot.src} alt="" widths={[200, 400]} sizes="96px" loading="lazy" class="menu__shot" />}
+                {item.href === '/services' && (
+                  <span class="menu__bento">
+                    <i />
+                    <i />
+                    <i />
+                  </span>
+                )}
+                {item.href === '/company' && (
+                  <svg viewBox="0 0 96 60" fill="none" preserveAspectRatio="xMidYMid slice">
+                    <path d="M-6 46 C 20 6, 46 62, 72 22 S 98 10, 104 16" stroke="url(#nav-curve-gradient)" stroke-width="12" stroke-linecap="round" />
+                  </svg>
+                )}
               </span>
             </a>
           </li>
@@ -106,7 +148,7 @@ const CURVE = 'M3 8 C 22 2, 38 2, 52 6.5 S 80 11, 97 4';
   <div class="menu__foot">
     <a
       href="/contact"
-      class="btn btn--light btn--lg"
+      class="btn btn--primary btn--lg"
       aria-current={isCurrent('/contact')}
       data-book-call
       data-umami-event="Book a call"
@@ -122,33 +164,67 @@ const CURVE = 'M3 8 C 22 2, 38 2, 52 6.5 S 80 11, 97 4';
       )
     }
   </div>
+  <svg class="menu__edge" aria-hidden="true" viewBox="0 0 400 30" preserveAspectRatio="none">
+    <path d="M-10 22 C 80 2, 160 30, 260 14 S 380 4, 410 12" stroke="url(#nav-curve-gradient)" stroke-width="8" fill="none" stroke-linecap="round"></path>
+  </svg>
 </div>
 
 <script>
-  // Marks the header once the page has scrolled, for its shadow. One passive listener, at most once a frame.
+  // ---------- The bar gathers into a pill once the page moves.
   const header = document.querySelector<HTMLElement>('[data-header]');
-  if (header) {
+  const logo = header?.querySelector<HTMLElement>('.header__inner > .logo');
+  const nav = header?.querySelector<HTMLElement>('[data-header-nav]');
+  if (header && logo && nav) {
+    const wide = window.matchMedia('(min-width: 900px)');
+    // Where the mark and the links have to slide to sit together in a centred pill. Layout offsets
+    // ignore transforms, so this can be measured in either state.
+    const measure = () => {
+      if (!wide.matches) return;
+      const glyph = logo.querySelector('svg');
+      const base = (logo.offsetParent as HTMLElement | null)?.offsetLeft ?? 0;
+      const glyphW = glyph?.getBoundingClientRect().width ?? 30;
+      const padL = 14;
+      const gap = 14;
+      const padR = 4;
+      const width = header.clientWidth;
+      const cluster = padL + glyphW + gap + nav.offsetWidth + padR;
+      const left = Math.round((width - cluster) / 2);
+      header.style.setProperty('--logo-x', `${left + padL - (base + logo.offsetLeft)}px`);
+      header.style.setProperty('--nav-x', `${Math.round(left + padL + glyphW + gap - (base + nav.offsetLeft))}px`);
+      header.style.setProperty('--pill-l', `${left}px`);
+      header.style.setProperty('--pill-r', `${Math.max(0, width - left - cluster)}px`);
+    };
+    let pill = false;
     let queued = false;
-    const mark = () => {
+    const update = () => {
       queued = false;
-      header.toggleAttribute('data-scrolled', window.scrollY > 8);
+      const next = window.scrollY > 24;
+      if (next === pill) return;
+      pill = next;
+      if (pill) measure();
+      header.toggleAttribute('data-pill', pill);
     };
     window.addEventListener(
       'scroll',
       () => {
         if (!queued) {
           queued = true;
-          requestAnimationFrame(mark);
+          requestAnimationFrame(update);
         }
       },
       { passive: true },
     );
-    mark();
+    window.addEventListener('resize', measure, { passive: true });
+    void document.fonts?.ready.then(measure);
+    measure();
+    update();
+    // Without this script the bar keeps a solid background, so the page never reads through it.
+    header.setAttribute('data-ready', '');
   }
 
-  // The sheet covers the page, so while it is open the page behind it is inert for keyboard and
-  // screen reader users. It also closes when the window grows past the breakpoint and when a
-  // page comes back from the back/forward cache with the sheet still open.
+  // ---------- The menu card covers the page, so the page behind it is inert for keyboard and
+  // screen reader users while it is open. It also closes when the window grows past the
+  // breakpoint and when a page comes back from the back/forward cache with it still open.
   const menu = document.getElementById('site-menu');
   if (menu && 'hidePopover' in menu) {
     const behind = [...document.querySelectorAll<HTMLElement>('.site > :not(#site-menu)')];
@@ -169,23 +245,38 @@ const CURVE = 'M3 8 C 22 2, 38 2, 52 6.5 S 80 11, 97 4';
 </script>
 
 <style>
-  /* Sticky, so Book a call is always one tap away. A soft shadow appears once the page moves. */
+  /* ---------- The bar, and the pill it gathers into ---------- */
+
   .header {
     position: sticky;
     top: 0;
     z-index: 50;
-    background: rgb(255 255 255 / 0.9);
-    -webkit-backdrop-filter: saturate(1.5) blur(12px);
-    backdrop-filter: saturate(1.5) blur(12px);
-    border-bottom: 1px solid var(--line);
-    transition: box-shadow 240ms var(--ease-out);
   }
-  .header[data-scrolled] {
-    box-shadow: 0 10px 30px -22px rgb(10 17 40 / 0.45);
+  /* Until the script runs (or without it) the bar is solid, so text never reads through it. */
+  .header:not([data-ready]) {
+    background: rgb(255 255 255 / 0.94);
+    border-bottom: 1px solid var(--line);
+  }
+  /* The shadow sits on a wrapper: a clip on the pill itself would cut it off. */
+  .header__bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    filter: drop-shadow(0 12px 22px rgb(10 17 40 / 0.12)) drop-shadow(0 1px 1px rgb(10 17 40 / 0.06));
+  }
+  .header__pill {
+    position: absolute;
+    inset: 0;
+    background: var(--surface);
+    opacity: 0;
+    clip-path: inset(0 0 0 0 round 0);
+    transition:
+      clip-path 560ms var(--ease-out),
+      opacity 260ms var(--ease-out);
   }
   .header__inner {
+    position: relative;
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: 8px 32px;
@@ -193,11 +284,20 @@ const CURVE = 'M3 8 C 22 2, 38 2, 52 6.5 S 80 11, 97 4';
     margin: 0 auto;
     padding: 16px var(--gutter);
   }
+  .header__inner > :global(.logo),
+  .header__nav,
+  .header__end {
+    transition: transform 560ms var(--ease-out);
+  }
+  .header__inner :global(.logo__words) {
+    transition:
+      opacity 220ms var(--ease-out),
+      visibility 0s;
+  }
   .header__nav {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
-    gap: 4px 8px;
+    gap: 4px;
   }
   .header__link {
     position: relative;
@@ -211,6 +311,25 @@ const CURVE = 'M3 8 C 22 2, 38 2, 52 6.5 S 80 11, 97 4';
   }
   .header__link:hover {
     color: var(--ink);
+  }
+
+  /* Gathered: the words of the logo step aside, the mark and the links meet in the middle. */
+  .header[data-pill] .header__pill {
+    opacity: 1;
+    clip-path: inset(12px var(--pill-r, 0px) 12px var(--pill-l, 0px) round 999px);
+  }
+  .header[data-pill] .header__inner :global(.logo__words) {
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 220ms var(--ease-out),
+      visibility 0s 220ms;
+  }
+  .header[data-pill] .header__inner > :global(.logo) {
+    transform: translateX(var(--logo-x, 0px));
+  }
+  .header[data-pill] .header__nav {
+    transform: translateX(var(--nav-x, 0px));
   }
 
   /* ---------- Nav curve ---------- */
@@ -269,6 +388,7 @@ const CURVE = 'M3 8 C 22 2, 38 2, 52 6.5 S 80 11, 97 4';
       opacity: 1;
     }
   }
+
   .header__cta {
     display: inline-flex;
     align-items: center;
@@ -299,7 +419,7 @@ const CURVE = 'M3 8 C 22 2, 38 2, 52 6.5 S 80 11, 97 4';
     color: var(--white);
   }
 
-  /* ---------- Menu button and sheet (below 900px) ---------- */
+  /* ---------- Phones: Book a call and the menu button in the bar ---------- */
 
   .header__menu-btn,
   .menu__close {
@@ -311,22 +431,15 @@ const CURVE = 'M3 8 C 22 2, 38 2, 52 6.5 S 80 11, 97 4';
     padding: 0;
     border: 1px solid var(--line);
     border-radius: 999px;
-    background: var(--white);
+    background: var(--surface);
     color: var(--ink);
     cursor: pointer;
-    transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+    transition: transform 160ms var(--ease-out);
   }
   .header__menu-btn:active,
   .menu__close:active {
     transform: scale(0.96);
   }
-  .menu__close {
-    display: grid;
-    background: transparent;
-    color: var(--white);
-    border-color: rgb(255 255 255 / 0.55);
-  }
-
   .header__end {
     display: none;
     align-items: center;
@@ -361,38 +474,63 @@ const CURVE = 'M3 8 C 22 2, 38 2, 52 6.5 S 80 11, 97 4';
     .header__menu-btn {
       display: grid;
     }
+    /* On phones the pill keeps everything where it is and closes in around it. */
+    .header[data-pill] .header__pill {
+      clip-path: inset(8px round 999px);
+    }
+    .header[data-pill] .header__inner :global(.logo__words) {
+      opacity: 1;
+      visibility: visible;
+    }
+    .header[data-pill] .header__inner > :global(.logo) {
+      transform: translateX(6px);
+    }
+    .header[data-pill] .header__end {
+      transform: translateX(-4px);
+    }
   }
+
+  /* ---------- Phone menu: the pill grows into a card ---------- */
 
   .menu {
     position: fixed;
-    inset: 0;
+    inset: 8px 8px auto;
     width: auto;
-    height: auto;
-    max-width: none;
-    max-height: none;
-    margin: 0;
+    max-width: 560px;
+    max-height: calc(100dvh - 16px);
+    margin: 0 auto;
     padding: 0;
     border: 0;
-    background: var(--ink);
-    color: var(--white);
+    border-radius: 26px;
+    background: var(--surface);
+    color: var(--ink);
     overflow-y: auto;
     overscroll-behavior: contain;
-    flex-direction: column;
-    opacity: 0;
+    box-shadow: 0 30px 70px -30px rgb(10 17 40 / 0.55);
+    clip-path: inset(0 0 calc(100% - 60px) 0 round 26px);
     transition:
-      opacity 140ms ease-out,
-      display 140ms allow-discrete,
-      overlay 140ms allow-discrete;
+      clip-path 520ms var(--ease-out),
+      display 520ms allow-discrete,
+      overlay 520ms allow-discrete;
   }
   .menu:popover-open {
-    display: flex;
-    opacity: 1;
-    transition-duration: 200ms;
-    transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+    clip-path: inset(0 round 26px);
   }
   @starting-style {
     .menu:popover-open {
-      opacity: 0;
+      clip-path: inset(0 0 calc(100% - 60px) 0 round 26px);
+    }
+  }
+  .menu::backdrop {
+    background: rgb(10 17 40 / 0.28);
+    transition:
+      background-color 400ms var(--ease-out),
+      display 400ms allow-discrete,
+      overlay 400ms allow-discrete;
+  }
+  @starting-style {
+    .menu:popover-open::backdrop {
+      background: rgb(10 17 40 / 0);
     }
   }
   @media (min-width: 900px) {
@@ -400,42 +538,69 @@ const CURVE = 'M3 8 C 22 2, 38 2, 52 6.5 S 80 11, 97 4';
       display: none !important;
     }
   }
+  /* The card's contents come in just after it opens, and leave first. */
+  .menu > :not(.menu__top) {
+    opacity: 0;
+    transition: opacity 200ms var(--ease-out);
+  }
+  .menu:popover-open > :not(.menu__top) {
+    opacity: 1;
+    transition-delay: 140ms;
+  }
+  @starting-style {
+    .menu:popover-open > :not(.menu__top) {
+      opacity: 0;
+    }
+  }
 
   .menu__top {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
-    padding: 16px var(--gutter);
-    border-bottom: 1px solid var(--footer-line);
+    gap: 8px;
+    height: 60px;
+    padding: 0 8px 0 14px;
   }
-  .menu :global(.menu__logo),
-  .menu :global(.menu__logo:hover) {
-    color: var(--white);
+  .menu__home {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin-left: -8px;
+  }
+  .menu__top-end {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .menu__close {
+    display: grid;
   }
 
   .menu__links {
     list-style: none;
     margin: 0;
-    padding: 24px var(--gutter) 0;
+    padding: 0;
   }
   .menu__links a {
     display: flex;
     align-items: center;
-    min-height: 64px;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 84px;
+    padding: 12px 18px;
+    border-top: 1px solid var(--line-soft);
     font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 40px;
-    line-height: 1.05;
+    font-weight: 800;
+    font-size: 30px;
+    line-height: 1.1;
     letter-spacing: -0.015em;
-    color: var(--white);
     text-decoration: none;
   }
-  .menu__links a:hover,
   .menu__links a[aria-current='page'] {
-    color: var(--cyan);
+    color: var(--teal-ink);
   }
-  /* The current page in the sheet carries the same wave, static and heavier, under its name. */
+  /* The current page in the card carries the same wave, static and heavier, under its name. */
   .menu__label {
     position: relative;
     display: inline-block;
@@ -456,53 +621,77 @@ const CURVE = 'M3 8 C 22 2, 38 2, 52 6.5 S 80 11, 97 4';
     display: block;
     opacity: 1;
   }
-  /* The sheet's one moment: links rise into place, 30 ms apart. Closing is quicker and all at once. */
-  .menu__links li {
-    opacity: 0;
-    transform: translateY(10px);
-    transition:
-      opacity 120ms ease-out,
-      transform 120ms ease-out;
+  .menu__thumb {
+    flex: none;
+    width: 96px;
+    height: 60px;
+    overflow: hidden;
+    border-radius: 12px;
+    border: 1px solid var(--line-soft);
+    background: var(--paper);
   }
-  .menu:popover-open .menu__links li {
-    opacity: 1;
-    transform: none;
-    transition-duration: 260ms;
-    transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+  .menu__thumb :global(.menu__shot),
+  .menu__thumb svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top left;
   }
-  .menu:popover-open .menu__links li:nth-child(1) { transition-delay: 40ms; }
-  .menu:popover-open .menu__links li:nth-child(2) { transition-delay: 70ms; }
-  .menu:popover-open .menu__links li:nth-child(3) { transition-delay: 100ms; }
-  .menu:popover-open .menu__links li:nth-child(4) { transition-delay: 130ms; }
-  .menu:popover-open .menu__links li:nth-child(5) { transition-delay: 160ms; }
-  @starting-style {
-    .menu:popover-open .menu__links li {
-      opacity: 0;
-      transform: translateY(10px);
-    }
+  /* Services: the bento in miniature. */
+  .menu__bento {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 4px;
+    height: 100%;
+    padding: 6px;
+  }
+  .menu__bento i {
+    border-radius: 5px;
+    background: var(--surface);
+    border: 1px solid var(--line-soft);
+  }
+  .menu__bento i:first-child {
+    grid-row: span 2;
+    background: var(--tint-cyan);
   }
 
   .menu__foot {
-    margin-top: auto;
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    padding: 32px var(--gutter) max(32px, env(safe-area-inset-bottom));
+    gap: 12px;
+    padding: 16px 18px 4px;
+    border-top: 1px solid var(--line-soft);
   }
   .menu__foot .btn {
     width: 100%;
   }
-  .menu__foot .btn[aria-current='page'] {
-    background: var(--white);
-  }
   .menu__mail {
     margin: 0;
     font-size: 15px;
-    color: var(--footer-text);
+    color: var(--ink-2);
   }
   .menu__mail a {
-    color: var(--white);
     font-weight: 700;
+  }
+  .menu__edge {
+    display: block;
+    width: 100%;
+    height: 30px;
+    margin-top: 8px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .header__pill,
+    .header__inner > :global(.logo),
+    .header__nav,
+    .header__end,
+    .menu,
+    .menu > *,
+    .menu::backdrop {
+      transition: none;
+    }
   }
 
   /* Browsers without the Popover API keep the wrapped link row instead of the menu. */

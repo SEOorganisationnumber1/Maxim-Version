@@ -459,8 +459,11 @@ const log = [...projects.filter((project) => !project.own), ...projects.filter((
     overflow: hidden;
     display: grid;
     place-items: center;
-    /* A little shorter than the screen, so the next section peeks in and invites the scroll. */
-    min-height: clamp(560px, calc(100svh - 77px - 72px), 860px);
+    /* A little shorter than the screen, so the next section peeks in and invites the scroll. It
+       starts under the open header bar, so the ribbons run behind it. */
+    min-height: clamp(636px, calc(100svh - 72px), 936px);
+    margin-top: -76px;
+    padding-top: 76px;
     background: var(--paper);
   }
   .hero__art {
@@ -630,6 +633,8 @@ const log = [...projects.filter((project) => !project.own), ...projects.filter((
   /* Phones: the ribbons become a band under the sentence instead of framing it. */
   @media (max-width: 899.98px) {
     .hero {
+      margin-top: -68px;
+      padding-top: 68px;
       min-height: 0;
       display: flex;
       flex-direction: column;

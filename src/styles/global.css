@@ -71,7 +71,8 @@ html:has(dialog[data-book-dialog][open]) { overflow: hidden; }
 
 body {
   margin: 0;
-  background: var(--ink);
+  /* The footer is white, so overscroll past the end of the page shows the same white. */
+  background: var(--surface);
 }
 
 .site {
@@ -94,8 +95,6 @@ a:hover { color: var(--teal-ink); }
 ::selection { background: rgb(28 202 216 / 0.32); color: var(--ink); }
 html { scrollbar-color: #b9c4d3 transparent; accent-color: var(--teal); }
 input, textarea { caret-color: var(--teal); }
-footer a { color: var(--footer-text); }
-footer a:hover { color: var(--white); }
 
 :focus-visible {
   outline: 3px solid var(--teal);

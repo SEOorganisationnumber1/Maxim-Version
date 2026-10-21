@@ -4,132 +4,238 @@ import { footerNav, services, site } from '../data/site';
 
 // Each build stamps the current year; the site rebuilds on every deploy.
 const year = new Date().getFullYear();
-const hasContact = Boolean(site.email || site.socials.length || site.location);
+
+/** The anchor of each service block on /services, as that page builds it. */
+const serviceAnchor = (name: string) =>
+  name
+    .toLowerCase()
+    .replace(/&/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
 ---
 
+{/* Light and quiet. The page's ribbons end on its top edge: a white wave with the brand ribbon along it. */}
 <footer class="footer">
+  <svg class="footer__edge" aria-hidden="true" focusable="false" viewBox="0 0 1440 56" preserveAspectRatio="none">
+    <defs>
+      <linearGradient id="footer-edge" x1="0" y1="0" x2="1440" y2="0" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#22D3DD"></stop>
+        <stop offset="0.55" stop-color="#2F8CF6"></stop>
+        <stop offset="1" stop-color="#5B4FE9"></stop>
+      </linearGradient>
+    </defs>
+    <path d="M0 40 C 220 6, 420 52, 720 30 S 1240 4, 1440 24 L 1440 57 L 0 57 Z" fill="#FFFFFF"></path>
+    <path
+      d="M0 40 C 220 6, 420 52, 720 30 S 1240 4, 1440 24"
+      stroke="url(#footer-edge)"
+      stroke-width="8"
+      fill="none"
+      stroke-linecap="round"
+      vector-effect="non-scaling-stroke"></path>
+  </svg>
   <div class="footer__inner">
     <div class="footer__cols">
       <div class="footer__brand">
-        <Logo id="logo-f" class="footer__logo" />
+        <Logo id="logo-f" />
         <p>{site.tagline}</p>
       </div>
-      <nav aria-label="Footer" class="footer__nav">
-        <span class="footer__head">Pages</span>
-        {footerNav.map((item) => <><a href={item.href}>{item.label}</a>{'\n'}</>)}
+      <nav aria-label="Footer" class="footer__pages">
+        <p class="footer__head">Pages</p>
+        <ul class="footer__links">
+          {
+            footerNav.map((item) => (
+              <li>
+                <a href={item.href}>{item.label}</a>
+              </li>
+            ))
+          }
+        </ul>
       </nav>
-      <div class="footer__list">
-        <span class="footer__head">We do</span>
-        {services.map((s) => <><span>{s}</span>{'\n'}</>)}
+      <div class="footer__build">
+        <p class="footer__head">What we build</p>
+        <ul class="footer__chips">
+          {
+            services.map((service) => (
+              <li>
+                <a href={`/services#${serviceAnchor(service)}`}>{service}</a>
+              </li>
+            ))
+          }
+        </ul>
       </div>
-      <div class="footer__list">
-        <span class="footer__head">Get in touch</span>
-        {site.email && <a href={`mailto:${site.email}`}>{site.email}</a>}
-        {site.socials.map((s) => <><a href={s.url} rel="me noopener" target="_blank">{s.label}</a>{'\n'}</>)}
-        {site.location && <span>{site.location}</span>}
-        {!hasContact && <a href="/contact" data-book-call data-umami-event="Book a call" data-umami-event-from="footer">Book a call</a>}
+      <div class="footer__touch">
+        <p class="footer__head">Get in touch</p>
+        <a href="/contact" class="footer__book" data-book-call data-umami-event="Book a call" data-umami-event-from="footer">Book a call</a>
+        {site.email && <a href={`mailto:${site.email}`} class="footer__plain">{site.email}</a>}
+        {
+          site.socials.map((social) => (
+            <a href={social.url} rel="me noopener" target="_blank" class="footer__plain">
+              {social.label}
+            </a>
+          ))
+        }
+        {site.location && <span class="footer__plain">{site.location}</span>}
       </div>
     </div>
     <div class="footer__bottom">
-      <span class="footer__legal">
-        <span>© {year} {site.name}</span>
-        <a href="/privacy">Privacy policy</a>
-      </span>
+      <span>© {year} {site.name}</span>
+      <a href="/privacy">Privacy policy</a>
     </div>
   </div>
 </footer>
 
 <style>
   .footer {
-    background: var(--ink);
-    color: var(--white);
+    position: relative;
+    background: var(--surface);
+    color: var(--ink);
+  }
+  /* Sits on top of whatever ends the page, so the wave reads as the footer rising into it. */
+  .footer__edge {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% - 1px);
+    display: block;
+    width: 100%;
+    height: clamp(28px, 4vw, 56px);
+    overflow: visible;
+    pointer-events: none;
   }
   .footer__inner {
     max-width: var(--container);
     margin: 0 auto;
-    padding: 64px var(--gutter) 32px;
-    display: flex;
-    flex-direction: column;
-    gap: 48px;
+    padding: 44px var(--gutter) 28px;
   }
   .footer__cols {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr) minmax(0, 1.8fr) minmax(0, 0.9fr);
     gap: 40px;
   }
-  .footer__brand {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-  .footer__brand :global(.footer__logo),
-  .footer__brand :global(.footer__logo:hover) {
-    color: var(--white);
-  }
   .footer__brand p {
-    margin: 0;
+    margin: 12px 0 0;
+    max-width: 22em;
     font-size: 15px;
     line-height: 1.6;
-    color: var(--footer-text);
+    color: var(--ink-2);
   }
   .footer__head {
-    padding-bottom: 8px;
+    margin: 0 0 12px;
     font-weight: 700;
     font-size: 15px;
-    color: var(--white);
+    line-height: 1.3;
+    color: var(--ink);
   }
-  .footer__nav {
-    display: flex;
-    flex-direction: column;
+  .footer__links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
   }
-  .footer__nav a {
-    display: flex;
+  .footer__links a,
+  .footer__plain {
+    display: inline-flex;
     align-items: center;
-    min-height: 44px;
-    font-size: 15px;
+    min-height: 40px;
     font-weight: 600;
+    font-size: 15px;
+    color: var(--ink-2);
     text-decoration: none;
-  }
-  .footer__list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .footer__list > span:not(.footer__head),
-  .footer__list > a {
-    font-size: 15px;
-    color: var(--footer-text);
-  }
-  .footer__list > a {
-    display: flex;
-    align-items: center;
-    min-height: 44px;
-    font-weight: 600;
     overflow-wrap: anywhere;
   }
-  .footer__list > a:hover {
+  .footer__links a:hover,
+  a.footer__plain:hover {
+    color: var(--teal-ink);
+  }
+  /* Every service goes to its own block on Services. */
+  .footer__chips {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .footer__chips a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 14px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--ink);
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    transition:
+      border-color 160ms var(--ease-out),
+      background-color 160ms var(--ease-out);
+  }
+  .footer__chips a:hover {
+    border-color: var(--ink);
+    background: var(--surface);
+  }
+  .footer__touch {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .footer__book {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 18px;
+    border-radius: 999px;
+    background: var(--ink);
     color: var(--white);
+    font-weight: 700;
+    font-size: 15px;
+    text-decoration: none;
+    transition:
+      transform 160ms var(--ease-out),
+      background-color 160ms var(--ease-out);
+  }
+  .footer__book:hover {
+    background: #1b2547;
+  }
+  .footer__book:active {
+    transform: scale(0.97);
   }
   .footer__bottom {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
     align-items: center;
-    gap: 12px;
-    border-top: 1px solid var(--footer-line);
-    padding-top: 24px;
+    gap: 0 24px;
+    margin-top: 44px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line-soft);
     font-size: 14px;
-    color: var(--footer-text);
+    color: var(--muted);
   }
-  .footer__legal {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0 20px;
-  }
-  .footer__legal a {
+  .footer__bottom a {
     display: inline-flex;
     align-items: center;
     min-height: 44px;
+    color: var(--ink-2);
+  }
+  @media (max-width: 999.98px) {
+    .footer__cols {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+  }
+  /* Phones: the name on top, pages and contact side by side, the services across the width. */
+  @media (max-width: 599.98px) {
+    .footer__cols {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 28px 20px;
+    }
+    .footer__brand,
+    .footer__build {
+      grid-column: 1 / -1;
+    }
+    .footer__build {
+      order: 3;
+    }
   }
 </style>
