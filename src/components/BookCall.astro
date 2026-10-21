@@ -545,6 +545,13 @@ const briefHref = isDialog ? '/contact#brief' : '#brief';
       animation: none;
     }
   }
+
+  /* Phones: on /contact the title is the page title, so it takes the page title size. */
+  @media (max-width: 639.98px) {
+    .book--page .book__title {
+      font-size: 42px;
+    }
+  }
 </style>
 
 <script>

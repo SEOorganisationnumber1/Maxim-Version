@@ -99,6 +99,8 @@ const workShot = projects.find((project) => !project.own && project.image)?.imag
         }
       </div>
 
+      {/* On wide screens these are two tiles; on phones they share one. */}
+      <div class="links">
       <nav class="tile pages" aria-label="Footer">
         <p class="tile__title">Pages</p>
         <ul>
@@ -123,6 +125,7 @@ const workShot = projects.find((project) => !project.own && project.image)?.imag
             ))
           }
         </ul>
+      </div>
       </div>
     </div>
     <div class="footer__bottom">
@@ -329,6 +332,9 @@ const workShot = projects.find((project) => !project.own && project.image)?.imag
     overflow-wrap: anywhere;
   }
 
+  .links {
+    display: contents;
+  }
   .pages {
     grid-area: pages;
   }
@@ -421,23 +427,59 @@ const workShot = projects.find((project) => !project.own && project.image)?.imag
       height: 90%;
     }
   }
+  /* Phones: the ending above already asks for the call, so the footer does not ask again. The
+     pages and what we build share one tile. */
   @media (max-width: 599.98px) {
+    .footer {
+      padding-top: 48px;
+    }
     .footer__grid {
       grid-template-columns: minmax(0, 1fr);
-      grid-template-areas: 'brand' 'next' 'touch' 'pages' 'build';
-      gap: 10px;
+      grid-template-areas: 'brand' 'next' 'links';
+      gap: 12px;
+    }
+    .touch {
+      display: none;
+    }
+    .links {
+      grid-area: links;
+      display: grid;
+      gap: 22px;
+      padding: 20px;
+      background: var(--surface);
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius-tile);
+      box-shadow: var(--shadow-tile);
+    }
+    .pages a {
+      min-height: 44px;
+    }
+    .links > .tile {
+      grid-area: auto;
+      padding: 0;
+      background: none;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
     }
     .tile {
       padding: 20px;
     }
     .brand {
-      min-height: 220px;
+      min-height: 160px;
+      gap: 14px;
+    }
+    .brand__line {
+      font-size: 22px;
     }
     .next {
-      grid-template-columns: minmax(0, 1fr) 104px;
+      grid-template-columns: minmax(0, 1fr) 76px;
+      gap: 14px;
     }
     .next__title {
-      font-size: 24px;
+      gap: 8px;
+      font-size: 22px;
+      white-space: nowrap;
     }
   }
   @media (prefers-reduced-motion: reduce) {

@@ -41,7 +41,7 @@ const DONE_AT_REST = 2;
   <!-- Websites: one layout that works at every width -->
   <article class="tile tile--web" aria-labelledby="tile-web">
     <div class="tile__meta">
-      <h3 class="tile__title" id="tile-web"><a href={more.web}>Websites & Landing Pages<Icon name="arrow-right" size={16} strokeWidth={2.6} class="tile__go" /></a></h3>
+      <h3 class="tile__title" id="tile-web"><a href={more.web}>Websites & Landing <span class="tile__end">Pages<Icon name="arrow-right" size={16} strokeWidth={2.6} class="tile__go" /></span></a></h3>
       <p class="tile__text">Fast sites that work on every screen.</p>
     </div>
     <div class="tile__stage tile__stage--web">
@@ -82,7 +82,7 @@ const DONE_AT_REST = 2;
   <!-- Telegram: a bot with yesterday's question and today's order -->
   <article class="tile tile--bot" aria-labelledby="tile-bot">
     <div class="tile__meta">
-      <h3 class="tile__title" id="tile-bot"><a href={more.bot}>Telegram Bots & Extensions<Icon name="arrow-right" size={16} strokeWidth={2.6} class="tile__go" /></a></h3>
+      <h3 class="tile__title" id="tile-bot"><a href={more.bot}>Telegram Bots & <span class="tile__end">Extensions<Icon name="arrow-right" size={16} strokeWidth={2.6} class="tile__go" /></span></a></h3>
       <p class="tile__text">Bots that take orders and answer customers.</p>
     </div>
     <div class="tile__stage tile__stage--bot">
@@ -124,7 +124,7 @@ const DONE_AT_REST = 2;
   <!-- Web apps: an unsaved change, ready to save -->
   <article class="tile tile--app" aria-labelledby="tile-app">
     <div class="tile__meta">
-      <h3 class="tile__title" id="tile-app"><a href={more.app}>Web Apps & SaaS<Icon name="arrow-right" size={16} strokeWidth={2.6} class="tile__go" /></a></h3>
+      <h3 class="tile__title" id="tile-app"><a href={more.app}>Web Apps & <span class="tile__end">SaaS<Icon name="arrow-right" size={16} strokeWidth={2.6} class="tile__go" /></span></a></h3>
       <p class="tile__text">Order systems, bookings and dashboards.</p>
     </div>
     <div class="tile__stage">
@@ -147,7 +147,7 @@ const DONE_AT_REST = 2;
   <!-- Mobile: a real screen that follows its dark mode switch -->
   <article class="tile tile--phone" aria-labelledby="tile-phone">
     <div class="tile__meta">
-      <h3 class="tile__title" id="tile-phone"><a href={more.phone}>Mobile & Desktop Apps<Icon name="arrow-right" size={16} strokeWidth={2.6} class="tile__go" /></a></h3>
+      <h3 class="tile__title" id="tile-phone"><a href={more.phone}>Mobile & Desktop <span class="tile__end">Apps<Icon name="arrow-right" size={16} strokeWidth={2.6} class="tile__go" /></span></a></h3>
       <p class="tile__text">Apps for iPhone, Android, Mac and Windows.</p>
     </div>
     <div class="tile__stage">
@@ -171,7 +171,7 @@ const DONE_AT_REST = 2;
   <!-- AI: an automation, half way through a run, read left to right -->
   <article class="tile tile--ai" aria-labelledby="tile-ai">
     <div class="tile__meta">
-      <h3 class="tile__title" id="tile-ai"><a href={more.ai}>AI & Automation<Icon name="arrow-right" size={16} strokeWidth={2.6} class="tile__go" /></a></h3>
+      <h3 class="tile__title" id="tile-ai"><a href={more.ai}>AI & <span class="tile__end">Automation<Icon name="arrow-right" size={16} strokeWidth={2.6} class="tile__go" /></span></a></h3>
       <p class="tile__text">Routine replies drafted for you to approve.</p>
     </div>
     <div class="tile__stage tile__stage--ai">
@@ -195,7 +195,7 @@ const DONE_AT_REST = 2;
   <!-- Search: a café on top of the results, and this page measured now -->
   <article class="tile tile--seo" aria-labelledby="tile-seo">
     <div class="tile__meta">
-      <h3 class="tile__title" id="tile-seo"><a href={more.seo}>Search & Growth<Icon name="arrow-right" size={16} strokeWidth={2.6} class="tile__go" /></a></h3>
+      <h3 class="tile__title" id="tile-seo"><a href={more.seo}>Search & <span class="tile__end">Growth<Icon name="arrow-right" size={16} strokeWidth={2.6} class="tile__go" /></span></a></h3>
       <p class="tile__text">Get found on Google and in ChatGPT.</p>
     </div>
     <div class="tile__stage tile__stage--seo">
@@ -224,6 +224,8 @@ const DONE_AT_REST = 2;
     </div>
   </article>
 </div>
+{/* Phones swipe through the tiles; these marks show where you are. */}
+<div class="bench__marks" aria-hidden="true" data-bench-marks>{Array.from({ length: 6 }, (_, i) => <i class:list={{ on: i === 0 }} />)}</div>
 
 <style>
   /* ---------- Grid: one wide tile, one tall tile, the rest standard ---------- */
@@ -254,13 +256,6 @@ const DONE_AT_REST = 2;
         'seo seo';
     }
   }
-  @media (max-width: 639.98px) {
-    .bench {
-      grid-template-columns: minmax(0, 1fr);
-      grid-template-areas: 'web' 'bot' 'app' 'phone' 'ai' 'seo';
-    }
-  }
-
   .tile {
     display: flex;
     flex-direction: column;
@@ -317,6 +312,10 @@ const DONE_AT_REST = 2;
   .tile__title a:hover,
   .tile__title a:focus-visible {
     color: var(--teal-ink);
+  }
+  /* The arrow stays with the last word, so it never drops onto a line of its own. */
+  .tile__end {
+    white-space: nowrap;
   }
   .tile__title a:hover :global(.tile__go),
   .tile__title a:focus-visible :global(.tile__go) {
@@ -1204,6 +1203,74 @@ const DONE_AT_REST = 2;
       border-right-color: var(--teal);
     }
   }
+
+  /* Phones: one row you swipe, each tile 86% wide with the next one peeking in, and the title
+     above its demo so you know what you are playing with. */
+  .bench__marks {
+    display: none;
+  }
+  @media (max-width: 639.98px) {
+    .bench {
+      display: flex;
+      gap: 12px;
+      margin: 0 calc(-1 * var(--gutter));
+      padding: 4px var(--gutter) 20px;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scroll-padding: 0 var(--gutter);
+      scrollbar-width: none;
+    }
+    .bench::-webkit-scrollbar {
+      display: none;
+    }
+    .tile {
+      flex: 0 0 86%;
+      scroll-snap-align: start;
+    }
+    .tile__meta {
+      order: 0;
+      padding: 20px 20px 16px;
+    }
+    .tile__stage {
+      min-height: 0;
+      padding: 18px;
+      border-top: 1px solid var(--line-soft);
+      border-bottom: 0;
+    }
+    .tile__title {
+      font-size: 20px;
+    }
+    /* A taller tap area without breaking the title's line. */
+    .tile__title a {
+      display: inline-block;
+      padding: 8px 0;
+      margin: -8px 0;
+    }
+    .chat {
+      min-height: 400px;
+    }
+    .bench__marks {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 2px;
+    }
+    .bench__marks i {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--line);
+      transition:
+        width 260ms var(--ease-out),
+        background-color 260ms var(--ease-out);
+    }
+    .bench__marks i.on {
+      width: 22px;
+      background: var(--ink);
+    }
+  }
+
 </style>
 
 <script>
@@ -1391,6 +1458,23 @@ const DONE_AT_REST = 2;
         if (runLabel) runLabel.textContent = 'Run again';
         setBusy(run, false);
       });
+    }
+
+    // ---------- Phones: the marks under the row follow the tile in view.
+    const marks = [...document.querySelectorAll<HTMLElement>('[data-bench-marks] i')];
+    const tiles = [...root.querySelectorAll<HTMLElement>('.tile')];
+    if (marks.length && tiles.length) {
+      const seen = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            const at = tiles.indexOf(entry.target as HTMLElement);
+            marks.forEach((mark, i) => mark.classList.toggle('on', i === at));
+          }
+        },
+        { root, threshold: 0.6 },
+      );
+      tiles.forEach((tile) => seen.observe(tile));
     }
 
     // ---------- Search: real numbers for this page load, from the browser's own timing data.

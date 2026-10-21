@@ -141,7 +141,7 @@ const log = [...projects.filter((project) => !project.own), ...projects.filter((
         <div class="block__title">
           <h2 class="h2">What we build.</h2>
         </div>
-        <a href="/services" class="text-link">All services<Icon name="arrow-right" /></a>
+        <a href="/services" class="text-link see-all">All services<Icon name="arrow-right" /></a>
       </div>
       <Workbench />
     </div>
@@ -170,7 +170,7 @@ const log = [...projects.filter((project) => !project.own), ...projects.filter((
         <div class="container block">
           <div class="block__head">
             <h2 class="h2" id="work-title">Recent work.</h2>
-            <a href="/work" class="text-link">All work<Icon name="arrow-right" /></a>
+            <a href="/work" class="text-link see-all">All work<Icon name="arrow-right" /></a>
           </div>
           <div class="log-wrap" data-log-wrap>
             <ol class="log" data-log>
@@ -247,7 +247,7 @@ const log = [...projects.filter((project) => !project.own), ...projects.filter((
       <div class="terms__side">
         <h2 class="h2" id="terms-title">What you get in writing.</h2>
         <p class="block__intro">How every project works, before you sign anything.</p>
-        <a href="/services#terms" class="text-link">All terms<Icon name="arrow-right" /></a>
+        <a href="/services#terms" class="text-link see-all">All terms<Icon name="arrow-right" /></a>
       </div>
       <article class="doc" data-doc aria-labelledby="doc-title">
         <div class="doc__head">
@@ -1191,6 +1191,40 @@ const log = [...projects.filter((project) => !project.own), ...projects.filter((
       display: inline;
       -webkit-box-decoration-break: clone;
       box-decoration-break: clone;
+    }
+  }
+
+  /* ---------- Phones: one rhythm. 64px above each section, 24px from its title to its content,
+     and the "see all" link closes the section as a full-width button. ---------- */
+  @media (max-width: 639.98px) {
+    .hero__title {
+      font-size: 42px;
+    }
+    .hero__actions {
+      max-width: none;
+    }
+    .block {
+      padding-top: 64px;
+      padding-bottom: 0;
+      gap: 24px;
+    }
+    .block__head {
+      display: contents;
+    }
+    .terms {
+      gap: 24px;
+    }
+    .terms__side {
+      display: contents;
+    }
+    .terms__side .block__intro {
+      margin-top: -12px;
+    }
+    .end {
+      padding-top: 72px;
+    }
+    .end__title {
+      font-size: 42px;
     }
   }
 </style>

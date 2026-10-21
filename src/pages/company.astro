@@ -275,4 +275,20 @@ const tints = ['cyan', 'blue', 'violet'] as const;
     font-size: 15px;
     color: var(--ink-2);
   }
+
+  /* ---------- Phones: the same rhythm as every page ---------- */
+  @media (max-width: 639.98px) {
+    .hero__inner {
+      padding-top: 40px;
+      padding-bottom: 0;
+    }
+    .story,
+    .block {
+      padding-top: 64px;
+      padding-bottom: 0;
+    }
+    .story {
+      gap: 24px;
+    }
+  }
 </style>

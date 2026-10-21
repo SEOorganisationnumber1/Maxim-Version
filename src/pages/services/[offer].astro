@@ -130,7 +130,7 @@ const jsonLd: Record<string, unknown>[] = [
           <h2 class="h2">How a project runs.</h2>
           <p class="block__intro">{offer.steps.intro}</p>
         </div>
-        <a href="/services#terms" class="text-link">All terms<Icon name="arrow-right" /></a>
+        <a href="/services#terms" class="text-link see-all">All terms<Icon name="arrow-right" /></a>
       </div>
       <ol class="steps">
         {
@@ -520,6 +520,62 @@ const jsonLd: Record<string, unknown>[] = [
   @media (hover: hover) and (pointer: fine) {
     .pill:hover :global(svg) {
       transform: translateX(3px);
+    }
+  }
+
+  /* ---------- Phones: one rhythm, the examples you swipe, "All terms" closing its section ---------- */
+  @media (max-width: 639.98px) {
+    .hero__inner {
+      padding-top: 24px;
+      padding-bottom: 0;
+      gap: 32px;
+    }
+    .hero__title {
+      font-size: 42px;
+    }
+    .hero__actions {
+      width: 100%;
+      flex-direction: column;
+    }
+    .block {
+      padding-top: 64px;
+      padding-bottom: 0;
+      gap: 24px;
+    }
+    .block__head--row {
+      display: contents;
+    }
+    .block__intro {
+      font-size: 17px;
+    }
+    .examples {
+      display: flex;
+      gap: 12px;
+      margin: 0 calc(-1 * var(--gutter));
+      padding: 4px var(--gutter) 20px;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scroll-padding: 0 var(--gutter);
+      scrollbar-width: none;
+    }
+    .examples::-webkit-scrollbar {
+      display: none;
+    }
+    .example {
+      flex: 0 0 86%;
+      padding: 20px;
+      scroll-snap-align: start;
+    }
+    .example__title {
+      font-size: 20px;
+    }
+    .gets {
+      padding: 6px 20px 20px;
+    }
+    .more {
+      padding-top: 64px;
+      padding-bottom: 0;
     }
   }
 </style>

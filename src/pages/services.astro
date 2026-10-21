@@ -303,15 +303,20 @@ const faqPageJsonLd: Record<string, unknown> = {
   <section id="services" class="anchor bg-paper">
     <div class="container services__inner">
       {
-        serviceBlocks.map((service) => (
+        serviceBlocks.map((service, index) => (
           <article class="service anchor" id={service.name.toLowerCase().replace(/&/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}>
             <div class="service__col">
               <h2 class="service__title">{service.name}</h2>
               <p class="service__text">{service.description}</p>
             </div>
-            <div class="service__col">
+            <div class="service__col" data-get>
               <h3 class="service__label">What you get</h3>
-              <ul class="service__list">
+              {/* Phones: the list starts closed and opens with a tap (the script turns this on). */}
+              <button type="button" class="service__toggle" aria-expanded="true" aria-controls={`get-${index}`} data-get-toggle>
+                What you get
+                <span class="service__sign" aria-hidden="true" />
+              </button>
+              <ul class="service__list" id={`get-${index}`}>
                 {service.deliverables.map((item) => (
                   <li>{item}</li>
                 ))}
@@ -443,6 +448,31 @@ const faqPageJsonLd: Record<string, unknown> = {
     pad="bottom"
   />
 </Base>
+
+<script>
+  // Phones: each "What you get" list starts closed and opens with a tap. Wider screens always
+  // show it. Without this script every list simply stays open.
+  const phone = window.matchMedia('(max-width: 639.98px)');
+  const groups = [...document.querySelectorAll<HTMLElement>('[data-get]')];
+  const setUp = () => {
+    for (const group of groups) {
+      const button = group.querySelector<HTMLButtonElement>('[data-get-toggle]');
+      group.toggleAttribute('data-collapsible', phone.matches);
+      group.toggleAttribute('data-open', false);
+      button?.setAttribute('aria-expanded', String(!phone.matches));
+    }
+  };
+  for (const group of groups) {
+    const button = group.querySelector<HTMLButtonElement>('[data-get-toggle]');
+    button?.addEventListener('click', () => {
+      const open = !group.hasAttribute('data-open');
+      group.toggleAttribute('data-open', open);
+      button.setAttribute('aria-expanded', String(open));
+    });
+  }
+  phone.addEventListener('change', setUp);
+  setUp();
+</script>
 
 <style>
   /* Anchored sections: keep the top edge off the viewport edge after a jump. */
@@ -857,5 +887,122 @@ const faqPageJsonLd: Record<string, unknown> = {
     font-size: 16px;
     line-height: 1.65;
     color: var(--ink-2);
+  }
+
+  /* ---------- Phones: one rhythm, lists that open on tap, plans you swipe ---------- */
+  .service__toggle {
+    display: none;
+  }
+  @media (max-width: 639.98px) {
+    .hero__inner {
+      padding-top: 40px;
+      padding-bottom: 0;
+    }
+    .services__inner {
+      padding-top: 32px;
+      gap: 12px;
+    }
+    .stack__inner,
+    .pricing__inner,
+    .terms__inner,
+    .faq__inner {
+      padding-top: 64px;
+    }
+    .services__inner,
+    .stack__inner,
+    .pricing__inner,
+    .terms__inner,
+    .faq__inner {
+      padding-bottom: 0;
+    }
+    .stack__inner,
+    .pricing__inner,
+    .terms__inner,
+    .faq__inner {
+      gap: 24px;
+    }
+    .section-head__text {
+      font-size: 17px;
+    }
+    .service {
+      gap: 16px;
+      padding: 20px;
+    }
+    .service__title {
+      font-size: 24px;
+    }
+    .service__col + .service__col {
+      padding-top: 0;
+    }
+    [data-collapsible] .service__label {
+      display: none;
+    }
+    [data-collapsible] .service__toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      min-height: 52px;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: var(--ink);
+      font: 700 16px/1.2 var(--font-body);
+      text-align: left;
+      cursor: pointer;
+    }
+    [data-collapsible]:not([data-open]) .service__list {
+      display: none;
+    }
+    /* Plus that turns into a minus when the list is open. */
+    .service__sign {
+      position: relative;
+      flex: none;
+      width: 30px;
+      height: 30px;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+    }
+    .service__sign::before,
+    .service__sign::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 12px;
+      height: 2px;
+      margin: -1px 0 0 -6px;
+      border-radius: 2px;
+      background: var(--ink);
+      transition: transform 260ms var(--ease-out);
+    }
+    .service__sign::after {
+      transform: rotate(90deg);
+    }
+    [data-open] .service__sign::after {
+      transform: rotate(0deg);
+    }
+    .plans {
+      display: flex;
+      gap: 12px;
+      margin: 0 calc(-1 * var(--gutter));
+      padding: 4px var(--gutter) 20px;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scroll-padding: 0 var(--gutter);
+      scrollbar-width: none;
+    }
+    .plans::-webkit-scrollbar {
+      display: none;
+    }
+    .plan {
+      flex: 0 0 86%;
+      padding: 24px;
+      scroll-snap-align: start;
+    }
+    .plan__period {
+      font-size: 14px;
+    }
   }
 </style>

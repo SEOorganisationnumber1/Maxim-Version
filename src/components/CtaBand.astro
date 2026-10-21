@@ -145,4 +145,26 @@ const {
     flex-wrap: wrap;
     gap: 12px;
   }
+
+  /* ---------- Phones: 64px above it like every section, a compact band, the button across ---------- */
+  @media (max-width: 639.98px) {
+    .cta,
+    .cta--bottom {
+      padding: 64px var(--gutter) 0;
+    }
+    .cta__band {
+      gap: 22px;
+      padding: 30px 22px;
+    }
+    .cta__copy h2 {
+      font-size: 30px;
+      line-height: 1.1;
+    }
+    .cta__copy p {
+      font-size: 16px;
+    }
+    .cta__actions {
+      width: 100%;
+    }
+  }
 </style>

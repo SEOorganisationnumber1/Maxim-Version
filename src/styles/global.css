@@ -252,6 +252,39 @@ img, svg { max-width: 100%; }
   font-size: 16px;
 }
 
+/* ---------- Phones: one type scale, one main button, one "see all" ---------- */
+
+@media (max-width: 639.98px) {
+  .h1 {
+    font-size: 42px;
+    line-height: 1.06;
+    letter-spacing: -0.03em;
+  }
+  .h2 {
+    font-size: 30px;
+    line-height: 1.1;
+  }
+  /* The main action of a section fills the width, where the thumb is. */
+  .btn--lg {
+    width: 100%;
+    min-height: 54px;
+  }
+  /* "All work", "All services" and the like close their section as a full-width outline button. */
+  .see-all {
+    order: 99;
+    justify-content: center;
+    width: 100%;
+    min-height: 54px;
+    padding: 0 22px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 17px;
+    text-decoration: none;
+  }
+}
+
 /* ---------- Chips and toggles ---------- */
 
 .chip {
