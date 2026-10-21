@@ -32,9 +32,6 @@ export type Offer = {
   cta: { title: string; text: string };
 };
 
-/** The three written promises of every project, as on Home. */
-export const offerPromises = ['Fixed price in writing', 'You own the code', '30 days of free fixes'];
-
 const callStep = (topic: string): OfferItem => ({
   title: 'A free call',
   text: `30 minutes on ${topic}. You leave with a clear next step.`,

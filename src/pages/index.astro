@@ -1,11 +1,10 @@
 ---
 import Base from '../layouts/Base.astro';
-import CtaBand from '../components/CtaBand.astro';
 import Icon from '../components/Icon.astro';
 import Workbench from '../components/Workbench.astro';
 import { Image } from 'astro:assets';
 import { filled, numbers, site } from '../data/site';
-import { cardLine, clients, projects, projectUrl } from '../data/projects';
+import { clients, projects, projectUrl } from '../data/projects';
 import { ribbonPath } from '../scripts/hero-ribbons';
 
 /** "Trusted by:" chips, clients only (never our own products). Past CHIP_LIMIT the rest are behind "+ more brands". */
@@ -20,26 +19,18 @@ const stats = filled([
   { value: numbers.retention, label: 'clients who stay past year one' },
 ]);
 
-/** Written promises from the Services terms: the trust we can offer without faces or logos. */
-const promises = ['Free 30-minute call', 'Fixed price in writing', 'You own the code'];
-
-/** The terms that matter most before a first call. The full list lives on Services. */
+/** The terms that matter most before a first call, written as the clauses of an agreement. The full list lives on Services. */
 const terms = [
-  { title: 'A fixed price, in writing', text: 'Agreed before any work starts.' },
-  { title: 'Pay in stages', text: 'Half to start, half at launch.' },
-  { title: 'Everything is yours', text: 'Code, designs and accounts, in your name.' },
-  { title: '30 days of free fixes', text: 'Any bug after launch, fixed at no cost.' },
+  { title: 'A fixed price, in writing.', text: 'Agreed before any work starts.' },
+  { title: 'Pay in stages.', text: 'Half to start, half at launch.' },
+  { title: 'Everything is yours.', text: 'Code, designs and accounts, in your name.' },
+  { title: '30 days of free fixes.', text: 'Any bug after launch, fixed at no cost.' },
 ];
-// Work we built for others leads: the first gets the large card with its own art, the next two get
-// small cards in the Work page looks. Cards link once their case study is written. Our own product
-// follows as one line, never as the lead case.
-const built = projects.filter((project) => !project.own);
-const ownProduct = projects.find((project) => project.own && project.site);
-const [featured, ...others] = built;
-const featuredUrl = featured ? projectUrl(featured) : null;
-const featuredResult = featured?.caseStudy?.results[0];
-const FeaturedCard = featuredUrl ? 'a' : 'article';
-const smallCards = others.slice(0, 2).map((project) => ({ project, url: projectUrl(project) }));
+
+// Recent work is a log of real, named projects: work we built for others first, our own product last.
+// Each row opens in place to the real screenshot and what we built. With a fine pointer, the
+// screenshot also trails the pointer down the list. A row says Live only when there is a public site.
+const log = [...projects.filter((project) => !project.own), ...projects.filter((project) => project.own)];
 
 ---
 
@@ -48,7 +39,7 @@ const smallCards = others.slice(0, 2).map((project) => ({ project, url: projectU
   fullTitle
   description={`${site.name} designs and builds websites, web and mobile apps, desktop apps, Telegram bots and browser extensions, then helps them grow through search.`}
 >
-  <!-- Hero: the brand's ribbons, one sentence, two actions, three written promises -->
+  <!-- Hero: the brand's ribbons, one sentence, two actions -->
   <section class="hero" data-hero-ribbons>
     <div aria-hidden="true" class="hero__art hero__art--left" data-ribbon-art="left">
       <svg viewBox="0 0 400 640" preserveAspectRatio="xMaxYMid slice" fill="none">
@@ -105,23 +96,12 @@ const smallCards = others.slice(0, 2).map((project) => ({ project, url: projectU
 
     <div class="hero__content">
       <h1 class="hero__title">We design, build and launch <span class="highlight hero__mark">websites and apps.</span></h1>
-      <p class="hero__lede">Plus Telegram bots, browser extensions and AI tools. One team, from first sketch to launch day.</p>
       <div class="hero__actions">
         <a href="/contact" class="btn btn--primary btn--lg" data-book-call data-umami-event="Book a call" data-umami-event-from="hero">
           Book a call<Icon name="arrow-right" />
         </a>
         <a href="/work" class="btn btn--outline btn--lg" data-motion-fallback>See our work</a>
       </div>
-      <ul class="hero__promises">
-        {
-          promises.map((promise) => (
-            <li>
-              <Icon name="check" size={16} strokeWidth={2.8} />
-              {promise}
-            </li>
-          ))
-        }
-      </ul>
       {
         chips.length > 0 && (
           <div class="hero__proof">
@@ -184,200 +164,174 @@ const smallCards = others.slice(0, 2).map((project) => ({ project, url: projectU
     )
   }
 
-  <!-- Recent work -->
+  <!-- Recent work: a log of real, named projects -->
   {
-    featured && (
-      <section class="bg-paper">
+    log.length > 0 && (
+      <section class="bg-paper" aria-labelledby="work-title">
         <div class="container block">
           <div class="block__head">
-            <div class="block__title">
-              <h2 class="h2">Recent work.</h2>
-            </div>
+            <h2 class="h2" id="work-title">Recent work.</h2>
             <a href="/work" class="text-link">All work<Icon name="arrow-right" /></a>
           </div>
-
-          <div class="work">
-            <FeaturedCard
-              href={featuredUrl ?? undefined}
-              class:list={['card', 'featured', { 'featured--compact': !featured.summary && !featuredResult && !featuredUrl }]}
-            >
-              <div class="shot shot--cyan featured__shot">
-                <svg aria-hidden="true" viewBox="0 0 600 400" preserveAspectRatio="xMidYMid slice" fill="none">
-                  <defs>
-                    <linearGradient id="work-a" x1="0" y1="0" x2="600" y2="400" gradientUnits="userSpaceOnUse">
-                      <stop offset="0" stop-color="#22D3DD" />
-                      <stop offset="1" stop-color="#2F8CF6" />
-                    </linearGradient>
-                  </defs>
-                  <path
-                    d="M-40 300 C 120 180, 220 420, 360 280 C 480 160, 520 60, 660 90"
-                    stroke="url(#work-a)"
-                    stroke-width="72"
-                    stroke-linecap="round"
-                  />
-                </svg>
-                {featured.image && (
-                  <Image
-                    src={featured.image.src}
-                    alt={featured.image.alt}
-                    widths={[640, 960, 1280, 1600]}
-                    sizes="(min-width: 1240px) 720px, (min-width: 800px) 58vw, 88vw"
-                    class="shot__img"
-                  />
-                )}
-              </div>
-              <div class="featured__body">
-                <div class="featured__copy">
-                  <span class="tagline">{cardLine(featured)}</span>
-                  <h3 class="featured__name">{featured.name}</h3>
-                  {featured.plain && <p class="featured__summary">{featured.plain}</p>}
-                </div>
-                {featured.facts.length > 0 && (
-                  <ul class="facts" aria-label="What's in it">
-                    {featured.facts.map((fact) => (
-                      <li>
-                        <Icon name="check" size={16} strokeWidth={2.8} />
-                        {fact}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                {(featuredResult || featuredUrl || featured.site) && (
-                  <div class="featured__foot">
-                    {featuredResult && (
-                      <div class="featured__metric">
-                        <span class="featured__value">{featuredResult.value}</span>
-                        <span class="featured__label">{featuredResult.label}</span>
-                      </div>
-                    )}
-                    {featuredUrl ? (
-                      <span class="featured__read">
-                        Read the case
-                        <Icon name="arrow-right" />
+          <div class="log-wrap" data-log-wrap>
+            <ol class="log" data-log>
+              {log.map((project) => {
+                const url = projectUrl(project);
+                const id = `log-${project.slug}`;
+                return (
+                  <li class="log__row" data-log-row={project.slug}>
+                    <button type="button" class="log__toggle" aria-expanded="false" aria-controls={id}>
+                      <span class="log__name">
+                        {project.name}
+                        {project.site && <span class="live">Live</span>}
                       </span>
-                    ) : (
-                      featured.site && (
-                        <a href={featured.site} class="featured__read" target="_blank" rel="noopener">
-                          Visit {new URL(featured.site).hostname}
-                          <span class="visually-hidden"> (opens in a new tab)</span>
-                          <Icon name="arrow-up-right" />
-                        </a>
-                      )
-                    )}
-                  </div>
+                      <span class="log__what">{project.own ? `Our own product. ${project.plain ?? ''}` : project.plain}</span>
+                      <span class="log__kind">{project.kind}</span>
+                      <span class="log__plus" aria-hidden="true" />
+                    </button>
+                    <div class="log__open" id={id} inert>
+                      <div class="log__inner">
+                        <div class="log__detail">
+                          {project.image && (
+                            <div class="log__shot">
+                              <Image
+                                src={project.image.src}
+                                alt={project.image.alt}
+                                widths={[640, 960, 1280]}
+                                sizes="(min-width: 1240px) 620px, (min-width: 800px) 52vw, 92vw"
+                                loading="lazy"
+                              />
+                            </div>
+                          )}
+                          <div class="log__about">
+                            {project.summary && <p class="log__summary">{project.summary}</p>}
+                            {url && (
+                              <a href={url} class="text-link">
+                                Read the case
+                                <Icon name="arrow-right" />
+                              </a>
+                            )}
+                            {project.site && (
+                              <a href={project.site} class="text-link" target="_blank" rel="noopener">
+                                Visit {new URL(project.site).hostname}
+                                <span class="visually-hidden"> (opens in a new tab)</span>
+                                <Icon name="arrow-up-right" />
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+            <div class="peek" aria-hidden="true" data-peek>
+              <div class="peek__card">
+                {log.map(
+                  (project) =>
+                    project.image && (
+                      <Image src={project.image.src} alt="" widths={[400, 800]} sizes="320px" loading="lazy" class="peek__img" data-peek-for={project.slug} />
+                    ),
                 )}
               </div>
-            </FeaturedCard>
-
-            {smallCards.length > 0 && (
-              <div class="work__grid">
-                {smallCards.map(({ project, url }) => {
-                  const Card = url ? 'a' : 'article';
-                  const gradientId = `work-${project.slug}`;
-                  return (
-                    <Card href={url ?? undefined} class="card">
-                      <div class:list={['shot', `shot--${project.look.tone}`, 'small__shot']}>
-                        <svg aria-hidden="true" viewBox="0 0 600 240" preserveAspectRatio="xMidYMid slice" fill="none">
-                          <defs>
-                            <linearGradient id={gradientId} x1="0" y1="0" x2="600" y2="240" gradientUnits="userSpaceOnUse">
-                              <stop offset="0" stop-color={project.look.gradient[0]} />
-                              <stop offset="1" stop-color={project.look.gradient[1]} />
-                            </linearGradient>
-                          </defs>
-                          <path d={project.look.path} stroke={`url(#${gradientId})`} stroke-width="60" stroke-linecap="round" />
-                        </svg>
-                        {project.image && (
-                          <Image
-                            src={project.image.src}
-                            alt={project.image.alt}
-                            widths={[480, 800, 1200]}
-                            sizes="(min-width: 1240px) 560px, (min-width: 800px) 45vw, 88vw"
-                            class="shot__img"
-                          />
-                        )}
-                      </div>
-                      <div class="small__body">
-                        <span class="tagline">{cardLine(project)}</span>
-                        <h3 class="small__name">{project.name}</h3>
-                        {project.plain && <p class="small__summary">{project.plain}</p>}
-                        {project.facts.length > 0 && (
-                          <ul class="facts facts--small" aria-label="What's in it">
-                            {project.facts.map((fact) => (
-                              <li>
-                                <Icon name="check" size={15} strokeWidth={2.8} />
-                                {fact}
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                        {!url && project.site && (
-                          <a href={project.site} class="small__visit" target="_blank" rel="noopener">
-                            Visit {new URL(project.site).hostname}
-                            <span class="visually-hidden"> (opens in a new tab)</span>
-                            <Icon name="arrow-up-right" />
-                          </a>
-                        )}
-                      </div>
-                    </Card>
-                  );
-                })}
-              </div>
-            )}
-
-            {ownProduct && ownProduct.site && (
-              <div class="own">
-                {ownProduct.image && (
-                  <Image
-                    src={ownProduct.image.src}
-                    alt=""
-                    widths={[160, 320]}
-                    sizes="160px"
-                    class="own__img"
-                  />
-                )}
-                <p class="own__text">
-                  <b>We run our own product too.</b> {ownProduct.name} {ownProduct.plain?.replace(/^./, (c) => c.toLowerCase())}
-                </p>
-                <a href={ownProduct.site} class="own__link" target="_blank" rel="noopener">
-                  Visit {new URL(ownProduct.site).hostname}
-                  <span class="visually-hidden"> (opens in a new tab)</span>
-                  <Icon name="arrow-up-right" />
-                </a>
-              </div>
-            )}
+            </div>
           </div>
         </div>
       </section>
     )
   }
 
-  <!-- Terms: what is promised in writing before anyone pays -->
-  <section class="bg-paper">
-    <div class="container block">
-      <div class="block__head">
-        <div class="block__title">
-          <h2 class="h2">What you get in writing.</h2>
-          <p class="block__intro">How every project works, before you sign anything.</p>
-        </div>
+  <!-- Terms: a written agreement, signed before any work starts -->
+  <section class="bg-paper" aria-labelledby="terms-title">
+    <div class="container block terms">
+      <div class="terms__side">
+        <h2 class="h2" id="terms-title">What you get in writing.</h2>
+        <p class="block__intro">How every project works, before you sign anything.</p>
         <a href="/services#terms" class="text-link">All terms<Icon name="arrow-right" /></a>
       </div>
-      <dl class="terms">
-        {
-          terms.map((term) => (
-            <div class="terms__row">
-              <dt class="terms__title">
-                <Icon name="check" size={18} strokeWidth={2.8} />
-                {term.title}
-              </dt>
-              <dd class="terms__text">{term.text}</dd>
-            </div>
-          ))
-        }
-      </dl>
+      <article class="doc" data-doc aria-labelledby="doc-title">
+        <div class="doc__head">
+          <h3 class="doc__title" id="doc-title">The {site.shortName} agreement</h3>
+          <p class="doc__sub">Signed before any work starts</p>
+        </div>
+        <dl class="clauses">
+          {
+            terms.map((term) => (
+              <div class="clause">
+                <dt>{term.title}</dt>
+                <dd>{term.text}</dd>
+              </div>
+            ))
+          }
+        </dl>
+        <div class="sign" aria-hidden="true">
+          <div class="sign__line">
+            <svg style="--w: 190px" viewBox="0 0 190 56" fill="none">
+              <path
+                class="sign__ink sign__ink--us"
+                pathLength="1"
+                d="M22 8 C 12 22, 6 40, 12 46 C 18 50, 30 40, 38 42 C 44 44, 40 50, 48 46 C 56 42, 58 30, 64 34 C 70 38, 64 46, 72 44 C 80 42, 82 32, 88 36 C 94 40, 90 46, 98 44 C 106 42, 108 30, 116 34 C 122 38, 118 46, 128 42 C 136 38, 140 30, 146 34 C 152 38, 150 46, 158 42 C 166 38, 172 30, 184 28 M 30 52 C 70 46, 120 46, 176 40"
+              ></path>
+            </svg>
+            For {site.name}
+          </div>
+          <div class="sign__line">
+            <svg style="--w: 130px" viewBox="0 0 130 56" fill="none">
+              <path
+                class="sign__ink sign__ink--you"
+                pathLength="1"
+                d="M8 14 C 12 24, 18 30, 24 28 C 30 26, 32 16, 34 12 C 30 28, 26 44, 20 50 C 16 54, 12 50, 18 44 C 26 36, 36 34, 44 36 C 52 38, 48 46, 56 44 C 64 42, 66 34, 72 36 C 78 38, 74 46, 82 44 C 90 42, 94 36, 100 38 C 108 40, 112 36, 124 32"
+              ></path>
+            </svg>
+            For you
+          </div>
+        </div>
+      </article>
     </div>
   </section>
 
-  <CtaBand title="Tell us what you want to launch." text="You talk to the people who will build it. We reply within one business day." pad="bottom" />
+  <!-- Closing: the hero ribbons come back around the last question -->
+  <section class="end" aria-labelledby="end-title">
+    <div aria-hidden="true" class="end__art end__art--left">
+      <svg viewBox="0 0 400 640" preserveAspectRatio="xMaxYMid slice" fill="none">
+        <defs>
+          <linearGradient id="end-a" x1="0" y1="0" x2="400" y2="640" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#22D3DD"></stop>
+            <stop offset="0.6" stop-color="#2FB4F0"></stop>
+            <stop offset="1" stop-color="#2F8CF6"></stop>
+          </linearGradient>
+          <linearGradient id="end-b" x1="0" y1="440" x2="220" y2="660" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#2F8CF6"></stop>
+            <stop offset="1" stop-color="#5B4FE9"></stop>
+          </linearGradient>
+        </defs>
+        <path d={ribbonPath('left-blob')} fill="#DFF6F9"></path>
+        <path d={ribbonPath('left-ribbon')} stroke="url(#end-a)" stroke-width="78" stroke-linecap="round"></path>
+        <path d={ribbonPath('left-accent')} stroke="url(#end-b)" stroke-width="104" stroke-linecap="round"></path>
+      </svg>
+    </div>
+    <div aria-hidden="true" class="end__art end__art--right">
+      <svg viewBox="0 0 260 640" preserveAspectRatio="xMinYMid slice" fill="none">
+        <defs>
+          <linearGradient id="end-c" x1="260" y1="0" x2="60" y2="640" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#2F8CF6"></stop>
+            <stop offset="0.5" stop-color="#2FB4F0"></stop>
+            <stop offset="1" stop-color="#22D3DD"></stop>
+          </linearGradient>
+        </defs>
+        <path d={ribbonPath('right-blob')} fill="#E4EEFF"></path>
+        <path d={ribbonPath('right-ribbon')} stroke="url(#end-c)" stroke-width="70" stroke-linecap="round"></path>
+      </svg>
+    </div>
+    <h2 class="end__title" id="end-title">Tell us what you want to <span class="highlight">launch.</span></h2>
+    <p class="end__text">
+      You talk to the people who will build it.{site.responseTime && ` We reply within ${site.responseTime}.`}
+    </p>
+    <a href="/contact" class="btn btn--primary btn--lg end__cta" data-book-call data-umami-event="Book a call" data-umami-event-from="home-end">
+      Book a call<Icon name="arrow-right" />
+    </a>
+  </section>
 </Base>
 
 <script>
@@ -410,6 +364,89 @@ const smallCards = others.slice(0, 2).map((project) => ({ project, url: projectU
       hero.style.setProperty('--hx', '0');
       hero.style.setProperty('--hy', '0');
     });
+  }
+
+  // ---------- Recent work: rows open in place; a glance trails the pointer down the list.
+  const wrap = document.querySelector<HTMLElement>('[data-log-wrap]');
+  if (wrap) {
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const fine = window.matchMedia('(hover: hover) and (pointer: fine)');
+    const peek = wrap.querySelector<HTMLElement>('[data-peek]');
+    wrap.querySelectorAll<HTMLButtonElement>('.log__toggle').forEach((button) => {
+      const row = button.closest<HTMLElement>('.log__row');
+      const panel = document.getElementById(button.getAttribute('aria-controls') ?? '');
+      if (!row || !panel) return;
+      button.addEventListener('click', () => {
+        const open = button.getAttribute('aria-expanded') !== 'true';
+        button.setAttribute('aria-expanded', String(open));
+        row.classList.toggle('is-open', open);
+        panel.inert = !open;
+        if (open) peek?.classList.remove('is-on');
+      });
+    });
+
+    const shots = new Map<string, HTMLElement>();
+    peek?.querySelectorAll<HTMLElement>('[data-peek-for]').forEach((img) => shots.set(img.dataset.peekFor ?? '', img));
+    if (peek && shots.size > 0) {
+      const W = 320;
+      const H = 200;
+      let x = 0;
+      let y = 0;
+      let tx = 0;
+      let ty = 0;
+      let raf = 0;
+      let active: HTMLElement | null = null;
+      // A little lag and a tilt in the direction of travel, settling when the pointer rests.
+      const frame = () => {
+        const dx = tx - x;
+        x += dx * 0.16;
+        y += (ty - y) * 0.16;
+        peek.style.setProperty('--px', `${x.toFixed(1)}px`);
+        peek.style.setProperty('--py', `${y.toFixed(1)}px`);
+        peek.style.setProperty('--pr', `${Math.max(-6, Math.min(6, dx * 0.04)).toFixed(2)}deg`);
+        raf = Math.abs(dx) + Math.abs(ty - y) > 0.3 ? requestAnimationFrame(frame) : 0;
+      };
+      const hide = () => {
+        peek.classList.remove('is-on');
+        active = null;
+      };
+      wrap.addEventListener('pointermove', (event) => {
+        if (!fine.matches || still.matches) return;
+        const row = (event.target as Element).closest<HTMLElement>('.log__row');
+        const img = row ? shots.get(row.dataset.logRow ?? '') : undefined;
+        // No glance over an opened row: its screenshot is already on the page.
+        if (!row || !img || row.classList.contains('is-open')) return hide();
+        const r = wrap.getBoundingClientRect();
+        tx = Math.min(event.clientX - r.left + 28, r.width - W);
+        ty = event.clientY - r.top - H / 2;
+        if (active !== row) {
+          if (!active) {
+            x = tx;
+            y = ty;
+          }
+          shots.forEach((el) => el.classList.toggle('is-on', el === img));
+          active = row;
+        }
+        peek.classList.add('is-on');
+        if (!raf) raf = requestAnimationFrame(frame);
+      });
+      wrap.addEventListener('pointerleave', hide);
+    }
+  }
+
+  // ---------- The agreement signs itself once, when most of it is on screen.
+  const doc = document.querySelector<HTMLElement>('[data-doc]');
+  if (doc) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          doc.classList.add('is-signed');
+          io.disconnect();
+        }
+      },
+      { threshold: 0.6 },
+    );
+    io.observe(doc);
   }
 </script>
 
@@ -511,63 +548,12 @@ const smallCards = others.slice(0, 2).map((project) => ({ project, url: projectU
       color: var(--ink);
     }
   }
-  .hero__lede {
-    margin: 26px 0 0;
-    max-width: 34em;
-    font-size: clamp(1.0625rem, 1.5vw, 1.3rem);
-    line-height: 1.55;
-    color: var(--ink-2);
-    text-wrap: balance;
-  }
   .hero__actions {
-    margin-top: 34px;
+    margin-top: 40px;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 12px;
-  }
-  .hero__promises {
-    list-style: none;
-    margin: 26px 0 0;
-    padding: 0;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px 22px;
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--ink-2);
-  }
-  .hero__promises li {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-  }
-  /* Too narrow for three in a row: a short stack reads better than one line, then two. */
-  @media (max-width: 479.98px) {
-    .hero__promises {
-      display: grid;
-      justify-content: center;
-      justify-items: start;
-      gap: 8px;
-    }
-  }
-  .hero__promises :global(svg) {
-    color: var(--teal);
-  }
-  /* After the highlight lands, the three checks draw in, one after another. */
-  .hero__promises :global(svg path) {
-    stroke-dasharray: 24;
-    stroke-dashoffset: 0;
-    animation: check-draw 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-  .hero__promises li:nth-child(1) :global(svg path) { animation-delay: 900ms; }
-  .hero__promises li:nth-child(2) :global(svg path) { animation-delay: 1000ms; }
-  .hero__promises li:nth-child(3) :global(svg path) { animation-delay: 1100ms; }
-  @keyframes check-draw {
-    from {
-      stroke-dashoffset: 24;
-    }
   }
   .hero__proof {
     margin-top: 24px;
@@ -668,7 +654,6 @@ const smallCards = others.slice(0, 2).map((project) => ({ project, url: projectU
   }
   @media (prefers-reduced-motion: reduce) {
     .hero__mark,
-    .hero__promises :global(svg path),
     .hero__art :global(.ribbon-stroke) {
       animation: none;
     }
@@ -703,206 +688,260 @@ const smallCards = others.slice(0, 2).map((project) => ({ project, url: projectU
     gap: 12px;
   }
 
-  /* ---------- Recent work ---------- */
+  /* ---------- Recent work: a log of real projects ---------- */
 
-  .work {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
+  .log-wrap {
+    position: relative;
   }
-  .featured {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 0;
-  }
-  .featured__shot {
-    flex: 3 1 480px;
-    min-height: 400px;
-  }
-  /* Until the project has a summary, a result or a case study, the card is only its name: keep it short. */
-  .featured--compact .featured__shot {
-    min-height: 240px;
-  }
-  .featured__body {
-    flex: 2 1 320px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 32px;
-    padding: 40px;
-  }
-  .featured__copy {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-  .featured__name {
-    margin: 0;
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: clamp(2rem, 3.4vw, 3rem);
-    line-height: 1.05;
-  }
-  .featured__summary {
-    margin: 0;
-    font-size: 17px;
-    line-height: 1.6;
-    color: var(--ink-2);
-  }
-  .featured__foot {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 16px;
-  }
-  .featured__metric {
-    display: flex;
-    flex-direction: column;
-  }
-  .featured__value {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 40px;
-    line-height: 1;
-  }
-  .featured__label {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--ink-2);
-  }
-  .featured__read {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 700;
-    font-size: 16px;
-  }
-
-  .work__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(360px, 100%), 1fr));
-    gap: 24px;
-  }
-  /* A 2:1 well keeps the screenshot's sides in view at every width; only the bottom bleeds off. */
-  .small__shot {
-    min-height: 0;
-    aspect-ratio: 2 / 1;
-  }
-  @media (max-width: 799.98px) {
-    .featured__shot {
-      flex-basis: 100%;
-      min-height: 0;
-      aspect-ratio: 2 / 1;
-    }
-  }
-  .small__body {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 28px;
-  }
-  .small__name {
-    margin: 0;
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 30px;
-    line-height: 1.1;
-  }
-  .small__summary {
-    margin: 0;
-    font-size: 16px;
-    line-height: 1.6;
-    color: var(--ink-2);
-  }
-  .small__visit {
-    align-self: flex-start;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    min-height: 44px;
-    font-weight: 700;
-    font-size: 15px;
-  }
-
-  /* What a visitor can do in each project: short, checked, in plain words. */
-  .facts {
+  .log {
     list-style: none;
     margin: 0;
     padding: 0;
+    border-top: 1px solid var(--line);
+  }
+  .log__row {
+    border-bottom: 1px solid var(--line);
+  }
+  .log__toggle {
+    width: 100%;
     display: grid;
-    gap: 8px;
-  }
-  .facts li {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    font-size: 15px;
-    font-weight: 600;
-    line-height: 1.4;
-    color: var(--ink);
-  }
-  .facts :global(svg) {
-    flex: none;
-    margin-top: 1px;
-    color: var(--teal-ink);
-  }
-  .facts--small {
-    gap: 6px;
-    margin-top: 6px;
-  }
-  .facts--small li {
-    font-size: 14px;
-  }
-
-  /* Our own product: one line under the work, not a case. */
-  .own {
-    display: flex;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.5fr) minmax(0, 0.6fr) 30px;
     align-items: center;
-    gap: 18px;
-    padding: 14px 20px 14px 14px;
-    border: 1px solid var(--line-soft);
-    border-radius: 20px;
-    background: var(--surface);
+    gap: 24px;
+    padding: 26px 10px;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 240ms var(--ease-out);
   }
-  .own__img {
-    flex: none;
-    width: 112px;
-    height: 70px;
-    object-fit: cover;
-    object-position: top left;
-    border-radius: 12px;
-    border: 1px solid var(--line-soft);
+  .log__toggle:focus-visible {
+    outline: 3px solid var(--teal);
+    outline-offset: -3px;
+    border-radius: 14px;
   }
-  .own__text {
-    flex: 1;
-    margin: 0;
-    font-size: 15px;
-    line-height: 1.55;
+  .log__name {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.375rem, 2.2vw, 1.85rem);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    transition: transform 320ms var(--ease-out);
+  }
+  .log__what {
+    font-size: 16px;
+    line-height: 1.45;
     color: var(--ink-2);
   }
-  .own__text b {
-    color: var(--ink);
+  .log__kind {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--muted);
   }
-  .own__link {
-    flex: none;
+  /* Plus that turns into a minus when the row is open. */
+  .log__plus {
+    position: relative;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    transition:
+      background-color 200ms var(--ease-out),
+      border-color 200ms var(--ease-out);
+  }
+  .log__plus::before,
+  .log__plus::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 12px;
+    height: 2px;
+    margin: -1px 0 0 -6px;
+    border-radius: 2px;
+    background: var(--ink);
+    transition:
+      transform 320ms var(--ease-out),
+      background-color 200ms var(--ease-out);
+  }
+  .log__plus::after {
+    transform: rotate(90deg);
+  }
+  .log__toggle[aria-expanded='true'] .log__plus {
+    background: var(--ink);
+    border-color: var(--ink);
+  }
+  .log__toggle[aria-expanded='true'] .log__plus::before,
+  .log__toggle[aria-expanded='true'] .log__plus::after {
+    background: var(--white);
+  }
+  .log__toggle[aria-expanded='true'] .log__plus::after {
+    transform: rotate(0deg);
+  }
+  /* Only where there is a public site to visit. */
+  .live {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    min-height: 44px;
-    font-weight: 700;
-    font-size: 15px;
+    gap: 6px;
+    padding: 3px 10px 3px 8px;
+    border-radius: 999px;
+    background: #e7f8ef;
+    color: #0c6b3d;
+    font: 700 12px/1.4 var(--font-body);
+    letter-spacing: 0;
   }
-  @media (max-width: 639.98px) {
-    .own {
-      flex-wrap: wrap;
-      gap: 12px 16px;
+  .live::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #12b76a;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .log__toggle:hover {
+      background: var(--surface);
     }
-    .own__img {
-      width: 88px;
-      height: 55px;
+    .log__toggle:hover .log__name {
+      transform: translateX(6px);
     }
-    .own__text {
-      flex-basis: calc(100% - 104px);
+  }
+  /* An opened row: the real screenshot and what we built. */
+  .log__open {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 420ms var(--ease-out);
+  }
+  .log__row.is-open .log__open {
+    grid-template-rows: 1fr;
+  }
+  .log__inner {
+    min-height: 0;
+    overflow: hidden;
+  }
+  .log__detail {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: 32px;
+    align-items: start;
+    padding: 4px 10px 34px;
+  }
+  .log__shot {
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-radius: 18px;
+    border: 1px solid var(--line-soft);
+    background: var(--tint-cyan);
+    box-shadow: var(--shadow-tile);
+  }
+  .log__shot :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+  }
+  .log__about {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .log__summary {
+    margin: 0 0 6px;
+    max-width: 34em;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+  /* The glance: the hovered row's screenshot trails the pointer (fine pointers only). */
+  .peek {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 5;
+    width: 320px;
+    aspect-ratio: 16 / 10;
+    pointer-events: none;
+    transform: translate3d(var(--px, 0), var(--py, 0), 0) rotate(var(--pr, 0deg));
+    will-change: transform;
+  }
+  .peek__card {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: 16px;
+    background: var(--tint-cyan);
+    box-shadow:
+      0 30px 60px -28px rgb(10 17 40 / 0.45),
+      0 0 0 1px rgb(10 17 40 / 0.06);
+    opacity: 0;
+    transform: scale(0.9);
+    transform-origin: 0 50%;
+    transition:
+      opacity 200ms var(--ease-out),
+      transform 260ms var(--ease-out);
+  }
+  .peek.is-on .peek__card {
+    opacity: 1;
+    transform: none;
+  }
+  .peek__card :global(.peek__img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    opacity: 0;
+    transition: opacity 260ms var(--ease-out);
+  }
+  .peek__card :global(.peek__img.is-on) {
+    opacity: 1;
+  }
+  @media (max-width: 799.98px) {
+    .log__toggle {
+      grid-template-columns: minmax(0, 1fr) 30px;
+      gap: 6px 16px;
+      padding: 20px 4px;
+    }
+    .log__name,
+    .log__what {
+      grid-column: 1;
+    }
+    .log__what {
+      font-size: 15px;
+    }
+    .log__kind {
+      display: none;
+    }
+    .log__plus {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+    }
+    .log__detail {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 18px;
+      padding: 0 4px 26px;
+    }
+  }
+  @media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+    .peek {
+      display: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .log__open,
+    .log__name,
+    .log__plus::before,
+    .log__plus::after {
+      transition: none;
     }
   }
 
@@ -916,48 +955,237 @@ const smallCards = others.slice(0, 2).map((project) => ({ project, url: projectU
     line-height: 1.6;
     color: var(--ink-2);
   }
-  /* ---------- Terms: four short promises, two by two ---------- */
+  /* ---------- Terms: a written agreement ---------- */
 
   .terms {
-    margin: 0;
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1px;
-    background: var(--line-soft);
-    border: 1px solid var(--line-soft);
-    border-radius: var(--radius-tile);
-    box-shadow: var(--shadow-tile);
-    overflow: hidden;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: clamp(32px, 6vw, 88px);
+    align-items: start;
   }
-  .terms__row {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    padding: 26px clamp(20px, 3vw, 34px);
+  .terms__side {
+    position: sticky;
+    top: 120px;
+    display: grid;
+    justify-items: start;
+    gap: 18px;
+  }
+  .doc {
+    padding: clamp(26px, 4vw, 52px);
     background: var(--surface);
+    border: 1px solid var(--line-soft);
+    border-radius: 8px;
+    box-shadow:
+      0 2px 0 rgb(10 17 40 / 0.03),
+      0 40px 70px -50px rgb(10 17 40 / 0.5);
   }
-  .terms__title {
+  .doc__head {
     display: flex;
-    align-items: center;
-    gap: 10px;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 16px;
+    padding-bottom: 22px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .doc__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 22px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  .doc__sub {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .clauses {
+    margin: 0;
+  }
+  .clause {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 24px;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .clause dt {
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: 21px;
+    font-size: 20px;
     line-height: 1.25;
   }
-  .terms__title :global(svg) {
-    flex: none;
-    color: var(--teal);
-  }
-  @media (max-width: 719.98px) {
-    .terms {
-      grid-template-columns: 1fr;
-    }
-  }
-  .terms__text {
-    margin: 0 0 0 28px;
+  .clause dd {
+    margin: 0;
     font-size: 16px;
     line-height: 1.55;
     color: var(--ink-2);
+  }
+  /* Two signatures on their lines; they draw themselves once the agreement is in view. */
+  .sign {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-top: 72px;
+  }
+  .sign__line {
+    position: relative;
+    padding-top: 10px;
+    border-top: 1.5px solid var(--ink);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .sign__line svg {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 2px);
+    width: 100%;
+    max-width: var(--w);
+    height: auto;
+    overflow: visible;
+  }
+  .sign__ink {
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+  .sign__ink--us {
+    stroke: var(--ink);
+  }
+  .sign__ink--you {
+    stroke: var(--teal-ink);
+  }
+  .doc.is-signed .sign__ink {
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1100ms cubic-bezier(0.65, 0, 0.35, 1);
+  }
+  .doc.is-signed .sign__ink--you {
+    transition-delay: 900ms;
+    transition-duration: 800ms;
+  }
+  @media (max-width: 799.98px) {
+    .terms {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .terms__side {
+      position: static;
+    }
+    .doc__head {
+      flex-direction: column;
+    }
+    .clause {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 6px;
+      padding: 18px 0;
+    }
+    .clause dt {
+      font-size: 18px;
+    }
+    .sign {
+      gap: 22px;
+      margin-top: 60px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sign__ink,
+    .doc.is-signed .sign__ink {
+      stroke-dashoffset: 0;
+      transition: none;
+    }
+  }
+
+  /* ---------- Closing: the hero ribbons come back around the last question ---------- */
+
+  .end {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding: 140px var(--gutter) 150px;
+    background: var(--paper);
+    text-align: center;
+  }
+  .end__art {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: -1;
+  }
+  .end__art svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 24%);
+    mask-image: linear-gradient(to bottom, transparent, #000 24%);
+  }
+  .end__art--left {
+    left: -24px;
+    width: min(520px, max(0px, calc((100% - 860px) / 2 + 220px)));
+    -webkit-mask-image: linear-gradient(to right, #000 50%, transparent 96%);
+    mask-image: linear-gradient(to right, #000 50%, transparent 96%);
+  }
+  .end__art--right {
+    right: -24px;
+    width: min(460px, max(0px, calc((100% - 860px) / 2 + 180px)));
+    -webkit-mask-image: linear-gradient(to left, #000 50%, transparent 96%);
+    mask-image: linear-gradient(to left, #000 50%, transparent 96%);
+  }
+  .end__title {
+    max-width: 13ch;
+    margin: 0 auto;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(2.6rem, 6.4vw, 5.4rem);
+    line-height: 1.12;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+  .end__text {
+    max-width: 30em;
+    margin: 26px auto 0;
+    font-size: clamp(1.0625rem, 1.4vw, 1.25rem);
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+  .end__cta {
+    margin-top: 36px;
+  }
+  /* Phones: the ribbons become a band under the button that runs into the footer. */
+  @media (max-width: 799.98px) {
+    .end {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 104px var(--gutter) 0;
+    }
+    .end__art--left {
+      position: relative;
+      order: 9;
+      left: auto;
+      width: calc(100% + 2 * var(--gutter));
+      height: 200px;
+      margin: 56px calc(-1 * var(--gutter)) 0;
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
+    .end__art--left svg {
+      transform: scaleX(-1);
+    }
+    .end__art--right {
+      display: none;
+    }
+    .end__title {
+      line-height: 1.2;
+    }
+    .end__title :global(.highlight) {
+      display: inline;
+      -webkit-box-decoration-break: clone;
+      box-decoration-break: clone;
+    }
   }
 </style>

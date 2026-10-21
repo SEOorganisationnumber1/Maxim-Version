@@ -3,7 +3,7 @@ import Base from '../../layouts/Base.astro';
 import CtaBand from '../../components/CtaBand.astro';
 import Icon from '../../components/Icon.astro';
 import OfferStage from '../../components/OfferStage.astro';
-import { offerPromises, offers, offerUrl, type Offer } from '../../data/offers';
+import { offers, offerUrl, type Offer } from '../../data/offers';
 
 // One page per offer in src/data/offers.ts: /services/telegram-bots and so on.
 export function getStaticPaths() {
@@ -81,16 +81,6 @@ const jsonLd: Record<string, unknown>[] = [
           </a>
           <a href="#examples" class="btn btn--outline btn--lg">See examples</a>
         </div>
-        <ul class="hero__promises">
-          {
-            offerPromises.map((promise) => (
-              <li>
-                <Icon name="check" size={16} strokeWidth={2.8} />
-                {promise}
-              </li>
-            ))
-          }
-        </ul>
       </div>
       <div class="hero__stage">
         <OfferStage kind={offer.stage} tone={offer.tone} />
@@ -126,10 +116,7 @@ const jsonLd: Record<string, unknown>[] = [
       <ul class="gets">
         {
           offer.deliverables.items.map((item) => (
-            <li>
-              <Icon name="check" size={16} strokeWidth={2.6} />
-              <span>{item}</span>
-            </li>
+            <li>{item}</li>
           ))
         }
       </ul>
@@ -259,25 +246,6 @@ const jsonLd: Record<string, unknown>[] = [
     flex-wrap: wrap;
     gap: 12px;
   }
-  .hero__promises {
-    list-style: none;
-    margin: 26px 0 0;
-    padding: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px 24px;
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--ink-2);
-  }
-  .hero__promises li {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .hero__promises :global(svg) {
-    color: var(--teal);
-  }
   @media (max-width: 959.98px) {
     .hero__inner {
       grid-template-columns: minmax(0, 1fr);
@@ -381,13 +349,8 @@ const jsonLd: Record<string, unknown>[] = [
     line-height: 1.5;
   }
   .gets li {
-    display: grid;
-    grid-template-columns: 16px 1fr;
-    gap: 12px;
-  }
-  .gets :global(svg) {
-    margin-top: 4px;
-    color: var(--teal);
+    padding-top: 14px;
+    border-top: 1px solid var(--line-soft);
   }
   @media (max-width: 959.98px) {
     .block--split {
