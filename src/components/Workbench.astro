@@ -3,6 +3,9 @@
 // of thing, already alive at rest (a real café homepage, a conversation, a run half done).
 // The tile with live numbers measures this very page in the visitor's browser. Demo content is
 // invented and labelled as a demo (Lumen Coffee is not a client).
+//
+// Each tile's title comes first in the HTML, so screen readers hear what a demo is before its
+// controls; CSS shows the title under the demo.
 import Icon from './Icon.astro';
 
 const home = new URL('/', Astro.site).href;
@@ -19,9 +22,9 @@ const more = {
 };
 
 const replies = [
-  { say: 'Two flat whites, please', reply: 'Two flat whites, ready in 10 minutes. Pay now or at pick-up?' },
+  { say: 'Add a croissant', reply: 'Added. One warm croissant, ready with your coffee.' },
   { say: 'Are you open now?', reply: 'Yes, until 6 pm today. Want to order ahead?' },
-  { say: 'Talk to a person', reply: "Sure, I've passed you to the team. They reply right here." },
+  { say: 'Talk to a person', reply: 'Sure. A barista from Lumen will answer right here.' },
 ];
 
 const steps = [
@@ -36,7 +39,11 @@ const DONE_AT_REST = 2;
 
 <div class="bench" data-bench>
   <!-- Websites: one layout that works at every width -->
-  <article class="tile tile--web">
+  <article class="tile tile--web" aria-labelledby="tile-web">
+    <div class="tile__meta">
+      <div class="tile__row"><h3 class="tile__title" id="tile-web"><a href={more.web}>Websites & Landing Pages<Icon name="arrow-right" size={16} strokeWidth={2.6} class="tile__go" /></a></h3><span class="tile__hint" aria-hidden="true">Slide</span></div>
+      <p class="tile__text">Fast sites that work on every screen.</p>
+    </div>
     <div class="tile__stage tile__stage--web">
       <div class="web__frame" data-web-frame>
         <div class="web__bar" aria-hidden="true"><i></i><i></i><i></i><span>lumencoffee.com</span></div>
@@ -66,18 +73,18 @@ const DONE_AT_REST = 2;
         </div>
       </div>
       <div class="web__control">
-        <label for="web-width" class="web__label">Screen width <output for="web-width" data-web-out>Desktop, 1280 px</output></label>
+        <label for="web-width" class="web__label">Screen width<span class="visually-hidden"> of the demo site</span> <output for="web-width" data-web-out>Desktop, 1280 px</output></label>
         <input id="web-width" type="range" min="320" max="1280" step="1" value="1280" data-web-range />
       </div>
     </div>
-    <div class="tile__meta">
-      <div class="tile__row"><h3 class="tile__title"><a href={more.web}>Websites & Landing Pages</a></h3><span class="tile__hint" aria-hidden="true">Drag</span></div>
-      <p class="tile__text">Fast sites that work on every screen.</p>
-    </div>
   </article>
 
-  <!-- Telegram: a bot mid-conversation -->
-  <article class="tile tile--bot">
+  <!-- Telegram: a bot with yesterday's question and today's order -->
+  <article class="tile tile--bot" aria-labelledby="tile-bot">
+    <div class="tile__meta">
+      <div class="tile__row"><h3 class="tile__title" id="tile-bot"><a href={more.bot}>Telegram Bots & Extensions<Icon name="arrow-right" size={16} strokeWidth={2.6} class="tile__go" /></a></h3><span class="tile__hint" aria-hidden="true">Tap</span></div>
+      <p class="tile__text">Bots that take orders and answer customers.</p>
+    </div>
     <div class="tile__stage tile__stage--bot">
       <div class="chat" data-chat>
         <div class="chat__head">
@@ -85,6 +92,10 @@ const DONE_AT_REST = 2;
           <span><b>Lumen Coffee</b><small>bot · demo</small></span>
         </div>
         <div class="chat__log" data-chat-log aria-live="off">
+          <p class="chat__day" aria-hidden="true">Yesterday</p>
+          <p class="msg msg--bot">Hi! I take orders for Lumen Coffee. What would you like?</p>
+          <p class="msg msg--me">Do you have oat milk?</p>
+          <p class="msg msg--bot">Yes, oat and almond, at no extra cost.</p>
           <p class="chat__day" aria-hidden="true">Today</p>
           <div class="msg msg--bot msg--menu">
             <b>Today at Lumen</b>
@@ -92,11 +103,12 @@ const DONE_AT_REST = 2;
             <span><i class="mini__dot mini__dot--b"></i>Croissant</span>
             <span><i class="mini__dot mini__dot--c"></i>Cold brew</span>
           </div>
-          <p class="msg msg--bot">Hi! I take orders for Lumen Coffee. What would you like?</p>
-          <p class="msg msg--me" data-replay data-exchange="0">Two flat whites, please</p>
-          <p class="msg msg--bot" data-replay data-exchange="0">Two flat whites, ready in 10 minutes. Pay now or at pick-up?</p>
+          <p class="msg msg--me">Two flat whites with oat milk, please</p>
+          <p class="msg msg--bot">Ready in 10 minutes. Pay now or at pick-up?</p>
+          <p class="msg msg--me" data-replay data-exchange="0">Pay now</p>
+          <p class="msg msg--bot" data-replay data-exchange="0">Paid. Your order is ready at 8:40, we'll message you here.</p>
         </div>
-        <div class="chat__chips" data-chat-chips>
+        <div class="chat__chips" data-chat-chips role="group" aria-label="Demo replies">
           {
             replies.map((r) => (
               <button type="button" class="chat__chip" data-say={r.say} data-reply={r.reply}>
@@ -107,14 +119,14 @@ const DONE_AT_REST = 2;
         </div>
       </div>
     </div>
-    <div class="tile__meta">
-      <div class="tile__row"><h3 class="tile__title"><a href={more.bot}>Telegram Bots & Extensions</a></h3><span class="tile__hint" aria-hidden="true">Tap</span></div>
-      <p class="tile__text">Bots that take orders and answer customers.</p>
-    </div>
   </article>
 
   <!-- Web apps: an unsaved change, ready to save -->
-  <article class="tile tile--app">
+  <article class="tile tile--app" aria-labelledby="tile-app">
+    <div class="tile__meta">
+      <div class="tile__row"><h3 class="tile__title" id="tile-app"><a href={more.app}>Web Apps & SaaS<Icon name="arrow-right" size={16} strokeWidth={2.6} class="tile__go" /></a></h3><span class="tile__hint" aria-hidden="true">Save</span></div>
+      <p class="tile__text">Order systems, bookings and dashboards.</p>
+    </div>
     <div class="tile__stage">
       <div class="settings">
         <p class="settings__title">Lumen dashboard · demo</p>
@@ -122,22 +134,22 @@ const DONE_AT_REST = 2;
         <label class="switch">
           <input type="checkbox" role="switch" data-app-toggle checked />
           <span class="switch__track" aria-hidden="true"></span>
-          <span>Take orders online</span>
+          <span>Take orders online<span class="visually-hidden"> (demo)</span></span>
         </label>
         <button type="button" class="save" data-app-save data-state="changed" aria-describedby="app-save-note">
-          <span class="save__label" data-app-label>Save changes</span>
+          <span class="save__label" data-app-label>Save changes</span><span class="visually-hidden"> (demo)</span>
         </button>
         <p id="app-save-note" class="settings__note" data-app-note>You have one unsaved change.</p>
       </div>
     </div>
-    <div class="tile__meta">
-      <div class="tile__row"><h3 class="tile__title"><a href={more.app}>Web Apps & SaaS</a></h3><span class="tile__hint" aria-hidden="true">Save</span></div>
-      <p class="tile__text">Order systems, bookings and dashboards.</p>
-    </div>
   </article>
 
   <!-- Mobile: a real screen that follows its dark mode switch -->
-  <article class="tile tile--phone">
+  <article class="tile tile--phone" aria-labelledby="tile-phone">
+    <div class="tile__meta">
+      <div class="tile__row"><h3 class="tile__title" id="tile-phone"><a href={more.phone}>Mobile & Desktop Apps<Icon name="arrow-right" size={16} strokeWidth={2.6} class="tile__go" /></a></h3><span class="tile__hint" aria-hidden="true">Switch</span></div>
+      <p class="tile__text">Apps for iPhone, Android, Mac and Windows.</p>
+    </div>
     <div class="tile__stage">
       <div class="phone" data-phone data-theme="light">
         <div class="phone__screen" aria-hidden="true">
@@ -151,17 +163,17 @@ const DONE_AT_REST = 2;
       <label class="switch switch--center">
         <input type="checkbox" role="switch" data-phone-toggle />
         <span class="switch__track" aria-hidden="true"></span>
-        <span>Dark mode</span>
+        <span>Dark mode<span class="visually-hidden"> on the demo phone</span></span>
       </label>
-    </div>
-    <div class="tile__meta">
-      <div class="tile__row"><h3 class="tile__title"><a href={more.phone}>Mobile & Desktop Apps</a></h3><span class="tile__hint" aria-hidden="true">Switch</span></div>
-      <p class="tile__text">Apps for iPhone, Android, Mac and Windows.</p>
     </div>
   </article>
 
-  <!-- AI: an automation, half way through a run -->
-  <article class="tile tile--ai">
+  <!-- AI: an automation, half way through a run, read left to right -->
+  <article class="tile tile--ai" aria-labelledby="tile-ai">
+    <div class="tile__meta">
+      <div class="tile__row"><h3 class="tile__title" id="tile-ai"><a href={more.ai}>AI & Automation<Icon name="arrow-right" size={16} strokeWidth={2.6} class="tile__go" /></a></h3><span class="tile__hint" aria-hidden="true">Run</span></div>
+      <p class="tile__text">Routine replies drafted for you to approve.</p>
+    </div>
     <div class="tile__stage tile__stage--ai">
       <ol class="flow" data-flow>
         {
@@ -175,19 +187,19 @@ const DONE_AT_REST = 2;
           ))
         }
       </ol>
-      <button type="button" class="run" data-flow-run>Run it</button>
+      <button type="button" class="run" data-flow-run><span data-flow-label>Run it</span><span class="visually-hidden"> (demo)</span></button>
       <p class="visually-hidden" aria-live="polite" data-flow-status></p>
-    </div>
-    <div class="tile__meta">
-      <div class="tile__row"><h3 class="tile__title"><a href={more.ai}>AI & Automation</a></h3><span class="tile__hint" aria-hidden="true">Run</span></div>
-      <p class="tile__text">Routine replies drafted for you to approve.</p>
     </div>
   </article>
 
-  <!-- Search: this page, measured now -->
-  <article class="tile tile--seo">
+  <!-- Search: a café on top of the results, and this page measured now -->
+  <article class="tile tile--seo" aria-labelledby="tile-seo">
+    <div class="tile__meta">
+      <div class="tile__row"><h3 class="tile__title" id="tile-seo"><a href={more.seo}>Search & Growth<Icon name="arrow-right" size={16} strokeWidth={2.6} class="tile__go" /></a></h3><span class="tile__hint" aria-hidden="true">Check</span></div>
+      <p class="tile__text">Get found on Google and in ChatGPT.</p>
+    </div>
     <div class="tile__stage tile__stage--seo">
-      <div class="serp" aria-label="Demo search result: Lumen Coffee first for coffee near me">
+      <div class="serp" role="img" aria-label="Demo search result: Lumen Coffee first for coffee near me">
         <p class="serp__query" aria-hidden="true">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
           coffee near me
@@ -200,16 +212,15 @@ const DONE_AT_REST = 2;
         <div class="serp__miss" aria-hidden="true"><i></i><i></i></div>
       </div>
       <p class="seo__live" data-live hidden>
-        This page loaded in <b data-stat="load"></b> on your device.
-        <a href={pagespeed} target="_blank" rel="noopener" data-umami-event="Site check" data-umami-event-check="PageSpeed">
-          Check our speed on Google<span class="visually-hidden"> (opens in a new tab)</span>
-          <Icon name="arrow-up-right" size={14} />
-        </a>
+        <span class="seo__dot" aria-hidden="true"></span>
+        <span>
+          This page loaded in <b data-stat="load"></b> on your device.
+          <a href={pagespeed} target="_blank" rel="noopener" data-umami-event="Site check" data-umami-event-check="PageSpeed">
+            Check our speed on Google<span class="visually-hidden"> (opens in a new tab)</span>
+            <Icon name="arrow-up-right" size={14} />
+          </a>
+        </span>
       </p>
-    </div>
-    <div class="tile__meta">
-      <div class="tile__row"><h3 class="tile__title"><a href={more.seo}>Search & Growth</a></h3><span class="tile__hint tile__hint--live" aria-hidden="true">Live</span></div>
-      <p class="tile__text">Get found on Google and in ChatGPT.</p>
     </div>
   </article>
 </div>
@@ -268,18 +279,17 @@ const DONE_AT_REST = 2;
     gap: 16px;
     min-height: 220px;
     padding: 24px;
-    /* Two faint brand tints, placed differently per tile, so no two stages look the same. */
-    background:
-      radial-gradient(70% 60% at var(--g1, 0% 0%), rgb(28 202 216 / 0.09), transparent 70%),
-      radial-gradient(60% 55% at var(--g2, 100% 100%), rgb(47 140 246 / 0.07), transparent 70%),
-      var(--paper);
+    /* The bench itself: a fine dot grid, like a cutting mat, that each demo sits on. */
+    background-color: var(--paper);
+    background-image: radial-gradient(circle at 1px 1px, rgb(10 17 40 / 0.075) 1px, transparent 1.4px);
+    background-size: 18px 18px;
+    background-position: 9px 9px;
     border-bottom: 1px solid var(--line-soft);
   }
-  .tile--bot .tile__stage { --g1: 100% 0%; --g2: 0% 100%; }
-  .tile--app .tile__stage { --g1: 50% 0%; --g2: 100% 80%; }
-  .tile--phone .tile__stage { --g1: 0% 100%; --g2: 100% 0%; }
-  .tile--ai .tile__stage { --g1: 20% 100%; --g2: 90% 10%; }
-  .tile--seo .tile__stage { --g1: 100% 50%; --g2: 0% 0%; }
+  /* The title is first in the HTML for screen readers; on screen it sits under the demo. */
+  .tile__meta {
+    order: 2;
+  }
   /* One verb next to the title says how to play with the demo. */
   .tile__row {
     display: flex;
@@ -305,20 +315,6 @@ const DONE_AT_REST = 2;
       border-color: var(--line);
     }
   }
-  .tile__hint--live::before {
-    content: '';
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #12b76a;
-    box-shadow: 0 0 0 3px rgb(18 183 106 / 0.18);
-    animation: live 2s ease-in-out infinite;
-  }
-  @keyframes live {
-    50% {
-      box-shadow: 0 0 0 5px rgb(18 183 106 / 0.08);
-    }
-  }
   .tile__meta {
     display: flex;
     flex-direction: column;
@@ -329,23 +325,24 @@ const DONE_AT_REST = 2;
     color: inherit;
     text-decoration: none;
   }
-  .tile__title a::after {
-    content: ' →';
+  /* Always visible, so touch screens can tell the title is a link too. */
+  .tile__title :global(.tile__go) {
     display: inline-block;
-    opacity: 0;
-    transform: translateX(-4px);
+    margin-left: 6px;
+    vertical-align: -1px;
+    color: var(--muted);
     transition:
-      opacity 200ms var(--ease-out),
-      transform 200ms var(--ease-out);
+      transform 200ms var(--ease-out),
+      color 200ms var(--ease-out);
   }
   .tile__title a:hover,
   .tile__title a:focus-visible {
     color: var(--teal-ink);
   }
-  .tile__title a:hover::after,
-  .tile__title a:focus-visible::after {
-    opacity: 1;
-    transform: none;
+  .tile__title a:hover :global(.tile__go),
+  .tile__title a:focus-visible :global(.tile__go) {
+    color: var(--teal-ink);
+    transform: translateX(3px);
   }
   .tile__title {
     margin: 0;
@@ -606,7 +603,7 @@ const DONE_AT_REST = 2;
   .chat {
     display: flex;
     flex-direction: column;
-    min-height: 420px;
+    min-height: 470px;
     background: #e7eef4;
     border-radius: 18px;
     overflow: hidden;
@@ -639,14 +636,20 @@ const DONE_AT_REST = 2;
     color: var(--white);
     font-weight: 800;
   }
+  /* The history never sets the tile's height: it fills the space there is, newest at the bottom,
+     and older messages slide out of view at the top, as in a real chat. */
   .chat__log {
-    flex: 1;
+    flex: 1 1 0;
+    min-height: 0;
+    contain: size;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
     gap: 6px;
     padding: 14px 12px;
     overflow: hidden;
+    /* Older messages fade out under the header instead of being cut in half. */
+    mask-image: linear-gradient(to bottom, transparent, #000 32px);
   }
   .chat__log :global(.msg) {
     margin: 0;
@@ -672,6 +675,9 @@ const DONE_AT_REST = 2;
     font-size: 11px;
     font-weight: 700;
     color: var(--ink-2);
+  }
+  .chat__day:not(:first-child) {
+    margin-top: 8px;
   }
   .chat__log :global(.msg--menu) {
     display: grid;
@@ -738,7 +744,7 @@ const DONE_AT_REST = 2;
     border-top: 1px solid var(--line-soft);
   }
   .chat__chip {
-    min-height: 36px;
+    min-height: 40px;
     padding: 0 12px;
     border: 1px solid var(--line);
     border-radius: 999px;
@@ -914,8 +920,8 @@ const DONE_AT_REST = 2;
     display: grid;
     gap: 8px;
     align-content: start;
-    height: 200px;
-    padding: 26px 12px 12px;
+    min-height: 200px;
+    padding: 26px 12px 14px;
     border-radius: 22px;
     background: #f5fafc;
     transition: background-color 320ms var(--ease-out);
@@ -994,26 +1000,46 @@ const DONE_AT_REST = 2;
   /* ---------- AI flow ---------- */
 
   .tile__stage--ai {
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
+    grid-template-columns: minmax(0, 1fr);
     justify-items: start;
-    gap: 20px 28px;
+    align-content: center;
+    gap: 22px;
+    padding: 28px clamp(24px, 4vw, 44px);
   }
+  /* Four steps left to right, joined by a line that fills in as each step is done. */
   .flow {
     list-style: none;
     margin: 0;
     padding: 0;
+    width: 100%;
     display: grid;
-    gap: 10px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
   }
   .flow__step {
-    display: flex;
-    align-items: center;
+    position: relative;
+    display: grid;
+    align-content: start;
     gap: 12px;
     font-size: 15px;
     font-weight: 600;
+    line-height: 1.35;
     color: var(--muted);
     transition: color 200ms var(--ease-out);
+  }
+  .flow__step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 12px;
+    left: 36px;
+    right: -2px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--line);
+    transition: background-color 300ms var(--ease-out);
+  }
+  .flow__step[data-state='done']:not(:last-child)::after {
+    background: var(--teal);
   }
   .flow__dot {
     flex: none;
@@ -1023,6 +1049,7 @@ const DONE_AT_REST = 2;
     height: 26px;
     border-radius: 50%;
     border: 1.5px dashed #b9c4d3;
+    background: var(--paper);
     color: transparent;
     transition:
       background-color 200ms var(--ease-out),
@@ -1072,8 +1099,16 @@ const DONE_AT_REST = 2;
     cursor: progress;
   }
   @media (max-width: 639.98px) {
-    .tile__stage--ai {
-      grid-template-columns: 1fr;
+    .flow {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 10px;
+    }
+    .flow__step {
+      display: flex;
+      align-items: center;
+    }
+    .flow__step:not(:last-child)::after {
+      display: none;
     }
   }
 
@@ -1116,7 +1151,7 @@ const DONE_AT_REST = 2;
   }
   .serp__hit b {
     font-size: 15px;
-    color: var(--teal-ink);
+    color: #066877;
   }
   .serp__stars {
     color: #8a5a00;
@@ -1141,10 +1176,31 @@ const DONE_AT_REST = 2;
     width: 60%;
   }
   .seo__live {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
     margin: 0;
     font-size: 13px;
     line-height: 1.5;
     color: var(--ink-2);
+  }
+  .seo__live[hidden] {
+    display: none;
+  }
+  .seo__dot {
+    flex: none;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #12b76a;
+    box-shadow: 0 0 0 3px rgb(18 183 106 / 0.18);
+    transform: translateY(-1px);
+    animation: live 1.6s ease-in-out 3;
+  }
+  @keyframes live {
+    50% {
+      box-shadow: 0 0 0 6px rgb(18 183 106 / 0.06);
+    }
   }
   .seo__live b {
     color: var(--ink);
@@ -1161,7 +1217,7 @@ const DONE_AT_REST = 2;
     .chat__log :global(.msg),
     .flow__step .flow__dot,
     .chat__log :global(.typing i),
-    .tile__hint--live::before {
+    .seo__dot {
       animation: none !important;
     }
     /* A full ring instead of a frozen half spinner. */
@@ -1352,7 +1408,8 @@ const DONE_AT_REST = 2;
           step.dataset.state = 'done';
         }
         if (status) status.textContent = 'All four steps are done.';
-        run.textContent = 'Run again';
+        const runLabel = run.querySelector<HTMLElement>('[data-flow-label]');
+        if (runLabel) runLabel.textContent = 'Run again';
         setBusy(run, false);
       });
     }

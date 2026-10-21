@@ -66,6 +66,8 @@ export type Project = {
   summary: string | null;
   /** What it does, in a few plain words, for the Home cards (no tech stack). Falls back to the summary's first sentence. */
   plain: string | null;
+  /** Up to three things a visitor can do in it, in plain words, for the Home cards. Taken from the code, never invented. */
+  facts: string[];
   /** The live product, linked from the cards so visitors can see the work for themselves. */
   site: string | null;
   /** A real screenshot of the product for the card (src/assets/work). Without it the card shows the wave art. */
@@ -101,7 +103,7 @@ const toClientLine = (services: Service[]): string => {
   return line.charAt(0).toUpperCase() + line.slice(1);
 };
 
-type Seed = Pick<Project, 'slug' | 'name' | 'services'> & Partial<Pick<Project, 'summary' | 'plain' | 'site' | 'image' | 'own' | 'client' | 'caseStudy'>>;
+type Seed = Pick<Project, 'slug' | 'name' | 'services'> & Partial<Pick<Project, 'summary' | 'plain' | 'facts' | 'site' | 'image' | 'own' | 'client' | 'caseStudy'>>;
 
 // Real work only: every project here is shown on Home, Work and in llms.txt; clients (not `own`)
 // also on Clients. Add `summary` and `caseStudy` (shape: CaseStudy above) as they are written;
@@ -122,17 +124,9 @@ const seeds: Seed[] = [
   // From the owner's own repositories (2026-10-19). Shown without product names or links until the
   // owner says whether each one was client work and whether it is live; summaries come from the code.
   {
-    slug: 'crypto-exchange-platform',
-    plain: 'People swap crypto for money sent straight to their bank card.',
-    name: 'Crypto exchange platform',
-    services: ['Web Apps & SaaS'],
-    summary:
-      'A crypto-to-fiat exchange: sign-up with email verification and KYC, a dashboard, exchanges with live status, wallet deposits by QR code, transaction history and an admin view. React and Supabase.',
-    image: { src: cryptoExchangeShot, alt: 'The exchange home page: "Convert Crypto to Real Money in Minutes" next to a card of exchange rates' },
-  },
-  {
     slug: 'car-parts-store',
     plain: 'An online shop for car parts, from search to checkout.',
+    facts: ['Search by year, make and model', 'Cart and checkout', 'Customer accounts'],
     name: 'Car parts store',
     services: ['Websites & Landing Pages'],
     summary:
@@ -140,8 +134,19 @@ const seeds: Seed[] = [
     image: { src: carPartsShot, alt: 'The car parts store home page: "Premium car parts for your vehicle" with a wheel, a brake disc and a search by year, make and model' },
   },
   {
+    slug: 'crypto-exchange-platform',
+    plain: 'People swap crypto for money sent straight to their bank card.',
+    facts: ['Email sign-up and ID check', 'Deposits by QR code', 'Live status on every exchange'],
+    name: 'Crypto exchange platform',
+    services: ['Web Apps & SaaS'],
+    summary:
+      'A crypto-to-fiat exchange: sign-up with email verification and KYC, a dashboard, exchanges with live status, wallet deposits by QR code, transaction history and an admin view. React and Supabase.',
+    image: { src: cryptoExchangeShot, alt: 'The exchange home page: "Convert Crypto to Real Money in Minutes" next to a card of exchange rates' },
+  },
+  {
     slug: 'electronics-store',
     plain: 'An online electronics shop in several languages.',
+    facts: ['Catalog filled by our import scripts', 'Favorites, cart and orders', 'An admin page for the owner'],
     name: 'Electronics store',
     services: ['Websites & Landing Pages', 'Web Apps & SaaS'],
     summary:
@@ -151,6 +156,7 @@ const seeds: Seed[] = [
   {
     slug: 'reviews-site',
     plain: 'Customers post star ratings with photos; the owner approves them.',
+    facts: ['Star ratings with photos', 'A password-protected admin panel'],
     name: 'Reviews site',
     services: ['Websites & Landing Pages'],
     summary:
@@ -165,6 +171,7 @@ export const projects: Project[] = seeds.map((seed, i) => ({
   services: seed.services,
   summary: seed.summary ?? null,
   plain: seed.plain ?? seed.summary?.split(/(?<=\.)\s/)[0] ?? null,
+  facts: seed.facts ?? [],
   site: seed.site ?? null,
   image: seed.image ?? null,
   own: seed.own ?? false,

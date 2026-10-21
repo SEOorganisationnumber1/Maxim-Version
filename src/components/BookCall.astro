@@ -26,9 +26,11 @@ const lede = '30 minutes on video about your idea. Free, with no obligation.';
 
 /** What happens, in order. A real sequence, so it reads as a short timeline (no numbers needed). */
 const steps = [
-  bookingUrl ? 'Pick a time on the calendar.' : 'We email you a time that suits you.',
-  'We talk through your idea and what you have so far.',
-  `A fixed price in writing within ${site.responseTime ?? 'two business days'}.`,
+  bookingUrl
+    ? 'Pick a time on the calendar.'
+    : `We email you a time ${site.responseTime ? `within ${site.responseTime}` : 'that suits you'}.`,
+  'You talk through your idea with the people who will build it.',
+  'A fixed price in writing within two business days.',
 ];
 // On /contact the written brief sits below the calendar; from the dialog it is one page away.
 const briefHref = isDialog ? '/contact#brief' : '#brief';
@@ -456,10 +458,10 @@ const briefHref = isDialog ? '/contact#brief' : '#brief';
   }
   /* The calendar wants about 800px to put the time slots beside the month; give it the room. */
   /* The request form needs less room than the calendar. */
-  .book--dialog .book__panel:not(:has(.cal)) {
-    width: min(880px, calc(100% - 32px));
-  }
   @media (min-width: 861px) {
+    .book--dialog .book__panel:not(:has(.cal)) {
+      width: min(880px, calc(100% - 32px));
+    }
     .book--dialog .book__panel:has(.cal) {
       grid-template-columns: minmax(0, 0.56fr) minmax(0, 1.44fr);
     }

@@ -25,8 +25,8 @@ export const site = {
   socials: [] as Social[],
   /** 'City, Country', shown in the footer. */
   location: null as string | null,
-  /** Ends "We will reply to you within ...", e.g. 'one business day'. Matches the free-estimate term on Services. */
-  responseTime: 'two business days' as string | null,
+  /** How fast a request gets an answer. Ends "We will reply to you within ...". The fixed price takes longer (two business days, on Services). */
+  responseTime: 'one business day' as string | null,
 };
 
 /** The business behind the site, named in the privacy policy as the data controller. */
