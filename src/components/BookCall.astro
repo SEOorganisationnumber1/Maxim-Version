@@ -22,14 +22,13 @@ const wrapperProps = isDialog
   ? { class: 'book book--dialog', 'aria-labelledby': 'book-title', 'data-book-dialog': '' }
   : { class: 'book book--page', 'aria-labelledby': 'book-title' };
 
-const lede = bookingUrl
-  ? 'Pick a time for a free 30-minute video call. No obligation.'
-  : 'Tell us when suits you. We send a calendar invite for a free 30-minute video call.';
+const lede = '30 minutes on video about your idea. Free, with no obligation.';
 
-const points = [
+/** What happens, in order. A real sequence, so it reads as a short timeline (no numbers needed). */
+const steps = [
+  bookingUrl ? 'Pick a time on the calendar.' : 'We email you a time that suits you.',
   'We talk through your idea and what you have so far.',
   `A fixed price in writing within ${site.responseTime ?? 'two business days'}.`,
-  'No obligation to go ahead.',
 ];
 // On /contact the written brief sits below the calendar; from the dialog it is one page away.
 const briefHref = isDialog ? '/contact#brief' : '#brief';
@@ -45,18 +44,17 @@ const briefHref = isDialog ? '/contact#brief' : '#brief';
       )
     }
     <div class="book__info">
-      <Title id="book-title" class="book__title">{bookingUrl ? 'Book a free ' : 'Request a '}<span class="highlight">call.</span></Title>
+      <Title id="book-title" class="book__title">Book a free <span class="highlight">call.</span></Title>
       <p class="book__lede">{lede}</p>
-      <ul class="book__points">
+      <ol class="book__steps">
         {
-          points.map((point) => (
+          steps.map((step) => (
             <li>
-              <Icon name="check" size={16} strokeWidth={2.6} />
-              <span>{point}</span>
+              <span>{step}</span>
             </li>
           ))
         }
-      </ul>
+      </ol>
       {
         bookingUrl && (
           <p class="book__alt">
@@ -168,24 +166,45 @@ const briefHref = isDialog ? '/contact#brief' : '#brief';
     line-height: 1.6;
     color: var(--ink-2);
   }
-  .book__points {
+  /* A short vertical timeline: a dot per step on one hairline. */
+  .book__steps {
     list-style: none;
-    margin: 0;
+    margin: 4px 0 0;
     padding: 0;
     display: grid;
-    gap: 12px;
+    gap: 18px;
+    position: relative;
   }
-  .book__points li {
-    display: grid;
-    grid-template-columns: 16px 1fr;
-    gap: 12px;
+  .book__steps::before {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 10px;
+    bottom: 10px;
+    width: 1.5px;
+    background: var(--line);
+  }
+  .book__steps li {
+    position: relative;
+    padding-left: 28px;
     font-size: 15px;
-    line-height: 1.5;
-    color: var(--ink-2);
+    font-weight: 600;
+    line-height: 1.45;
+    color: var(--ink);
   }
-  .book__points :global(svg) {
-    margin-top: 3px;
-    color: var(--teal);
+  .book__steps li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 4px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 2px solid var(--teal);
+  }
+  .book__steps li:first-child::before {
+    background: var(--teal);
   }
   .book__alt {
     margin: auto 0 0;
@@ -436,6 +455,10 @@ const briefHref = isDialog ? '/contact#brief' : '#brief';
     transform: scale(0.94);
   }
   /* The calendar wants about 800px to put the time slots beside the month; give it the room. */
+  /* The request form needs less room than the calendar. */
+  .book--dialog .book__panel:not(:has(.cal)) {
+    width: min(880px, calc(100% - 32px));
+  }
   @media (min-width: 861px) {
     .book--dialog .book__panel:has(.cal) {
       grid-template-columns: minmax(0, 0.56fr) minmax(0, 1.44fr);
@@ -443,6 +466,11 @@ const briefHref = isDialog ? '/contact#brief' : '#brief';
   }
   .book--dialog .book__main {
     padding-top: 64px;
+  }
+  /* The form side needs no room for the close button above the first field. */
+  .book--dialog .book__main:not(:has(.cal)) {
+    padding-top: 56px;
+    padding-bottom: 28px;
   }
   .book__main:has(.cal) {
     padding-left: clamp(12px, 1.6vw, 20px);
@@ -675,7 +703,7 @@ const briefHref = isDialog ? '/contact#brief' : '#brief';
     const panel = dialog.querySelector<HTMLElement>('.book__panel');
     if (panel) {
       const b = from.getBoundingClientRect();
-      const w = Math.min(1220, window.innerWidth - 32);
+      const w = panel.getBoundingClientRect().width || Math.min(1220, window.innerWidth - 32);
       const h = Math.min(panel.scrollHeight, window.innerHeight - 48);
       const left = (window.innerWidth - w) / 2;
       const top = (window.innerHeight - h) / 2;

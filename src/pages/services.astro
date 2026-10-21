@@ -304,7 +304,7 @@ const faqPageJsonLd: Record<string, unknown> = {
     <div class="container services__inner">
       {
         serviceBlocks.map((service) => (
-          <article class="service">
+          <article class="service anchor" id={service.name.toLowerCase().replace(/&/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}>
             <div class="service__col">
               <h2 class="service__title">{service.name}</h2>
               <p class="service__text">{service.description}</p>

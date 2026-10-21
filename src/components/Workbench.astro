@@ -6,11 +6,17 @@
 import Icon from './Icon.astro';
 
 const home = new URL('/', Astro.site).href;
-const checks = [
-  { label: 'PageSpeed', href: `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(home)}`, external: true },
-  { label: 'Schema', href: `https://validator.schema.org/#url=${encodeURIComponent(home)}`, external: true },
-  { label: 'llms.txt', href: '/llms.txt', external: false },
-];
+const pagespeed = `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(home)}`;
+
+/** Where each tile's title leads: the offer page when there is one, else its block on Services. */
+const more = {
+  web: '/services#websites-landing-pages',
+  bot: '/services/telegram-bots',
+  app: '/services#web-apps-saas',
+  phone: '/services#mobile-desktop-apps',
+  ai: '/services#ai-automation',
+  seo: '/services#search-growth',
+};
 
 const replies = [
   { say: 'Two flat whites, please', reply: 'Two flat whites, ready in 10 minutes. Pay now or at pick-up?' },
@@ -19,12 +25,12 @@ const replies = [
 ];
 
 const steps = [
-  'New enquiry from your website',
-  'AI sorts it: redesign, this month',
-  'Added to your CRM, details filled in',
-  'Reply drafted for you to approve',
+  'New Google review: 4 stars',
+  'AI drafts a friendly reply',
+  'You approve it with one tap',
+  'Reply posted on Google',
 ];
-/** Two of four steps are done at rest, so the tile reads as a run in progress. */
+/** Two of four steps are done at rest, so the tile reads as a run already under way. */
 const DONE_AT_REST = 2;
 ---
 
@@ -65,7 +71,7 @@ const DONE_AT_REST = 2;
       </div>
     </div>
     <div class="tile__meta">
-      <div class="tile__row"><h3 class="tile__title">Websites & Landing Pages</h3><span class="tile__hint" aria-hidden="true">Drag</span></div>
+      <div class="tile__row"><h3 class="tile__title"><a href={more.web}>Websites & Landing Pages</a></h3><span class="tile__hint" aria-hidden="true">Drag</span></div>
       <p class="tile__text">Fast sites that work on every screen.</p>
     </div>
   </article>
@@ -78,7 +84,7 @@ const DONE_AT_REST = 2;
           <span class="chat__avatar" aria-hidden="true">L</span>
           <span><b>Lumen Coffee</b><small>bot · demo</small></span>
         </div>
-        <div class="chat__log" data-chat-log aria-live="polite">
+        <div class="chat__log" data-chat-log aria-live="off">
           <p class="chat__day" aria-hidden="true">Today</p>
           <div class="msg msg--bot msg--menu">
             <b>Today at Lumen</b>
@@ -87,8 +93,8 @@ const DONE_AT_REST = 2;
             <span><i class="mini__dot mini__dot--c"></i>Cold brew</span>
           </div>
           <p class="msg msg--bot">Hi! I take orders for Lumen Coffee. What would you like?</p>
-          <p class="msg msg--me" data-replay>Two flat whites, please</p>
-          <p class="msg msg--bot" data-replay>Two flat whites, ready in 10 minutes. Pay now or at pick-up?</p>
+          <p class="msg msg--me" data-replay data-exchange="0">Two flat whites, please</p>
+          <p class="msg msg--bot" data-replay data-exchange="0">Two flat whites, ready in 10 minutes. Pay now or at pick-up?</p>
         </div>
         <div class="chat__chips" data-chat-chips>
           {
@@ -102,7 +108,7 @@ const DONE_AT_REST = 2;
       </div>
     </div>
     <div class="tile__meta">
-      <div class="tile__row"><h3 class="tile__title">Telegram Bots & Extensions</h3><span class="tile__hint" aria-hidden="true">Tap</span></div>
+      <div class="tile__row"><h3 class="tile__title"><a href={more.bot}>Telegram Bots & Extensions</a></h3><span class="tile__hint" aria-hidden="true">Tap</span></div>
       <p class="tile__text">Bots that take orders and answer customers.</p>
     </div>
   </article>
@@ -111,11 +117,12 @@ const DONE_AT_REST = 2;
   <article class="tile tile--app">
     <div class="tile__stage">
       <div class="settings">
-        <p class="settings__title">Notifications</p>
+        <p class="settings__title">Lumen dashboard · demo</p>
+        <p class="settings__stat"><b>12</b> orders today</p>
         <label class="switch">
           <input type="checkbox" role="switch" data-app-toggle checked />
           <span class="switch__track" aria-hidden="true"></span>
-          <span>Weekly report by email</span>
+          <span>Take orders online</span>
         </label>
         <button type="button" class="save" data-app-save data-state="changed" aria-describedby="app-save-note">
           <span class="save__label" data-app-label>Save changes</span>
@@ -124,8 +131,8 @@ const DONE_AT_REST = 2;
       </div>
     </div>
     <div class="tile__meta">
-      <div class="tile__row"><h3 class="tile__title">Web Apps & SaaS</h3><span class="tile__hint" aria-hidden="true">Save</span></div>
-      <p class="tile__text">Bookings, dashboards and client portals.</p>
+      <div class="tile__row"><h3 class="tile__title"><a href={more.app}>Web Apps & SaaS</a></h3><span class="tile__hint" aria-hidden="true">Save</span></div>
+      <p class="tile__text">Order systems, bookings and dashboards.</p>
     </div>
   </article>
 
@@ -148,7 +155,7 @@ const DONE_AT_REST = 2;
       </label>
     </div>
     <div class="tile__meta">
-      <div class="tile__row"><h3 class="tile__title">Mobile & Desktop Apps</h3><span class="tile__hint" aria-hidden="true">Switch</span></div>
+      <div class="tile__row"><h3 class="tile__title"><a href={more.phone}>Mobile & Desktop Apps</a></h3><span class="tile__hint" aria-hidden="true">Switch</span></div>
       <p class="tile__text">Apps for iPhone, Android, Mac and Windows.</p>
     </div>
   </article>
@@ -159,7 +166,7 @@ const DONE_AT_REST = 2;
       <ol class="flow" data-flow>
         {
           steps.map((step, i) => (
-            <li class="flow__step" data-state={i < DONE_AT_REST ? 'done' : i === DONE_AT_REST ? 'running' : 'waiting'}>
+            <li class="flow__step" data-state={i < DONE_AT_REST ? 'done' : 'waiting'}>
               <span class="flow__dot" aria-hidden="true">
                 <Icon name="check" size={14} strokeWidth={3} />
               </span>
@@ -172,41 +179,36 @@ const DONE_AT_REST = 2;
       <p class="visually-hidden" aria-live="polite" data-flow-status></p>
     </div>
     <div class="tile__meta">
-      <div class="tile__row"><h3 class="tile__title">AI & Automation</h3><span class="tile__hint" aria-hidden="true">Run</span></div>
-      <p class="tile__text">Replies, sorting and data entry, automated.</p>
+      <div class="tile__row"><h3 class="tile__title"><a href={more.ai}>AI & Automation</a></h3><span class="tile__hint" aria-hidden="true">Run</span></div>
+      <p class="tile__text">Routine replies drafted for you to approve.</p>
     </div>
   </article>
 
   <!-- Search: this page, measured now -->
   <article class="tile tile--seo">
     <div class="tile__stage tile__stage--seo">
-      <p class="seo__intro">This page, measured live in your browser</p>
-      <dl class="seo__stats">
-        <div><dt>Loaded in</dt><dd data-stat="load">...</dd></div>
-        <div><dt>Page weight</dt><dd data-stat="weight">...</dd></div>
-        <div><dt>Requests</dt><dd data-stat="requests">...</dd></div>
-      </dl>
-      <ul class="seo__checks" aria-label="Check this site yourself">
-        {
-          checks.map((check) => (
-            <li>
-              <a
-                href={check.href}
-                {...(check.external ? { target: '_blank', rel: 'noopener' } : {})}
-                data-umami-event="Site check"
-                data-umami-event-check={check.label}
-              >
-                {check.label}
-                {check.external && <span class="visually-hidden"> (opens in a new tab)</span>}
-                <Icon name={check.external ? 'arrow-up-right' : 'arrow-right'} size={14} />
-              </a>
-            </li>
-          ))
-        }
-      </ul>
+      <div class="serp" aria-label="Demo search result: Lumen Coffee first for coffee near me">
+        <p class="serp__query" aria-hidden="true">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+          coffee near me
+        </p>
+        <div class="serp__hit" aria-hidden="true">
+          <b>Lumen Coffee</b>
+          <span class="serp__stars">★★★★★ <i>4.8</i></span>
+          <span>Open until 6 pm · Order ahead</span>
+        </div>
+        <div class="serp__miss" aria-hidden="true"><i></i><i></i></div>
+      </div>
+      <p class="seo__live" data-live hidden>
+        This page loaded in <b data-stat="load"></b> on your device.
+        <a href={pagespeed} target="_blank" rel="noopener" data-umami-event="Site check" data-umami-event-check="PageSpeed">
+          Check our speed on Google<span class="visually-hidden"> (opens in a new tab)</span>
+          <Icon name="arrow-up-right" size={14} />
+        </a>
+      </p>
     </div>
     <div class="tile__meta">
-      <div class="tile__row"><h3 class="tile__title">Search & Growth</h3><span class="tile__hint tile__hint--live" aria-hidden="true">Live</span></div>
+      <div class="tile__row"><h3 class="tile__title"><a href={more.seo}>Search & Growth</a></h3><span class="tile__hint tile__hint--live" aria-hidden="true">Live</span></div>
       <p class="tile__text">Get found on Google and in ChatGPT.</p>
     </div>
   </article>
@@ -285,26 +287,15 @@ const DONE_AT_REST = 2;
     justify-content: space-between;
     gap: 12px;
   }
+  /* A quiet one-word hint: plain text, never styled like a button. */
   .tile__hint {
     flex: none;
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    height: 26px;
-    padding: 0 11px;
-    border-radius: 999px;
-    background: var(--paper);
-    border: 1px solid var(--line-soft);
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--ink-2);
-  }
-  .tile__hint {
-    transition:
-      background-color 200ms var(--ease-out),
-      border-color 200ms var(--ease-out),
-      color 200ms var(--ease-out),
-      transform 200ms var(--ease-out);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
   }
   .tile {
     transition: border-color 240ms var(--ease-out);
@@ -312,12 +303,6 @@ const DONE_AT_REST = 2;
   @media (hover: hover) and (pointer: fine) {
     .tile:hover {
       border-color: var(--line);
-    }
-    .tile:hover .tile__hint:not(.tile__hint--live) {
-      background: var(--ink);
-      border-color: var(--ink);
-      color: var(--white);
-      transform: translateY(-1px);
     }
   }
   .tile__hint--live::before {
@@ -339,6 +324,28 @@ const DONE_AT_REST = 2;
     flex-direction: column;
     gap: 6px;
     padding: 20px 24px 22px;
+  }
+  .tile__title a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .tile__title a::after {
+    content: ' →';
+    display: inline-block;
+    opacity: 0;
+    transform: translateX(-4px);
+    transition:
+      opacity 200ms var(--ease-out),
+      transform 200ms var(--ease-out);
+  }
+  .tile__title a:hover,
+  .tile__title a:focus-visible {
+    color: var(--teal-ink);
+  }
+  .tile__title a:hover::after,
+  .tile__title a:focus-visible::after {
+    opacity: 1;
+    transform: none;
   }
   .tile__title {
     margin: 0;
@@ -823,6 +830,17 @@ const DONE_AT_REST = 2;
     font-weight: 700;
     color: var(--muted);
   }
+  .settings__stat {
+    margin: 0 0 4px;
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+  .settings__stat b {
+    font-family: var(--font-display);
+    font-size: 26px;
+    color: var(--ink);
+    margin-right: 4px;
+  }
   .settings__note {
     margin: 0;
     font-size: 12px;
@@ -1065,74 +1083,90 @@ const DONE_AT_REST = 2;
     place-items: stretch;
     align-content: center;
   }
-  .seo__intro {
-    margin: 0;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--muted);
-  }
-  .seo__stats {
-    margin: 0;
+  /* A search result page in miniature: the café on top. */
+  .serp {
+    width: 100%;
     display: grid;
-    gap: 2px;
+    gap: 8px;
+    padding: 14px;
+    border-radius: 16px;
+    background: var(--white);
+    border: 1px solid var(--line-soft);
+    box-shadow: 0 12px 30px -22px rgb(10 17 40 / 0.4);
   }
-  .seo__stats div {
+  .serp__query {
     display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 8px 0;
-    border-bottom: 1px solid var(--line-soft);
-  }
-  .seo__stats dt {
-    font-size: 14px;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 4px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    font-size: 13px;
     color: var(--ink-2);
   }
-  .seo__stats dd {
+  .serp__hit {
+    display: grid;
+    gap: 2px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: var(--tint-cyan);
+    font-size: 12px;
+    color: var(--ink-2);
+  }
+  .serp__hit b {
+    font-size: 15px;
+    color: var(--teal-ink);
+  }
+  .serp__stars {
+    color: #8a5a00;
+    letter-spacing: 1px;
+  }
+  .serp__stars i {
+    font-style: normal;
+    color: var(--ink-2);
+    letter-spacing: 0;
+  }
+  .serp__miss {
+    display: grid;
+    gap: 6px;
+    padding: 4px 12px;
+  }
+  .serp__miss i {
+    height: 7px;
+    border-radius: 999px;
+    background: var(--line-soft);
+  }
+  .serp__miss i:last-child {
+    width: 60%;
+  }
+  .seo__live {
     margin: 0;
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 28px;
-    line-height: 1;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+  .seo__live b {
+    color: var(--ink);
     font-variant-numeric: tabular-nums;
   }
-  .seo__checks {
-    list-style: none;
-    margin: 4px 0 0;
-    padding: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-  .seo__checks a {
+  .seo__live a {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    min-height: 34px;
-    padding: 0 12px;
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    background: var(--surface);
-    font-size: 13px;
+    gap: 4px;
     font-weight: 700;
-    text-decoration: none;
-    transition:
-      border-color 160ms var(--ease-out),
-      transform 160ms var(--ease-out);
-  }
-  .seo__checks a:hover {
-    color: var(--ink);
-    border-color: var(--ink);
-  }
-  .seo__checks a:active {
-    transform: scale(0.96);
   }
 
   @media (prefers-reduced-motion: reduce) {
     .chat__log :global(.msg),
     .flow__step .flow__dot,
-    .chat__log :global(.typing i) {
+    .chat__log :global(.typing i),
+    .tile__hint--live::before {
       animation: none !important;
+    }
+    /* A full ring instead of a frozen half spinner. */
+    .flow__step[data-state='running'] .flow__dot {
+      border-right-color: var(--teal);
     }
   }
 </style>
@@ -1210,12 +1244,21 @@ const DONE_AT_REST = 2;
     if (log && chips) {
       const buttons = [...chips.querySelectorAll<HTMLButtonElement>('button')];
       let chatting = false;
+      let exchange = 0;
+      /** Keeps the two latest exchanges, removed as whole question-and-answer pairs. */
+      const prune = () => {
+        const ids = [...new Set([...log.querySelectorAll<HTMLElement>('[data-exchange]')].map((el) => el.dataset.exchange))];
+        while (ids.length > 2) {
+          const oldest = ids.shift();
+          log.querySelectorAll(`[data-exchange="${oldest}"]`).forEach((el) => el.remove());
+        }
+      };
       const bubble = (text: string, who: 'me' | 'bot') => {
         const p = document.createElement('p');
         p.className = `msg msg--${who}`;
+        p.dataset.exchange = String(exchange);
         p.textContent = text;
         log.appendChild(p);
-        while (log.children.length > 5) log.firstElementChild?.remove();
         return p;
       };
       const typing = () => {
@@ -1227,8 +1270,10 @@ const DONE_AT_REST = 2;
       };
       const say = async (mine: string, reply: string) => {
         chatting = true;
+        exchange += 1;
         buttons.forEach((b) => setBusy(b, true));
         bubble(mine, 'me');
+        prune();
         await wait(260);
         const t = typing();
         await wait(900);
@@ -1240,6 +1285,8 @@ const DONE_AT_REST = 2;
       chips.addEventListener('click', (event) => {
         const b = (event.target as Element).closest<HTMLButtonElement>('button');
         if (!b || chatting || isBusy(b)) return;
+        // Announce replies only once the visitor is the one talking, never the automatic replay.
+        log.setAttribute('aria-live', 'polite');
         void say(b.dataset.say ?? '', b.dataset.reply ?? '');
       });
       onFirstView(log, () => {
@@ -1247,6 +1294,7 @@ const DONE_AT_REST = 2;
         const replay = [...log.querySelectorAll<HTMLElement>('[data-replay]')];
         const [mine, answer] = replay.map((el) => el.textContent ?? '');
         replay.forEach((el) => el.remove());
+        exchange = -1;
         void say(mine ?? '', answer ?? '');
       });
     }
@@ -1314,14 +1362,14 @@ const DONE_AT_REST = 2;
       const el = root.querySelector<HTMLElement>(`[data-stat="${key}"]`);
       if (el) el.textContent = value;
     };
-    const kb = (bytes: number) => (bytes >= 1048576 ? `${(bytes / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`);
+    const live = root.querySelector<HTMLElement>('[data-live]');
     const measure = () => {
       const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
-      const resources = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
-      if (nav && nav.loadEventStart > 0) set('load', `${(nav.loadEventStart / 1000).toFixed(2)} s`);
-      const bytes = (nav?.transferSize ?? 0) + resources.reduce((sum, r) => sum + (r.transferSize || 0), 0);
-      set('weight', bytes > 0 ? kb(bytes) : 'from cache');
-      set('requests', String(resources.length + 1));
+      // Shown only once there is a real number to show.
+      if (nav && nav.loadEventStart > 0 && live) {
+        set('load', `${(nav.loadEventStart / 1000).toFixed(2)} s`);
+        live.hidden = false;
+      }
     };
     if (document.readyState === 'complete') window.setTimeout(measure, 0);
     else window.addEventListener('load', () => window.setTimeout(measure, 0), { once: true });

@@ -52,9 +52,22 @@ const CURVE = 'M3 8 C 22 2, 38 2, 52 6.5 S 80 11, 97 4';
     </nav>
     {/* Below 900px the links move into the menu sheet. The Popover API opens and closes it,
         Esc and the back button included, without JavaScript. */}
-    <button type="button" class="header__menu-btn" popovertarget="site-menu" aria-label="Menu">
-      <Icon name="menu" size={22} />
-    </button>
+    {/* Phones keep Book a call in the sticky bar, next to the menu, so it is never out of reach. */}
+    <div class="header__end">
+      <a
+        href="/contact"
+        class="header__cta header__cta--phone"
+        aria-current={isCurrent('/contact')}
+        data-book-call
+        data-umami-event="Book a call"
+        data-umami-event-from="header-phone"
+      >
+        Book a call
+      </a>
+      <button type="button" class="header__menu-btn" popovertarget="site-menu" aria-label="Menu">
+        <Icon name="menu" size={22} />
+      </button>
+    </div>
   </div>
 </header>
 
@@ -314,13 +327,36 @@ const CURVE = 'M3 8 C 22 2, 38 2, 52 6.5 S 80 11, 97 4';
     border-color: rgb(255 255 255 / 0.55);
   }
 
+  .header__end {
+    display: none;
+    align-items: center;
+    gap: 8px;
+  }
+  .header__cta--phone {
+    min-height: 40px;
+    margin-left: 0;
+    padding: 0 14px;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+  /* The narrowest phones drop the small "Studio" next to the wordmark to keep Book a call on one line. */
+  @media (max-width: 419.98px) {
+    .header__inner :global(.logo__descriptor) {
+      display: none;
+    }
+  }
   @media (max-width: 899.98px) {
     .header__inner {
       flex-wrap: nowrap;
-      gap: 16px;
+      gap: 12px;
+      padding-top: 12px;
+      padding-bottom: 12px;
     }
     .header__nav {
       display: none;
+    }
+    .header__end {
+      display: flex;
     }
     .header__menu-btn {
       display: grid;
@@ -478,6 +514,7 @@ const CURVE = 'M3 8 C 22 2, 38 2, 52 6.5 S 80 11, 97 4';
       flex-wrap: wrap;
     }
     .header__menu-btn,
+    .header__cta--phone,
     .menu {
       display: none !important;
     }

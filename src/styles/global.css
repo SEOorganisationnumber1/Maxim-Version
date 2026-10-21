@@ -338,9 +338,9 @@ img, svg { max-width: 100%; }
     object-position 1200ms var(--ease-out),
     transform 400ms var(--ease-out);
 }
-/* Hovering a project card scrolls its screenshot a little, as if you were browsing the site. */
+/* Hovering a project card that links somewhere scrolls its screenshot a little, as if browsing it. */
 @media (hover: hover) and (pointer: fine) {
-  .card:hover .shot__img {
+  a.card:hover .shot__img {
     object-position: 50% 32%;
     transform: translateY(-4px);
   }

@@ -227,7 +227,7 @@ const smallCards = others.slice(0, 2).map((project) => ({ project, url: projectU
                 <div class="featured__copy">
                   <span class="tagline">{cardLine(featured)}</span>
                   <h3 class="featured__name">{featured.name}</h3>
-                  {featured.summary && <p class="featured__summary">{featured.summary.split(/(?<=\.)\s/)[0]}</p>}
+                  {featured.plain && <p class="featured__summary">{featured.plain}</p>}
                 </div>
                 {(featuredResult || featuredUrl || featured.site) && (
                   <div class="featured__foot">
@@ -286,6 +286,7 @@ const smallCards = others.slice(0, 2).map((project) => ({ project, url: projectU
                       <div class="small__body">
                         <span class="tagline">{cardLine(project)}</span>
                         <h3 class="small__name">{project.name}</h3>
+                        {project.plain && <p class="small__summary">{project.plain}</p>}
                         {!url && project.site && (
                           <a href={project.site} class="small__visit" target="_blank" rel="noopener">
                             Visit {new URL(project.site).hostname}
@@ -376,7 +377,8 @@ const smallCards = others.slice(0, 2).map((project) => ({ project, url: projectU
     overflow: hidden;
     display: grid;
     place-items: center;
-    min-height: clamp(620px, calc(100svh - 77px), 940px);
+    /* A little shorter than the screen, so the next section peeks in and invites the scroll. */
+    min-height: clamp(560px, calc(100svh - 77px - 72px), 860px);
     background: var(--paper);
   }
   .hero__art {
@@ -567,6 +569,23 @@ const smallCards = others.slice(0, 2).map((project) => ({ project, url: projectU
   .hero__motion[data-state='playing'] .hero__motion-play,
   .hero__motion[data-state='paused'] .hero__motion-pause {
     display: none;
+  }
+  /* Phones: the highlight hugs each wrapped line like a marker instead of filling a slab, and the
+     buttons share one width. */
+  @media (max-width: 559.98px) {
+    .hero__title {
+      line-height: 1.12;
+    }
+    .hero__mark {
+      display: inline;
+      -webkit-box-decoration-break: clone;
+      box-decoration-break: clone;
+    }
+    .hero__actions {
+      flex-direction: column;
+      width: 100%;
+      max-width: 340px;
+    }
   }
   /* Phones: the ribbons become a band under the sentence instead of framing it. */
   @media (max-width: 899.98px) {

@@ -64,6 +64,8 @@ export type Project = {
   services: Service[];
   /** One line on the Home and Work cards; hidden while null. */
   summary: string | null;
+  /** What it does, in a few plain words, for the Home cards (no tech stack). Falls back to the summary's first sentence. */
+  plain: string | null;
   /** The live product, linked from the cards so visitors can see the work for themselves. */
   site: string | null;
   /** A real screenshot of the product for the card (src/assets/work). Without it the card shows the wave art. */
@@ -99,7 +101,7 @@ const toClientLine = (services: Service[]): string => {
   return line.charAt(0).toUpperCase() + line.slice(1);
 };
 
-type Seed = Pick<Project, 'slug' | 'name' | 'services'> & Partial<Pick<Project, 'summary' | 'site' | 'image' | 'own' | 'client' | 'caseStudy'>>;
+type Seed = Pick<Project, 'slug' | 'name' | 'services'> & Partial<Pick<Project, 'summary' | 'plain' | 'site' | 'image' | 'own' | 'client' | 'caseStudy'>>;
 
 // Real work only: every project here is shown on Home, Work and in llms.txt; clients (not `own`)
 // also on Clients. Add `summary` and `caseStudy` (shape: CaseStudy above) as they are written;
@@ -108,6 +110,7 @@ type Seed = Pick<Project, 'slug' | 'name' | 'services'> & Partial<Pick<Project, 
 const seeds: Seed[] = [
   {
     slug: 'leadity-io',
+    plain: 'Finds local businesses on Google Maps, with the owner behind each one.',
     name: 'leadity.io',
     services: ['Websites & Landing Pages', 'Web Apps & SaaS', 'Search & Growth'],
     summary:
@@ -120,6 +123,7 @@ const seeds: Seed[] = [
   // owner says whether each one was client work and whether it is live; summaries come from the code.
   {
     slug: 'crypto-exchange-platform',
+    plain: 'People swap crypto for money sent straight to their bank card.',
     name: 'Crypto exchange platform',
     services: ['Web Apps & SaaS'],
     summary:
@@ -128,6 +132,7 @@ const seeds: Seed[] = [
   },
   {
     slug: 'car-parts-store',
+    plain: 'An online shop for car parts, from search to checkout.',
     name: 'Car parts store',
     services: ['Websites & Landing Pages'],
     summary:
@@ -136,6 +141,7 @@ const seeds: Seed[] = [
   },
   {
     slug: 'electronics-store',
+    plain: 'An online electronics shop in several languages.',
     name: 'Electronics store',
     services: ['Websites & Landing Pages', 'Web Apps & SaaS'],
     summary:
@@ -144,6 +150,7 @@ const seeds: Seed[] = [
   },
   {
     slug: 'reviews-site',
+    plain: 'Customers post star ratings with photos; the owner approves them.',
     name: 'Reviews site',
     services: ['Websites & Landing Pages'],
     summary:
@@ -157,6 +164,7 @@ export const projects: Project[] = seeds.map((seed, i) => ({
   name: seed.name,
   services: seed.services,
   summary: seed.summary ?? null,
+  plain: seed.plain ?? seed.summary?.split(/(?<=\.)\s/)[0] ?? null,
   site: seed.site ?? null,
   image: seed.image ?? null,
   own: seed.own ?? false,

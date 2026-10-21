@@ -63,16 +63,20 @@ const sendErrorText = `Something went wrong sending your request. Please try aga
 
     {
       !bookingUrl && (
-        <div class="field">
-          <label for="c-call" class="field__label">Best time for a call</label>
-          <select id="c-call" name="callTime" class="field__control" aria-describedby="c-call-hint">
-            {Object.entries(CALL_TIMES).map(([value, label]) => (
-              <option value={value}>{label}</option>
+        <fieldset class="needs" aria-describedby="c-call-hint">
+          <legend class="needs__legend">When suits you?</legend>
+          <div class="needs__list">
+            {Object.entries(CALL_TIMES).map(([value, label], i) => (
+              <label class="check">
+                <input type="radio" name="callTime" value={value} checked={i === 0} />
+                <Icon name="check" size={16} strokeWidth={2.6} class="check__icon" />
+                {label}
+              </label>
             ))}
-          </select>
+          </div>
           <p id="c-call-hint" class="field__note" data-tz-hint>In your time zone.</p>
           <input type="hidden" name="timezone" value="" data-tz />
-        </div>
+        </fieldset>
       )
     }
 
@@ -81,7 +85,7 @@ const sendErrorText = `Something went wrong sending your request. Please try aga
       <textarea
         id="c-msg"
         name="message"
-        rows="4"
+        rows="3"
         maxlength="5000"
         placeholder="A line or two about your idea is plenty."
         class="field__control field__control--area"></textarea>
@@ -235,7 +239,7 @@ const sendErrorText = `Something went wrong sending your request. Please try aga
     }
   }
   .field__control--area {
-    min-height: 120px;
+    min-height: 92px;
     padding: 12px 16px;
     line-height: 1.5;
     resize: vertical;
@@ -309,6 +313,9 @@ const sendErrorText = `Something went wrong sending your request. Please try aga
   .check:has(input:checked) :global(.check__icon) {
     display: block;
   }
+  .needs .field__note {
+    margin-top: 8px;
+  }
   .check:has(input:focus-visible) {
     outline: 3px solid var(--teal);
     outline-offset: 2px;
@@ -369,7 +376,7 @@ const sendErrorText = `Something went wrong sending your request. Please try aga
     const emailInput = $<HTMLInputElement>(form, '#c-email');
 
     // Only there while the form is the call request (no scheduling page set).
-    const callSelect = form.querySelector<HTMLSelectElement>('#c-call');
+    const callTimes = Array.from(form.querySelectorAll<HTMLInputElement>('input[name="callTime"]'));
     const zoneInput = form.querySelector<HTMLInputElement>('[data-tz]');
     const zoneHint = form.querySelector<HTMLElement>('[data-tz-hint]');
     const messageInput = $<HTMLTextAreaElement>(form, '#c-msg');
@@ -463,7 +470,7 @@ const sendErrorText = `Something went wrong sending your request. Please try aga
         name: nameInput.value.trim(),
         email: emailInput.value.trim(),
         needs: needs.filter((box) => box.checked).map((box) => box.value),
-        ...(callSelect ? { callTime: callSelect.value, timezone } : {}),
+        ...(callTimes.length ? { callTime: callTimes.find((r) => r.checked)?.value ?? 'any', timezone } : {}),
         message: messageInput.value.trim(),
       };
 
