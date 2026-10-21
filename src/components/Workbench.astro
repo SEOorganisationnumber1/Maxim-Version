@@ -41,7 +41,7 @@ const DONE_AT_REST = 2;
   <!-- Websites: one layout that works at every width -->
   <article class="tile tile--web" aria-labelledby="tile-web">
     <div class="tile__meta">
-      <div class="tile__row"><h3 class="tile__title" id="tile-web"><a href={more.web}>Websites & Landing Pages<Icon name="arrow-right" size={16} strokeWidth={2.6} class="tile__go" /></a></h3><span class="tile__hint" aria-hidden="true">Slide</span></div>
+      <h3 class="tile__title" id="tile-web"><a href={more.web}>Websites & Landing Pages<Icon name="arrow-right" size={16} strokeWidth={2.6} class="tile__go" /></a></h3>
       <p class="tile__text">Fast sites that work on every screen.</p>
     </div>
     <div class="tile__stage tile__stage--web">
@@ -82,7 +82,7 @@ const DONE_AT_REST = 2;
   <!-- Telegram: a bot with yesterday's question and today's order -->
   <article class="tile tile--bot" aria-labelledby="tile-bot">
     <div class="tile__meta">
-      <div class="tile__row"><h3 class="tile__title" id="tile-bot"><a href={more.bot}>Telegram Bots & Extensions<Icon name="arrow-right" size={16} strokeWidth={2.6} class="tile__go" /></a></h3><span class="tile__hint" aria-hidden="true">Tap</span></div>
+      <h3 class="tile__title" id="tile-bot"><a href={more.bot}>Telegram Bots & Extensions<Icon name="arrow-right" size={16} strokeWidth={2.6} class="tile__go" /></a></h3>
       <p class="tile__text">Bots that take orders and answer customers.</p>
     </div>
     <div class="tile__stage tile__stage--bot">
@@ -124,7 +124,7 @@ const DONE_AT_REST = 2;
   <!-- Web apps: an unsaved change, ready to save -->
   <article class="tile tile--app" aria-labelledby="tile-app">
     <div class="tile__meta">
-      <div class="tile__row"><h3 class="tile__title" id="tile-app"><a href={more.app}>Web Apps & SaaS<Icon name="arrow-right" size={16} strokeWidth={2.6} class="tile__go" /></a></h3><span class="tile__hint" aria-hidden="true">Save</span></div>
+      <h3 class="tile__title" id="tile-app"><a href={more.app}>Web Apps & SaaS<Icon name="arrow-right" size={16} strokeWidth={2.6} class="tile__go" /></a></h3>
       <p class="tile__text">Order systems, bookings and dashboards.</p>
     </div>
     <div class="tile__stage">
@@ -147,7 +147,7 @@ const DONE_AT_REST = 2;
   <!-- Mobile: a real screen that follows its dark mode switch -->
   <article class="tile tile--phone" aria-labelledby="tile-phone">
     <div class="tile__meta">
-      <div class="tile__row"><h3 class="tile__title" id="tile-phone"><a href={more.phone}>Mobile & Desktop Apps<Icon name="arrow-right" size={16} strokeWidth={2.6} class="tile__go" /></a></h3><span class="tile__hint" aria-hidden="true">Switch</span></div>
+      <h3 class="tile__title" id="tile-phone"><a href={more.phone}>Mobile & Desktop Apps<Icon name="arrow-right" size={16} strokeWidth={2.6} class="tile__go" /></a></h3>
       <p class="tile__text">Apps for iPhone, Android, Mac and Windows.</p>
     </div>
     <div class="tile__stage">
@@ -171,7 +171,7 @@ const DONE_AT_REST = 2;
   <!-- AI: an automation, half way through a run, read left to right -->
   <article class="tile tile--ai" aria-labelledby="tile-ai">
     <div class="tile__meta">
-      <div class="tile__row"><h3 class="tile__title" id="tile-ai"><a href={more.ai}>AI & Automation<Icon name="arrow-right" size={16} strokeWidth={2.6} class="tile__go" /></a></h3><span class="tile__hint" aria-hidden="true">Run</span></div>
+      <h3 class="tile__title" id="tile-ai"><a href={more.ai}>AI & Automation<Icon name="arrow-right" size={16} strokeWidth={2.6} class="tile__go" /></a></h3>
       <p class="tile__text">Routine replies drafted for you to approve.</p>
     </div>
     <div class="tile__stage tile__stage--ai">
@@ -195,7 +195,7 @@ const DONE_AT_REST = 2;
   <!-- Search: a café on top of the results, and this page measured now -->
   <article class="tile tile--seo" aria-labelledby="tile-seo">
     <div class="tile__meta">
-      <div class="tile__row"><h3 class="tile__title" id="tile-seo"><a href={more.seo}>Search & Growth<Icon name="arrow-right" size={16} strokeWidth={2.6} class="tile__go" /></a></h3><span class="tile__hint" aria-hidden="true">Check</span></div>
+      <h3 class="tile__title" id="tile-seo"><a href={more.seo}>Search & Growth<Icon name="arrow-right" size={16} strokeWidth={2.6} class="tile__go" /></a></h3>
       <p class="tile__text">Get found on Google and in ChatGPT.</p>
     </div>
     <div class="tile__stage tile__stage--seo">
@@ -285,23 +285,6 @@ const DONE_AT_REST = 2;
   /* The title is first in the HTML for screen readers; on screen it sits under the demo. */
   .tile__meta {
     order: 2;
-  }
-  /* One verb next to the title says how to play with the demo. */
-  .tile__row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-  }
-  /* A quiet one-word hint: plain text, never styled like a button. */
-  .tile__hint {
-    flex: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--muted);
   }
   .tile {
     transition: border-color 240ms var(--ease-out);
