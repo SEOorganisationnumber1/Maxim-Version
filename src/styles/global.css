@@ -71,8 +71,8 @@ html:has(dialog[data-book-dialog][open]) { overflow: hidden; }
 
 body {
   margin: 0;
-  /* The footer is white, so overscroll past the end of the page shows the same white. */
-  background: var(--surface);
+  /* The footer sits on paper, so overscroll past the end of the page shows the same paper. */
+  background: var(--paper);
 }
 
 .site {
