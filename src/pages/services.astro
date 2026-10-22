@@ -515,12 +515,12 @@ const faqPageJsonLd: Record<string, unknown> = {
     max-width: calc(100% - 44px);
     padding: 4px 10px;
     border-radius: 6px;
-    background: var(--teal);
+    background: var(--teal-ink); /* 5.05:1 for the white 15px text; --teal is 3.17:1 */
     color: var(--white);
     font: 700 15px/1.3 var(--font-display);
     transform: rotate(-2deg);
     transform-origin: left;
-    box-shadow: 0 6px 14px -8px rgb(8 159 179 / 0.7);
+    box-shadow: 0 6px 14px -8px rgb(7 122 138 / 0.7);
   }
   .tint-ink .callout {
     background: var(--cyan);
