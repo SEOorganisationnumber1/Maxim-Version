@@ -3,13 +3,19 @@ import Base from '../../layouts/Base.astro';
 import CtaBand from '../../components/CtaBand.astro';
 import Icon from '../../components/Icon.astro';
 import { Image } from 'astro:assets';
-import { services } from '../../data/site';
-import { cardLine, projects, projectUrl } from '../../data/projects';
+import { projects, projectUrl } from '../../data/projects';
 
-// Filtering only helps with two or more projects, and only by services that have a project.
-const showFilters = projects.length > 1;
-const filters = ['All', ...services.filter((s) => projects.some((p) => p.services.includes(s)))];
+// The Work page is the full log of projects: the same list as on Home, with a large panel beside it
+// that shows the project you pick. On phones the panel goes away and each row opens in place.
+// Work we built for others first, our own product last.
+const log = [...projects.filter((p) => !p.own && !p.sample), ...projects.filter((p) => p.own), ...projects.filter((p) => p.sample)];
+
+/** "Website" to "Websites" for the filter buttons. */
+const plural = (kind: string) => (kind.endsWith('s') ? kind : `${kind}s`);
+const kinds = [...new Set(log.map((p) => p.kind))];
+const showFilters = kinds.length > 1;
 const countLabel = (n: number) => (n === 1 ? '1 project' : `${n} projects`);
+const kindSlug = (kind: string) => kind.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 ---
 
 <Base
@@ -38,73 +44,134 @@ const countLabel = (n: number) => (n === 1 ? '1 project' : `${n} projects`);
     </div>
     <div class="container hero__inner">
       <h1 class="h1 hero__title">Products we <span class="highlight">built.</span></h1>
-      <p class="lede hero__lede">Design, engineering and growth work.{showFilters && ' Filter by what we did.'}</p>
-    </div>
-  </section>
-
-  <section class="bg-paper">
-    <div class="container work">
+      <p class="lede hero__lede">Real projects, named. Pick one to see it.</p>
       {
         showFilters && (
-          <div class="work__bar">
-            <div class="work__filters" role="group" aria-label="Filter by service">
-              {filters.map((f) => (
-                <button type="button" class="toggle" data-filter={f} aria-pressed={f === 'All' ? 'true' : 'false'}>
-                  {f}
+          <div class="bar">
+            <div class="filters" role="group" aria-label="Filter by kind">
+              <button type="button" class="toggle" data-filter="all" aria-pressed="true">All</button>
+              {kinds.map((kind) => (
+                <button type="button" class="toggle" data-filter={kindSlug(kind)} aria-pressed="false">
+                  {plural(kind)}
                 </button>
               ))}
             </div>
-            <p class="work__count" aria-live="polite" data-count>
-              {countLabel(projects.length)}
+            <p class="count" aria-live="polite" data-count>
+              {countLabel(log.length)}
             </p>
           </div>
         )
       }
-      <div class="work__grid">
+    </div>
+  </section>
+
+  <section class="bg-paper" aria-label="Projects">
+    <div class="container work" data-work>
+      <ol class="log">
         {
-          projects.map((p) => {
+          log.map((p, i) => {
             const url = projectUrl(p);
-            const Card = url ? 'a' : 'article';
             return (
-              <Card href={url ?? undefined} class="card work-card" data-services={p.services.join('|')}>
-                <div class:list={['shot', `shot--${p.look.tone}`, 'work-card__shot']}>
-                  <svg aria-hidden="true" viewBox="0 0 600 240" preserveAspectRatio="xMidYMid slice" fill="none">
-                    <path d={p.look.path} stroke={p.look.stroke} stroke-width="60" stroke-linecap="round" />
-                  </svg>
-                  {p.image && (
-                    <Image
-                      src={p.image.src}
-                      alt={p.image.alt}
-                      widths={[480, 800, 1200]}
-                      sizes="(min-width: 1240px) 380px, (min-width: 800px) 45vw, 88vw"
-                      class="shot__img"
-                    />
-                  )}
+              <li class="row" data-row={i} data-kind={kindSlug(p.kind)} aria-current={i === 0 ? 'true' : undefined}>
+                <button type="button" class="row__btn" aria-expanded="false" aria-controls={`row-${p.slug}`}>
+                  <span class="row__name">
+                    {p.name}
+                    {p.sample && <span class="sample">Sample</span>}
+                  </span>
+                  <span class="row__kind">{p.kind}</span>
+                  {p.plain && <span class="row__what">{p.own ? `Our own product. ${p.plain}` : p.plain}</span>}
+                </button>
+                {/* Phones: the row opens in place to the screenshot and what we built. */}
+                <div class="row__open" id={`row-${p.slug}`} inert>
+                  <div class="row__inner">
+                    <div class="row__detail">
+                      {p.image && (
+                        <Image
+                          src={p.image.src}
+                          alt={p.image.alt}
+                          widths={[480, 800]}
+                          sizes="92vw"
+                          loading="lazy"
+                          class="row__img"
+                        />
+                      )}
+                      {p.summary && <p class="row__summary">{p.summary}</p>}
+                      {url && (
+                        <a href={url} class="text-link">
+                          Read the case
+                          <Icon name="arrow-right" />
+                        </a>
+                      )}
+                      {p.site && (
+                        <a href={p.site} class="text-link" target="_blank" rel="noopener">
+                          Visit {new URL(p.site).hostname}
+                          <span class="visually-hidden"> (opens in a new tab)</span>
+                          <Icon name="arrow-up-right" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                <div class="work-card__body">
-                  <span class="tagline">{cardLine(p)}</span>
-                  <h2 class="work-card__name">{p.name}</h2>
-                  {p.summary && <p class="work-card__summary">{p.summary}</p>}
-                  {url ? (
-                    <span class="work-card__more">
-                      Read the case
-                      <Icon name="arrow-right" />
-                    </span>
-                  ) : (
-                    p.site && (
-                      <a href={p.site} class="work-card__more" target="_blank" rel="noopener">
+              </li>
+            );
+          })
+        }
+      </ol>
+
+      {/* Wide screens: the project you pick, large. One detail per project; the script shows one. */}
+      <aside class="panel" aria-live="polite" aria-label="The project you picked">
+        <div class="panel__shot">
+          {
+            log.map((p, i) =>
+              p.image ? (
+                <Image
+                  src={p.image.src}
+                  alt=""
+                  widths={[640, 960, 1280]}
+                  sizes="(min-width: 1240px) 580px, 48vw"
+                  loading={i === 0 ? 'eager' : 'lazy'}
+                  class:list={['panel__img', { 'is-on': i === 0 }]}
+                  data-shot={i}
+                />
+              ) : (
+                <span class:list={['panel__empty', { 'is-on': i === 0 }]} data-shot={i} />
+              ),
+            )
+          }
+        </div>
+        {
+          log.map((p, i) => {
+            const url = projectUrl(p);
+            return (
+              <div class="panel__body" data-detail={i} hidden={i !== 0}>
+                <p class="panel__kind">
+                  {p.own ? `${p.kind} · Our own product` : p.kind}
+                  {p.sample && <span class="sample">Sample, local only</span>}
+                </p>
+                <h2 class="panel__name">{p.name}</h2>
+                {p.summary && <p class="panel__text">{p.summary}</p>}
+                {(url || p.site) && (
+                  <div class="panel__links">
+                    {url && (
+                      <a href={url} class="btn btn--primary btn--sm">
+                        Read the case
+                        <Icon name="arrow-right" />
+                      </a>
+                    )}
+                    {p.site && (
+                      <a href={p.site} class="btn btn--outline btn--sm" target="_blank" rel="noopener">
                         Visit {new URL(p.site).hostname}
                         <span class="visually-hidden"> (opens in a new tab)</span>
                         <Icon name="arrow-up-right" />
                       </a>
-                    )
-                  )}
-                </div>
-              </Card>
+                    )}
+                  </div>
+                )}
+              </div>
             );
           })
         }
-      </div>
+      </aside>
     </div>
   </section>
 
@@ -112,33 +179,72 @@ const countLabel = (n: number) => (n === 1 ? '1 project' : `${n} projects`);
 </Base>
 
 <script>
-  // Service filters (rendered from two projects up). A processed script, not is:inline, so it is
-  // covered by the CSP hashes. A ?service= deep link is applied as soon as the page is parsed.
-  const buttons = [...document.querySelectorAll<HTMLButtonElement>('[data-filter]')];
-  const cards = [...document.querySelectorAll<HTMLElement>('[data-services]')];
-  const count = document.querySelector<HTMLElement>('[data-count]');
-  const valid = buttons.map((b) => b.dataset.filter ?? '').filter((f) => f && f !== 'All');
+  const work = document.querySelector<HTMLElement>('[data-work]');
+  if (work) {
+    const rows = [...work.querySelectorAll<HTMLElement>('[data-row]')];
+    const shots = [...work.querySelectorAll<HTMLElement>('[data-shot]')];
+    const details = [...work.querySelectorAll<HTMLElement>('[data-detail]')];
+    const wide = window.matchMedia('(min-width: 900px)');
+    const hover = window.matchMedia('(hover: hover) and (pointer: fine)');
+    let current = 0;
 
-  function apply(filter: string, updateUrl: boolean) {
-    for (const b of buttons) b.setAttribute('aria-pressed', String(b.dataset.filter === filter));
-    let shown = 0;
-    for (const card of cards) {
-      const match = filter === 'All' || (card.dataset.services ?? '').split('|').includes(filter);
-      card.hidden = !match;
-      if (match) shown++;
-    }
-    if (count) count.textContent = shown === 1 ? '1 project' : `${shown} projects`;
-    if (updateUrl) {
-      const url = new URL(window.location.href);
-      if (filter === 'All') url.searchParams.delete('service');
-      else url.searchParams.set('service', filter);
-      history.replaceState(history.state, '', url);
-    }
+    // Wide screens: the panel shows the picked project. The image crossfades; the text swaps.
+    const show = (i: number) => {
+      if (i === current) return;
+      current = i;
+      rows.forEach((row, j) => (j === i ? row.setAttribute('aria-current', 'true') : row.removeAttribute('aria-current')));
+      shots.forEach((shot) => shot.classList.toggle('is-on', Number(shot.dataset.shot) === i));
+      details.forEach((detail) => (detail.hidden = Number(detail.dataset.detail) !== i));
+    };
+
+    rows.forEach((row, i) => {
+      const button = row.querySelector<HTMLButtonElement>('.row__btn');
+      const panel = row.querySelector<HTMLElement>('.row__open');
+      if (!button || !panel) return;
+      button.addEventListener('pointerenter', () => {
+        if (wide.matches && hover.matches) show(i);
+      });
+      button.addEventListener('focus', () => {
+        if (wide.matches) show(i);
+      });
+      button.addEventListener('click', () => {
+        if (wide.matches) return show(i);
+        // Phones: the row opens in place.
+        const open = button.getAttribute('aria-expanded') !== 'true';
+        button.setAttribute('aria-expanded', String(open));
+        row.classList.toggle('is-open', open);
+        panel.inert = !open;
+      });
+    });
+
+    // Filters by kind. A ?kind= link opens the page filtered.
+    const buttons = [...document.querySelectorAll<HTMLButtonElement>('[data-filter]')];
+    const count = document.querySelector<HTMLElement>('[data-count]');
+    const apply = (filter: string, updateUrl: boolean) => {
+      buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filter === filter)));
+      let shown = 0;
+      let first = -1;
+      rows.forEach((row, i) => {
+        const match = filter === 'all' || row.dataset.kind === filter;
+        row.hidden = !match;
+        if (match) {
+          shown += 1;
+          if (first < 0) first = i;
+        }
+      });
+      if (count) count.textContent = shown === 1 ? '1 project' : `${shown} projects`;
+      if (first >= 0) show(first);
+      if (updateUrl) {
+        const url = new URL(window.location.href);
+        if (filter === 'all') url.searchParams.delete('kind');
+        else url.searchParams.set('kind', filter);
+        history.replaceState(history.state, '', url);
+      }
+    };
+    buttons.forEach((b) => b.addEventListener('click', () => apply(b.dataset.filter ?? 'all', true)));
+    const initial = new URLSearchParams(window.location.search).get('kind');
+    if (initial && buttons.some((b) => b.dataset.filter === initial)) apply(initial, false);
   }
-
-  for (const b of buttons) b.addEventListener('click', () => apply(b.dataset.filter ?? 'All', true));
-  const initial = new URLSearchParams(window.location.search).get('service');
-  if (initial && valid.includes(initial)) apply(initial, false);
 </script>
 
 <style>
@@ -163,11 +269,11 @@ const countLabel = (n: number) => (n === 1 ? '1 project' : `${n} projects`);
   }
   .hero__inner {
     position: relative;
-    padding-top: 88px;
-    padding-bottom: 40px;
+    padding-top: 72px;
+    padding-bottom: 36px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 16px;
   }
   .hero__title {
     max-width: 760px;
@@ -175,87 +281,276 @@ const countLabel = (n: number) => (n === 1 ? '1 project' : `${n} projects`);
   .hero__lede {
     max-width: 620px;
   }
-
-  /* ---------- Filter and grid ---------- */
-  .work {
-    padding-top: 24px;
-    padding-bottom: 96px;
-    display: flex;
-    flex-direction: column;
-    gap: 32px;
-  }
-  .work__bar {
+  .bar {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: space-between;
-    gap: 16px 24px;
+    gap: 12px 20px;
+    margin-top: 20px;
   }
-  .work__filters {
+  .filters {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
   }
-  .work__count {
+  .count {
     margin: 0;
     font-size: 14px;
     font-weight: 600;
-    color: var(--ink-2);
-  }
-  .work__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
-    gap: 24px;
+    color: var(--muted);
   }
 
-  /* ---------- Project card ---------- */
-  /* .card sets display:flex, which would override the UA [hidden] rule. */
-  .work-card[hidden] {
+  /* ---------- The list, and the panel beside it ---------- */
+  .work {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    align-items: start;
+    gap: 48px;
+    padding-bottom: 96px;
+  }
+  .log {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--line);
+  }
+  .row {
+    border-bottom: 1px solid var(--line);
+  }
+  .row[hidden] {
     display: none;
   }
-  /* A 2:1 well keeps the screenshot's sides in view at every width; only the bottom bleeds off. */
-  .work-card__shot {
-    min-height: 0;
-    aspect-ratio: 2 / 1;
+  .row__btn {
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 4px 20px;
+    padding: 22px 12px;
+    border: 0;
+    border-radius: 16px;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition:
+      background-color 220ms var(--ease-out),
+      box-shadow 220ms var(--ease-out);
   }
-  .work-card__body {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 28px;
+  .row__btn:focus-visible {
+    outline: 3px solid var(--teal);
+    outline-offset: -3px;
   }
-  .work-card__name {
-    margin: 0;
+  .row__name {
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: 30px;
-    line-height: 1.1;
+    font-size: clamp(1.375rem, 2vw, 1.7rem);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    transition: transform 300ms var(--ease-out);
   }
-  .work-card__summary {
+  .row__name .sample {
+    margin-left: 8px;
+    vertical-align: middle;
+    font-family: var(--font-body);
+    letter-spacing: 0;
+  }
+  .row__kind {
+    grid-row: span 2;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--muted);
+  }
+  .row__what {
+    font-size: 15px;
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+  .row[aria-current='true'] .row__btn {
+    background: var(--surface);
+    box-shadow: var(--shadow-tile);
+  }
+  .row[aria-current='true'] .row__name {
+    transform: translateX(6px);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .row__btn:hover .row__name {
+      transform: translateX(6px);
+    }
+  }
+  .row__open {
+    display: none;
+  }
+
+  .panel {
+    position: sticky;
+    top: 96px;
+    padding: 14px;
+    background: var(--surface);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius-tile);
+    box-shadow: var(--shadow-tile);
+  }
+  .panel__shot {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-radius: 18px;
+    background: var(--tint-cyan);
+  }
+  .panel__shot :global(.panel__img),
+  .panel__empty {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    opacity: 0;
+    transform: scale(1.02);
+    transition:
+      opacity 320ms var(--ease-out),
+      transform 520ms var(--ease-out);
+  }
+  .panel__shot :global(.is-on) {
+    opacity: 1;
+    transform: none;
+  }
+  .panel__body {
+    padding: 22px 12px 10px;
+  }
+  .panel__body[hidden] {
+    display: none;
+  }
+  .panel__kind {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
     margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  /* Samples only exist on localhost; the tag keeps them from being mistaken for real work. */
+  .sample {
+    padding: 2px 9px;
+    border: 1px dashed #c8a24a;
+    border-radius: 999px;
+    color: #7a4a00;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .panel__name {
+    margin: 4px 0 0;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(1.7rem, 2.6vw, 2.2rem);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+  }
+  .panel__text {
+    margin: 12px 0 0;
+    max-width: 38em;
     font-size: 16px;
     line-height: 1.6;
     color: var(--ink-2);
   }
-  .work-card__more {
-    align-self: flex-start;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    min-height: 44px;
-    font-weight: 700;
-    font-size: 15px;
+  .panel__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 18px;
   }
 
-  /* ---------- Phones: the same rhythm as every page ---------- */
+  /* ---------- Phones and narrow windows: no panel, rows open in place ---------- */
+  @media (max-width: 899.98px) {
+    .work {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0;
+    }
+    .panel {
+      display: none;
+    }
+    .row__btn {
+      padding: 18px 4px;
+      border-radius: 0;
+    }
+    .row[aria-current='true'] .row__btn {
+      background: none;
+      box-shadow: none;
+    }
+    .row[aria-current='true'] .row__name {
+      transform: none;
+    }
+    .row__open {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 420ms var(--ease-out);
+    }
+    .row.is-open .row__open {
+      grid-template-rows: 1fr;
+    }
+    .row__inner {
+      min-height: 0;
+      overflow: hidden;
+    }
+    .row__detail {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 0 4px 22px;
+    }
+    .row__detail :global(.row__img) {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+      object-position: top;
+      border-radius: 16px;
+      border: 1px solid var(--line-soft);
+    }
+    .row__summary {
+      margin: 4px 0 0;
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--ink-2);
+    }
+  }
   @media (max-width: 639.98px) {
     .hero__inner {
       padding-top: 40px;
-      padding-bottom: 0;
+      padding-bottom: 20px;
+    }
+    .bar {
+      margin-top: 8px;
+    }
+    .filters {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      margin: 0 calc(-1 * var(--gutter));
+      padding: 0 var(--gutter) 4px;
+      scrollbar-width: none;
+    }
+    .filters::-webkit-scrollbar {
+      display: none;
+    }
+    .filters .toggle {
+      flex: none;
     }
     .work {
-      padding-top: 32px;
       padding-bottom: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .row__name,
+    .row__open,
+    .panel__shot :global(.panel__img),
+    .panel__empty {
+      transition: none;
     }
   }
 </style>

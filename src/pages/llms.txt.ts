@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { projects, projectUrl, serviceLine, showClientsPage, type Project } from '../data/projects';
+import { realProjects as projects, projectUrl, serviceLine, showClientsPage, type Project } from '../data/projects';
 import { services, site } from '../data/site';
 import { offers, offerUrl } from '../data/offers';
 

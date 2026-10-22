@@ -4,7 +4,7 @@ import Icon from '../components/Icon.astro';
 import Workbench from '../components/Workbench.astro';
 import { Image } from 'astro:assets';
 import { filled, numbers, site } from '../data/site';
-import { clients, projects, projectUrl } from '../data/projects';
+import { clients, realProjects, projectUrl } from '../data/projects';
 import { ribbonPath } from '../scripts/hero-ribbons';
 
 /** "Trusted by:" chips, clients only (never our own products). Past CHIP_LIMIT the rest are behind "+ more brands". */
@@ -29,8 +29,8 @@ const terms = [
 
 // Recent work is a log of real, named projects: work we built for others first, our own product last.
 // Each row opens in place to the real screenshot and what we built. With a fine pointer, the
-// screenshot also trails the pointer down the list. A row says Live only when there is a public site.
-const log = [...projects.filter((project) => !project.own), ...projects.filter((project) => project.own)];
+// screenshot also trails the pointer down the list.
+const log = [...realProjects.filter((project) => !project.own), ...realProjects.filter((project) => project.own)];
 
 ---
 
@@ -182,7 +182,6 @@ const log = [...projects.filter((project) => !project.own), ...projects.filter((
                     <button type="button" class="log__toggle" aria-expanded="false" aria-controls={id}>
                       <span class="log__name">
                         {project.name}
-                        {project.site && <span class="live">Live</span>}
                       </span>
                       <span class="log__what">{project.own ? `Our own product. ${project.plain ?? ''}` : project.plain}</span>
                       <span class="log__kind">{project.kind}</span>
@@ -788,25 +787,6 @@ const log = [...projects.filter((project) => !project.own), ...projects.filter((
   }
   .log__toggle[aria-expanded='true'] .log__plus::after {
     transform: rotate(0deg);
-  }
-  /* Only where there is a public site to visit. */
-  .live {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 3px 10px 3px 8px;
-    border-radius: 999px;
-    background: #e7f8ef;
-    color: #0c6b3d;
-    font: 700 12px/1.4 var(--font-body);
-    letter-spacing: 0;
-  }
-  .live::before {
-    content: '';
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #12b76a;
   }
   @media (hover: hover) and (pointer: fine) {
     .log__toggle:hover {

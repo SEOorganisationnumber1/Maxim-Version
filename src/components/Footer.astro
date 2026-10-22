@@ -3,7 +3,7 @@ import { Image } from 'astro:assets';
 import Logo from './Logo.astro';
 import Icon from './Icon.astro';
 import { footerNav, services, site } from '../data/site';
-import { projects } from '../data/projects';
+import { realProjects } from '../data/projects';
 
 interface Props {
   /** href of the current page's nav item, e.g. '/work'; picks the "Next" tile. */
@@ -31,7 +31,7 @@ const nextFor: Record<string, Next> = {
   '/services': { href: '/company', label: 'Company', text: 'How we work, in plain words.', look: 'ribbon' },
 };
 const next = (current && nextFor[current]) || work;
-const workShot = projects.find((project) => !project.own && project.image)?.image ?? null;
+const workShot = realProjects.find((project) => !project.own && project.image)?.image ?? null;
 ---
 
 {/* The last small bento: the name, where to go next, the pages, the call and what we build. */}

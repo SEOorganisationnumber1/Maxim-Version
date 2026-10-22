@@ -85,6 +85,8 @@ export type Project = {
   look: Look;
   /** Null until the case study is written: no page is built for it and cards do not link. */
   caseStudy: CaseStudy | null;
+  /** Placeholder to see the Work page full while the real projects are on their way. Local only. */
+  sample: boolean;
 };
 
 /** "Web apps & SaaS and AI & automation" from ['Web Apps & SaaS', 'AI & Automation']. */
@@ -103,7 +105,7 @@ const toClientLine = (services: Service[]): string => {
   return line.charAt(0).toUpperCase() + line.slice(1);
 };
 
-type Seed = Pick<Project, 'slug' | 'name' | 'services' | 'kind'> & Partial<Pick<Project, 'summary' | 'plain' | 'site' | 'image' | 'own' | 'client' | 'caseStudy'>>;
+export type Seed = Pick<Project, 'slug' | 'name' | 'services' | 'kind'> & Partial<Pick<Project, 'summary' | 'plain' | 'site' | 'image' | 'own' | 'client' | 'caseStudy'>>;
 
 // Real work only: every project here is shown on Home, Work and in llms.txt; clients (not `own`)
 // also on Clients. Add `summary` and `caseStudy` (shape: CaseStudy above) as they are written;
@@ -114,7 +116,7 @@ const seeds: Seed[] = [
     slug: 'leadity-io',
     kind: 'Web app',
     plain: 'Finds local businesses on Google Maps, with the owner behind each one.',
-    name: 'leadity.io',
+    name: 'Leadity',
     services: ['Websites & Landing Pages', 'Web Apps & SaaS', 'Search & Growth'],
     summary:
       'A lead generation platform for local business leads from Google Maps. We co-founded it and built the first version full stack, then the website, the user area and its SEO.',
@@ -166,7 +168,12 @@ const seeds: Seed[] = [
   },
 ];
 
-export const projects: Project[] = seeds.map((seed, i) => ({
+// SAMPLES, NOT REAL WORK: placeholder projects that fill the Work page on localhost only
+// (src/data/samples.ts). Production builds never load that file, its text or its images.
+const samples: Seed[] = import.meta.env.DEV ? (await import('./samples')).samples : [];
+const withSamples = import.meta.env.DEV ? [...seeds, ...samples] : seeds;
+
+export const projects: Project[] = withSamples.map((seed, i) => ({
   slug: seed.slug,
   name: seed.name,
   kind: seed.kind,
@@ -180,7 +187,11 @@ export const projects: Project[] = seeds.map((seed, i) => ({
   clientLine: toClientLine(seed.services),
   look: looks[i % looks.length]!,
   caseStudy: seed.caseStudy ?? null,
+  sample: seed.slug.startsWith('sample-'),
 }));
+
+/** Real projects only: Home, the menus and everything outside the Work page. */
+export const realProjects: Project[] = projects.filter((p) => !p.sample);
 
 export type PublishedProject = Project & { caseStudy: CaseStudy };
 
@@ -196,7 +207,7 @@ export const projectUrl = (p: Project): string | null => (p.caseStudy ? `/work/$
  */
 export const CLIENTS_PAGE_MIN = 3;
 /** Confirmed client work only: our own products and unattributed work are never shown as clients. */
-export const clients: Project[] = projects.filter((p) => p.client && !p.own);
+export const clients: Project[] = realProjects.filter((p) => p.client && !p.own);
 export const showClientsPage = clients.length >= CLIENTS_PAGE_MIN;
 
 /** The small line above a card's name: "Our own product", or the services we delivered. */
