@@ -1,0 +1,348 @@
+---
+// One small picture per service, drawn in the frame that fits it: a real site in a browser, a
+// dashboard, a phone screen, a bot chat, an automation run and a search result. Used on the
+// Services tiles and, larger, in the opened service. Pictures only: nothing here is interactive.
+import { Image } from 'astro:assets';
+import carPartsShot from '../assets/work/car-parts-store.webp';
+
+export type DemoKind = 'web' | 'app' | 'phone' | 'bot' | 'ai' | 'seo';
+
+interface Props {
+  kind: DemoKind;
+  /** Larger, for the opened service. */
+  large?: boolean;
+}
+
+const { kind, large = false } = Astro.props;
+---
+
+<span class:list={['demo', `demo--${kind}`, { 'demo--large': large }]} aria-hidden="true">
+  {
+    kind === 'web' && (
+      <span class="browser">
+        <span class="browser__bar">
+          <i />
+          <i />
+          <i />
+        </span>
+        <span class="browser__shot">
+          <Image
+            src={carPartsShot}
+            alt=""
+            widths={large ? [800, 1200] : [480, 800]}
+            sizes={large ? '(min-width: 1080px) 620px, 92vw' : '(min-width: 1024px) 340px, (min-width: 640px) 46vw, 88vw'}
+            loading="lazy"
+          />
+        </span>
+      </span>
+    )
+  }
+  {
+    kind === 'app' && (
+      <span class="panel">
+        <small>Your dashboard</small>
+        <span>
+          <b class="panel__num">12</b> orders today
+        </span>
+        <span class="switch">
+          <i />
+          Take orders online
+        </span>
+      </span>
+    )
+  }
+  {
+    kind === 'phone' && (
+      <span class="phone">
+        <b>Good morning</b>
+        <span class="phone__card">
+          <small>Your order</small>
+          <b>Ready at 8:40</b>
+        </span>
+        <span class="phone__row">2 × Flat white</span>
+        <span class="phone__row">Pick up at the counter</span>
+      </span>
+    )
+  }
+  {
+    kind === 'bot' && (
+      <span class="chat">
+        <span class="chat__msg">Hi! What can I get you?</span>
+        <span class="chat__msg chat__msg--me">Two flat whites, please</span>
+        <span class="chat__msg">Paid ✓ Ready at 8:40. We’ll message you here.</span>
+      </span>
+    )
+  }
+  {
+    kind === 'ai' && (
+      <span class="steps">
+        <span class="steps__row">
+          <i />
+          New Google review: 4 stars
+        </span>
+        <span class="steps__row">
+          <i />
+          AI drafts a friendly reply
+        </span>
+        <span class="steps__row steps__row--waiting">
+          <i />
+          You approve it with one tap
+        </span>
+      </span>
+    )
+  }
+  {
+    kind === 'seo' && (
+      <span class="serp">
+        <span class="serp__query">coffee near me</span>
+        <span class="serp__hit">
+          <b>Your business</b>
+          <span class="serp__stars">★★★★★</span> 4.8 · Open now
+        </span>
+        <span class="serp__miss" />
+        <span class="serp__miss serp__miss--short" />
+      </span>
+    )
+  }
+</span>
+
+<style>
+  .demo {
+    position: relative;
+    display: block;
+    width: 100%;
+    font-family: var(--font-body);
+    color: var(--ink);
+    text-align: left;
+  }
+  .demo > span {
+    box-shadow: 0 24px 44px -24px rgb(10 17 40 / 0.55);
+  }
+  .demo--large {
+    max-width: 620px;
+    margin: 0 auto;
+  }
+
+  /* A real site in a browser */
+  .browser {
+    display: block;
+    overflow: hidden;
+    border-radius: 12px 12px 0 0;
+    background: var(--surface);
+  }
+  .browser__bar {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    height: 22px;
+    padding: 0 10px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .browser__bar i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--line);
+  }
+  .browser__shot {
+    display: block;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+  }
+  .browser__shot :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+  }
+
+  /* A dashboard */
+  .panel {
+    display: grid;
+    gap: 10px;
+    width: 86%;
+    margin: 0 auto;
+    padding: 16px 18px 24px;
+    border-radius: 16px 16px 0 0;
+    background: var(--surface);
+    font-size: 14px;
+  }
+  .panel small {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .panel__num {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 30px;
+    line-height: 1;
+  }
+  .switch {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+  }
+  .switch i {
+    position: relative;
+    flex: none;
+    width: 38px;
+    height: 22px;
+    border-radius: 999px;
+    background: var(--teal);
+  }
+  .switch i::after {
+    content: '';
+    position: absolute;
+    right: 3px;
+    top: 3px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--white);
+  }
+
+  /* A phone screen */
+  .phone {
+    display: grid;
+    align-content: start;
+    gap: 8px;
+    width: 46%;
+    max-width: 176px;
+    aspect-ratio: 9 / 18;
+    margin: 0 auto;
+    padding: 26px 10px 10px;
+    border: 6px solid var(--ink);
+    border-radius: 28px;
+    background: var(--paper);
+    font-size: 11px;
+  }
+  .phone b {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 14px;
+    line-height: 1.1;
+  }
+  .phone__card {
+    display: grid;
+    gap: 2px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: var(--teal-ink);
+    color: var(--white);
+  }
+  .phone__card b {
+    font-size: 13px;
+  }
+  .phone__row {
+    padding: 7px 8px;
+    border-radius: 8px;
+    background: var(--surface);
+    font-weight: 600;
+    color: var(--ink-2);
+  }
+
+  /* A bot chat */
+  .chat {
+    display: grid;
+    gap: 7px;
+    width: 84%;
+    margin: 0 auto;
+    padding: 12px 12px 24px;
+    border-radius: 16px 16px 0 0;
+    background: #e7eef4;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  .chat__msg {
+    max-width: 84%;
+    padding: 7px 11px;
+    border-radius: 14px;
+    border-bottom-left-radius: 5px;
+    background: var(--surface);
+  }
+  .chat__msg--me {
+    justify-self: end;
+    border-radius: 14px;
+    border-bottom-right-radius: 5px;
+    background: #d6f2df;
+  }
+
+  /* An automation run */
+  .demo--ai > span {
+    box-shadow: none;
+  }
+  .steps {
+    display: grid;
+    gap: 8px;
+    width: 86%;
+    margin: 0 auto;
+    padding-bottom: 28px;
+  }
+  .steps__row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: var(--surface);
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 10px 22px -16px rgb(10 17 40 / 0.5);
+  }
+  .steps__row i {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--teal);
+  }
+  .steps__row--waiting {
+    color: var(--muted);
+  }
+  .steps__row--waiting i {
+    border: 1.5px dashed #b9c4d3;
+    background: none;
+  }
+
+  /* A search result with the client on top */
+  .serp {
+    display: grid;
+    gap: 8px;
+    width: 86%;
+    margin: 0 auto;
+    padding: 14px 14px 24px;
+    border-radius: 16px 16px 0 0;
+    background: var(--surface);
+    font-size: 13px;
+  }
+  .serp__query {
+    padding: 5px 12px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--ink-2);
+  }
+  .serp__hit {
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: var(--tint-cyan);
+  }
+  .serp__hit b {
+    display: block;
+    font-size: 16px;
+    color: #066877;
+  }
+  .serp__stars {
+    color: #8a5a00;
+  }
+  .serp__miss {
+    height: 7px;
+    border-radius: 999px;
+    background: var(--line-soft);
+  }
+  .serp__miss--short {
+    width: 60%;
+  }
+</style>

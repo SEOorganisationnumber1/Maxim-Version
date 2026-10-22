@@ -52,8 +52,6 @@ export const numbers = {
 
 // No prices on the site (owner's decision, 2026-10-20): every project is priced per case, in writing,
 // after a free call. Keep amounts out of pages, llms.txt and structured data.
-export const plans = ['Launch', 'Growth', 'Full stack'] as const;
-export type PlanName = (typeof plans)[number];
 
 /** Client quotes on the Clients page, in the client's own words and with their permission. */
 export const testimonials: Testimonial[] = [];

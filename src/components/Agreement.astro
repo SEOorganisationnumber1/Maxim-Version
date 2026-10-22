@@ -1,0 +1,194 @@
+---
+// The terms as a written agreement with two signatures that draw themselves once it is in view.
+// Home shows the four that matter most; Services shows all of them.
+import { site } from '../data/site';
+
+interface Props {
+  terms: { title: string; text: string }[];
+  /** Unique id for the agreement's title, when a page has more than one. */
+  id?: string;
+}
+
+const { terms, id = 'agreement-title' } = Astro.props;
+---
+
+<article class="doc" data-doc aria-labelledby={id}>
+  <div class="doc__head">
+    <h3 class="doc__title" id={id}>The {site.shortName} agreement</h3>
+    <p class="doc__sub">Signed before any work starts</p>
+  </div>
+  <dl class="clauses">
+    {
+      terms.map((term) => (
+        <div class="clause">
+          <dt>{term.title}</dt>
+          <dd>{term.text}</dd>
+        </div>
+      ))
+    }
+  </dl>
+  <div class="sign" aria-hidden="true">
+    <div class="sign__line">
+      <svg style="--w: 190px" viewBox="0 0 190 56" fill="none">
+        <path
+          class="sign__ink sign__ink--us"
+          pathLength="1"
+          d="M22 8 C 12 22, 6 40, 12 46 C 18 50, 30 40, 38 42 C 44 44, 40 50, 48 46 C 56 42, 58 30, 64 34 C 70 38, 64 46, 72 44 C 80 42, 82 32, 88 36 C 94 40, 90 46, 98 44 C 106 42, 108 30, 116 34 C 122 38, 118 46, 128 42 C 136 38, 140 30, 146 34 C 152 38, 150 46, 158 42 C 166 38, 172 30, 184 28 M 30 52 C 70 46, 120 46, 176 40"
+        ></path>
+      </svg>
+      For {site.name}
+    </div>
+    <div class="sign__line">
+      <svg style="--w: 130px" viewBox="0 0 130 56" fill="none">
+        <path
+          class="sign__ink sign__ink--you"
+          pathLength="1"
+          d="M8 14 C 12 24, 18 30, 24 28 C 30 26, 32 16, 34 12 C 30 28, 26 44, 20 50 C 16 54, 12 50, 18 44 C 26 36, 36 34, 44 36 C 52 38, 48 46, 56 44 C 64 42, 66 34, 72 36 C 78 38, 74 46, 82 44 C 90 42, 94 36, 100 38 C 108 40, 112 36, 124 32"
+        ></path>
+      </svg>
+      For you
+    </div>
+  </div>
+</article>
+
+<script>
+  // Each agreement signs itself once, when most of it is on screen.
+  document.querySelectorAll<HTMLElement>('[data-doc]').forEach((doc) => {
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          doc.classList.add('is-signed');
+          io.disconnect();
+        }
+      },
+      { threshold: 0.35 },
+    );
+    io.observe(doc);
+  });
+</script>
+
+<style>
+  .doc {
+    padding: clamp(26px, 4vw, 52px);
+    background: var(--surface);
+    border: 1px solid var(--line-soft);
+    border-radius: 8px;
+    box-shadow:
+      0 2px 0 rgb(10 17 40 / 0.03),
+      0 40px 70px -50px rgb(10 17 40 / 0.5);
+  }
+  .doc__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 16px;
+    padding-bottom: 22px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .doc__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 22px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  .doc__sub {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .clauses {
+    margin: 0;
+  }
+  .clause {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 24px;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .clause dt {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 1.25;
+  }
+  .clause dd {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+  /* Two signatures on their lines; they draw themselves once the agreement is in view. */
+  .sign {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-top: 72px;
+  }
+  .sign__line {
+    position: relative;
+    padding-top: 10px;
+    border-top: 1.5px solid var(--ink);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .sign__line svg {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 2px);
+    width: 100%;
+    max-width: var(--w);
+    height: auto;
+    overflow: visible;
+  }
+  .sign__ink {
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+  .sign__ink--us {
+    stroke: var(--ink);
+  }
+  .sign__ink--you {
+    stroke: var(--teal-ink);
+  }
+  .doc.is-signed .sign__ink {
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1100ms cubic-bezier(0.65, 0, 0.35, 1);
+  }
+  .doc.is-signed .sign__ink--you {
+    transition-delay: 900ms;
+    transition-duration: 800ms;
+  }
+  @media (max-width: 799.98px) {
+    .doc__head {
+      flex-direction: column;
+    }
+    .clause {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 6px;
+      padding: 18px 0;
+    }
+    .clause dt {
+      font-size: 18px;
+    }
+    .sign {
+      gap: 22px;
+      margin-top: 60px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sign__ink,
+    .doc.is-signed .sign__ink {
+      stroke-dashoffset: 0;
+      transition: none;
+    }
+  }
+</style>

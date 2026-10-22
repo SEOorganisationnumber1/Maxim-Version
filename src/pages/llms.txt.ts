@@ -32,7 +32,7 @@ What we build: ${services.join(', ')}. UI and UX design is part of every project
 
 - [Home](${url('/')}): What we build and our latest work
 - [Work](${url('/work')}): Products we built and case studies
-- [Services](${url('/services')}): Every kind of project we take on, our stack, plans and FAQ${clientsPage}
+- [Services](${url('/services')}): Every kind of project we take on, what you get with each, our written terms and FAQ${clientsPage}
 - [Company](${url('/company')}): How we work and the rules we keep
 - [Contact](${url('/contact')}): Book a free 30-minute call or send a brief${contact}
 

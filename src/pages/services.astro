@@ -1,23 +1,31 @@
 ---
 import Base from '../layouts/Base.astro';
-import CtaBand from '../components/CtaBand.astro';
 import Icon from '../components/Icon.astro';
-import { type PlanName, type Service } from '../data/site';
+import Agreement from '../components/Agreement.astro';
+import RibbonEnd from '../components/RibbonEnd.astro';
+import ServiceDemo, { type DemoKind } from '../components/ServiceDemo.astro';
+import { Image } from 'astro:assets';
+import { type Service } from '../data/site';
 import { offersFor, offerUrl } from '../data/offers';
+import { realProjects, type Tint } from '../data/projects';
 
-type ServiceBlock = { name: Service; description: string; deliverables: string[] };
-type StackRow = { label: string; tools: string[] };
-type Plan = { name: PlanName; summary: string; period: string; featured: boolean; items: string[] };
+type ServiceBlock = {
+  name: Service;
+  /** What it gets you, in a few plain words, under the tile's name (as on Home's bench). */
+  line: string;
+  /** One true promise in the teal box on the tile. */
+  callout: string;
+  tint: Tint;
+  demo: DemoKind;
+  description: string;
+  deliverables: string[];
+  /** The tools behind it, in one line. */
+  tools: string;
+  /** The verb for its Book a call button: "Book a call about a site". */
+  about: string;
+};
 type Faq = { question: string; answer: string };
 type Term = { title: string; text: string };
-
-const jumpLinks = [
-  { href: '#services', label: 'What we do' },
-  { href: '#stack', label: 'Stack & tools' },
-  { href: '#plans', label: 'Plans' },
-  { href: '#terms', label: 'Terms' },
-  { href: '#faq', label: 'FAQ' },
-];
 
 // How every project works, approved by the owner on 2026-10-16. These are promises the studio
 // keeps: change them here first if the way of working changes.
@@ -54,32 +62,46 @@ const terms: Term[] = [
   },
 ];
 
-// One block per kind of project. UI and UX design is in every one of them, so it has no block of its own.
+// One tile per kind of project. UI and UX design is in every one of them, so it has no tile of its own.
 const serviceBlocks: ServiceBlock[] = [
   {
     name: 'Websites & Landing Pages',
-    description:
-      'Company websites, landing pages and blogs on modern frameworks. Server-rendered and fast by default. Core Web Vitals are a build requirement, not an afterthought.',
+    line: 'Fast sites that work on every screen.',
+    callout: 'Fast on every screen',
+    tint: 'cyan',
+    demo: 'web',
+    description: 'Company websites, landing pages and blogs that load fast and bring in customers, on every screen.',
     deliverables: [
       'Design of every page, for desktop and mobile',
       'Company sites, landing pages and blogs',
-      'A headless CMS your team can edit',
+      'A content editor your team can use',
       'Analytics, tracking and SEO foundations built in',
     ],
+    tools: 'Figma, Astro, Next.js, a headless CMS',
+    about: 'a site',
   },
   {
     name: 'Web Apps & SaaS',
-    description:
-      'Custom web applications and SaaS products, from the first version to scale. Full-stack and typed end to end, with the unglamorous parts done properly.',
+    line: 'Order systems, bookings and dashboards.',
+    callout: 'Orders, bookings, dashboards',
+    tint: 'blue',
+    demo: 'app',
+    description: 'Custom web applications and SaaS products, from the first version to scale, with the unglamorous parts done properly.',
     deliverables: [
       'MVPs and new SaaS products',
       'Internal tools, portals and dashboards',
       'Accounts, roles, payments and integrations',
-      'Tests, CI/CD and monitoring from day one',
+      'Tests and monitoring from day one',
     ],
+    tools: 'Next.js, TypeScript, Supabase',
+    about: 'a web app',
   },
   {
     name: 'Mobile & Desktop Apps',
+    line: 'Apps for iPhone, Android, Mac and Windows.',
+    callout: 'iPhone, Android, Mac, Windows',
+    tint: 'violet',
+    demo: 'phone',
     description:
       'Mobile apps for iOS and Android and desktop apps for Windows, macOS and Linux, designed and built from the first version to release.',
     deliverables: [
@@ -88,9 +110,15 @@ const serviceBlocks: ServiceBlock[] = [
       'Desktop apps for Windows, macOS and Linux',
       'Help with publishing to the App Store and Google Play',
     ],
+    tools: 'Figma, React Native, Electron',
+    about: 'an app',
   },
   {
     name: 'Telegram Bots & Extensions',
+    line: 'Bots that take orders and answer customers.',
+    callout: 'Orders paid inside the chat',
+    tint: 'ink',
+    demo: 'bot',
     description:
       'Telegram bots and Mini Apps that take orders, answer customers or run a workflow inside the chat, and browser extensions that add a feature where your users already work.',
     deliverables: [
@@ -99,100 +127,71 @@ const serviceBlocks: ServiceBlock[] = [
       'Extensions for Chrome, Firefox and Edge',
       'The admin panel, database and integrations behind them',
     ],
+    tools: 'Telegram Bot API, TypeScript, Supabase',
+    about: 'a bot',
   },
   {
     name: 'AI & Automation',
+    line: 'Routine replies drafted for you to approve.',
+    callout: 'Replies drafted, you approve',
+    tint: 'cyan',
+    demo: 'ai',
     description:
-      'AI features that do real work inside your product or your operations, built on your own data and measured like any other feature.',
+      'AI features that do real work inside your product or your operations, built on your own data and checked like any other feature.',
     deliverables: [
-      'Assistants and copilots inside your product',
+      'Assistants inside your product',
       'Search and answers over your own data',
-      'Workflow automation that removes manual steps',
-      'Evaluation, guardrails and cost control',
+      'Automation that removes manual steps',
+      'Checks, limits and cost control',
     ],
+    tools: 'LLM APIs, retrieval over your data, evaluation',
+    about: 'AI',
   },
   {
     name: 'Search & Growth',
+    line: 'Get found on Google and in ChatGPT.',
+    callout: 'Found on Google and in ChatGPT',
+    tint: 'blue',
+    demo: 'seo',
     description:
-      'SEO, GEO and AEO, so what we launch gets found: in Google, in AI Overviews and in answers from ChatGPT, Gemini and Perplexity.',
+      'We make what we launch easy to find: in Google (SEO), in Google’s AI answers (AEO), and in answers from ChatGPT, Gemini and Perplexity (GEO).',
     deliverables: [
-      'Technical SEO audit and fixes',
-      'Search-intent and question research',
+      'A technical audit, and the fixes',
+      'Research into what your customers search and ask',
       'Structured data and an llms.txt file',
       'A monthly report on rankings, AI citations and leads',
     ],
+    tools: 'Google Search Console, Ahrefs, GA4',
+    about: 'search',
   },
 ];
 
-const stack: StackRow[] = [
-  { label: 'Design', tools: ['Figma', 'Design tokens', 'Component libraries'] },
-  {
-    label: 'Build',
-    tools: ['Next.js', 'Astro', 'TypeScript', 'Tailwind CSS', 'Headless CMS'],
-  },
-  {
-    label: 'AI',
-    tools: ['LLM APIs', 'Retrieval over your data', 'Agents and automation', 'Evaluation'],
-  },
-  {
-    label: 'Growth',
-    tools: ['Google Search Console', 'Ahrefs', 'Schema.org markup', 'llms.txt', 'Citation tracking: ChatGPT, Gemini, Perplexity'],
-  },
-  { label: 'Measure', tools: ['GA4', 'Looker Studio', 'Form and call tracking'] },
-];
+/** The anchor each service keeps, so links from Home, the footer and elsewhere land on its tile. */
+const anchor = (name: string) =>
+  name
+    .toLowerCase()
+    .replace(/&/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+const kindSlug = (kind: string) => kind.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+/** Real projects that used this service, with a screenshot, our own product last. */
+const builtWith = (service: Service) =>
+  realProjects
+    .filter((p) => p.services.includes(service) && p.image)
+    .sort((a, b) => Number(a.own) - Number(b.own))
+    .slice(0, 3);
 
-const plans: Plan[] = [
-  {
-    name: 'Launch',
-    summary: 'Design and build. A new website or product, ready on launch day.',
-    period: 'One project',
-    featured: false,
-    items: [
-      'Product and UI design in Figma',
-      'Built on a modern, typed stack',
-      'Launch-ready: SEO foundations, structured data, Core Web Vitals',
-      'Analytics and conversion tracking set up',
-      'Handover and training for your team',
-    ],
-  },
-  {
-    name: 'Growth',
-    summary: 'SEO, GEO and AEO, run every month on the product you have.',
-    period: 'Month to month',
-    featured: true,
-    items: [
-      'Technical SEO audit and fixes',
-      'Search-intent content plan and production',
-      'GEO: structured, citable content for AI engines',
-      'AEO: snippet and AI Overview targeting',
-      'Monthly report on rankings, citations and leads',
-    ],
-  },
-  {
-    name: 'Full stack',
-    summary: 'Everything, as one ongoing product team for design, code, AI and growth.',
-    period: 'Month to month',
-    featured: false,
-    items: [
-      'Everything in Launch and Growth',
-      'Ongoing design and engineering',
-      'AI features and automation',
-      'A shared roadmap, reviewed every month',
-      'Priority support',
-    ],
-  },
-];
-
+// The questions that add something the terms and tiles do not already say.
 const faqs: Faq[] = [
-  {
-    question: 'What do you build?',
-    answer:
-      'Websites and landing pages, web apps and SaaS, mobile and desktop apps, Telegram bots and Mini Apps, browser extensions and AI features, plus the search work that gets them found. Design is part of every project, and one team covers design, engineering and growth.',
-  },
   {
     question: 'How long does a project take?',
     answer:
       'It depends on the scope. A landing page takes weeks; a first version of a web app or SaaS product usually takes a few months. You get a timeline with the proposal, and we report progress as we go.',
+  },
+  {
+    question: 'How much does a project cost?',
+    answer:
+      'It depends on what you need, so every project is priced on its own. After a free 30-minute call you get a fixed price for a written scope within two business days, before you commit to anything.',
   },
   {
     question: 'Do we need a full specification to start?',
@@ -208,26 +207,6 @@ const faqs: Faq[] = [
     question: 'Can you work with our in-house team?',
     answer:
       'Yes. We can own the whole project, or plug into your designers, developers or content team and cover only the gaps.',
-  },
-  {
-    question: 'What happens after we book a call?',
-    answer:
-      'On a free 30-minute call we go through what you want to launch and what you have so far. Within two business days after it you get our approach and a fixed price in writing, free. If it fits, we confirm the scope together and start.',
-  },
-  {
-    question: 'How much does a project cost?',
-    answer:
-      'It depends on what you need, so every project is priced on its own. After a free 30-minute call you get a fixed price for a written scope within two business days, before you commit to anything.',
-  },
-  {
-    question: 'How do payments work?',
-    answer:
-      '50% to start and 50% at launch. Larger projects pay in three stages: 30% to start, 40% when the design is approved and 30% at launch.',
-  },
-  {
-    question: 'Who owns the code and the design?',
-    answer:
-      'You do. Code, design files and accounts are yours once the final payment is made, and the domain, hosting and app store accounts are in your name from day one.',
   },
   {
     question: 'Do you guarantee rankings or AI citations?',
@@ -254,576 +233,596 @@ const faqPageJsonLd: Record<string, unknown> = {
   description="Websites, web apps and SaaS, mobile and desktop apps, Telegram bots and browser extensions, AI and automation, and search-led growth. One team designs, builds and grows your product."
   jsonLd={[faqPageJsonLd]}
 >
-  <section class="hero bg-paper">
-    <div class="hero__art" aria-hidden="true">
-      <svg viewBox="0 0 480 460" preserveAspectRatio="xMinYMid slice" fill="none">
-        <defs>
-          <linearGradient
-            id="top-a"
-            x1="480"
-            y1="0"
-            x2="60"
-            y2="460"
-            gradientUnits="userSpaceOnUse"
-          >
-            <stop offset="0" stop-color="#22D3DD"></stop>
-            <stop offset="0.5" stop-color="#2F8CF6"></stop>
-            <stop offset="1" stop-color="#5B4FE9"></stop>
-          </linearGradient>
-        </defs>
-        <path d="M520 -20 C 340 0, 200 120, 300 230 C 380 320, 280 440, 520 500 Z" fill="#E4EEFF"
-        ></path>
-        <path
-          d="M540 40 C 360 40, 220 140, 320 240 C 400 320, 330 420, 540 480"
-          stroke="url(#top-a)"
-          stroke-width="72"
-          stroke-linecap="round"></path>
-      </svg>
-    </div>
-    <div class="container hero__inner">
-      <h1 class="h1 hero__title">
-        Design, code and growth. <span class="highlight">Built as one.</span>
-      </h1>
-      <p class="lede hero__lede">
-        One team designs your product, engineers it, launches it and helps it grow. No handoffs
-        between agencies, no lost context.
-      </p>
-      <nav aria-label="On this page" class="jump">
-        {
-          jumpLinks.map((link) => (
-            <a href={link.href} class="jump__link">
-              {link.label}
-            </a>
-          ))
-        }
-      </nav>
-    </div>
+  <section class="hero container">
+    <h1 class="h1 hero__title">Design, code and growth. <span class="highlight">Built as one.</span></h1>
+    <p class="lede hero__lede">
+      One team designs your product, builds it, launches it and helps it grow. Open a service to see what you get.
+    </p>
   </section>
 
-  <section id="services" class="anchor bg-paper">
-    <div class="container services__inner">
+  <!-- Six services: each shown in its own frame, opened large on the same page -->
+  <section class="container" aria-label="What we build" data-services>
+    <ul class="grid" role="list">
       {
-        serviceBlocks.map((service, index) => (
-          <article class="service anchor" id={service.name.toLowerCase().replace(/&/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}>
-            <div class="service__col">
-              <h2 class="service__title">{service.name}</h2>
-              <p class="service__text">{service.description}</p>
-            </div>
-            <div class="service__col" data-get>
-              <h3 class="service__label">What you get</h3>
-              {/* Phones: the list starts closed and opens with a tap (the script turns this on). */}
-              <button type="button" class="service__toggle" aria-expanded="true" aria-controls={`get-${index}`} data-get-toggle>
-                What you get
-                <span class="service__sign" aria-hidden="true" />
-              </button>
-              <ul class="service__list" id={`get-${index}`}>
-                {service.deliverables.map((item) => (
-                  <li>{item}</li>
-                ))}
-              </ul>
-            </div>
-            {offersFor(service.name).length > 0 && (
-              <ul class="service__pages" aria-label={`More on ${service.name}`}>
-                {offersFor(service.name).map((offer) => (
-                  <li>
-                    <a href={offerUrl(offer)} class="service__page">
-                      {offer.name}
-                      <Icon name="arrow-right" size={16} />
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </article>
+        serviceBlocks.map((service, i) => (
+          <li class="tile">
+            <button
+              type="button"
+              class="tile__open"
+              id={anchor(service.name)}
+              data-open={i}
+              aria-haspopup="dialog"
+              aria-controls="service-open"
+            >
+              <span class:list={['stage', `tint-${service.tint}`]}>
+                <svg class="ribbon" aria-hidden="true" viewBox="0 0 400 200" preserveAspectRatio="none">
+                  <path d="M-20 170 C 80 40, 180 200, 280 90 S 400 10, 440 40" />
+                </svg>
+                <span class="callout">{service.callout}</span>
+                <span class="tile__demo">
+                  <ServiceDemo kind={service.demo} />
+                </span>
+              </span>
+              <span class="tile__meta">
+                <span class="tile__name">{service.name}</span>
+                <span class="tile__line">{service.line}</span>
+                <span class="tile__go" aria-hidden="true">
+                  <Icon name="arrow-right" />
+                </span>
+              </span>
+            </button>
+          </li>
         ))
       }
-    </div>
+    </ul>
   </section>
 
-  <section id="stack" class="anchor bg-paper">
-    <div class="container stack__inner">
-      <div class="section-head">
-        <h2 class="h2">A modern stack, chosen for speed.</h2>
-        <p class="section-head__text">
-          Every tool here earns its place by saving time or improving results. When something
-          better appears, we switch.
-        </p>
-      </div>
-      <dl class="stack">
-        {
-          stack.map((row) => (
-            <div class="stack__row">
-              <dt class="stack__label">{row.label}</dt>
-              <dd class="stack__tools">
-                {row.tools.map((tool) => (
-                  <>
-                    <span class="chip">{tool}</span>{'\n'}
-                  </>
-                ))}
-              </dd>
+  {/* The opened service. One article per service; the script shows the one you opened. */}
+  <dialog id="service-open" class="open" data-open-dialog>
+    <button type="button" class="open__close" data-open-close aria-label="Close">
+      <Icon name="close" size={20} />
+    </button>
+    {
+      serviceBlocks.map((service, i) => {
+        const pages = offersFor(service.name);
+        const built = builtWith(service.name);
+        return (
+          <article class="open__item" data-item={i} aria-labelledby={`service-title-${i}`} hidden>
+            <div class:list={['stage', 'open__stage', `tint-${service.tint}`]}>
+              <svg class="ribbon" aria-hidden="true" viewBox="0 0 400 200" preserveAspectRatio="none">
+                <path d="M-20 170 C 80 40, 180 200, 280 90 S 400 10, 440 40" />
+              </svg>
+              <span class="open__demo">
+                <ServiceDemo kind={service.demo} large />
+              </span>
             </div>
-          ))
-        }
-      </dl>
-    </div>
-  </section>
-
-  <section id="plans" class="anchor bg-paper">
-    <div class="container pricing__inner">
-      <div class="section-head">
-        <h2 class="h2">Three ways to work with us.</h2>
-      </div>
-      <div class="plans">
-        {
-          plans.map((plan) => (
-            <div class:list={['plan', { 'plan--featured': plan.featured }]}>
-              <div class="plan__head">
-                <h3 class="plan__name">{plan.name}</h3>
-                <p class="plan__summary">{plan.summary}</p>
+            <div class="open__body">
+              <div>
+                <h2 class="open__name" id={`service-title-${i}`}>
+                  {service.name}
+                </h2>
+                <p class="open__text">{service.description}</p>
+                {pages.length > 0 && (
+                  <ul class="open__pages" aria-label={`More on ${service.name}`}>
+                    {pages.map((offer) => (
+                      <li>
+                        <a href={offerUrl(offer)}>
+                          {offer.name}
+                          <Icon name="arrow-right" size={16} />
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {built.length > 0 && (
+                  <>
+                    <p class="open__label open__label--built">Built like this</p>
+                    <ul class="built">
+                      {built.map((p) => (
+                        <li>
+                          <a href={`/work?kind=${kindSlug(p.kind)}`}>
+                            <Image src={p.image!.src} alt="" widths={[240, 480]} sizes="160px" loading="lazy" />
+                            <span>{p.name}</span>
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
               </div>
-              <p class="plan__period">{plan.period}</p>
-              <ul class="plan__list">
-                {plan.items.map((item) => (
-                  <li>{item}</li>
-                ))}
-              </ul>
+              <div>
+                <h3 class="open__label">What you get</h3>
+                <ul class="gets">
+                  {service.deliverables.map((item) => (
+                    <li>{item}</li>
+                  ))}
+                </ul>
+                <p class="tools">Tools: {service.tools}</p>
+              </div>
+            </div>
+            <div class="open__foot">
               <a
                 href="/contact"
-                class:list={['btn', 'btn--sm', 'plan__cta', plan.featured ? 'btn--primary' : 'btn--outline']}
+                class="btn btn--primary"
                 data-book-call
-                data-book-from={`plan-${plan.name}`}
+                data-book-need={service.name}
+                data-umami-event="Book a call"
+                data-umami-event-from={`services-${anchor(service.name)}`}
               >
-                Ask about {plan.name}
+                Book a call about {service.about}
+                <Icon name="arrow-right" />
               </a>
             </div>
-          ))
-        }
+          </article>
+        );
+      })
+    }
+    <div class="open__nav">
+      <button type="button" class="btn btn--outline btn--sm" data-open-step="-1">
+        <Icon name="arrow-left" />Previous
+      </button>
+      <button type="button" class="btn btn--outline btn--sm" data-open-step="1">
+        Next<Icon name="arrow-right" />
+      </button>
+    </div>
+  </dialog>
+
+  <!-- Terms: the full written agreement -->
+  <section id="terms" class="anchor" aria-labelledby="terms-title">
+    <div class="container terms">
+      <div class="terms__side">
+        <h2 class="h2" id="terms-title">What you get in <span class="highlight">writing.</span></h2>
+        <p class="terms__intro">How every project works, before you sign anything.</p>
       </div>
+      <Agreement terms={terms} />
     </div>
   </section>
 
-  <section id="terms" class="anchor bg-paper">
-    <div class="container terms__inner">
-      <div class="section-head">
-        <h2 class="h2">Clear terms. No surprises.</h2>
-        <p class="section-head__text">How every project works, before you sign anything.</p>
+  <section id="faq" class="anchor" aria-labelledby="faq-title">
+    <div class="container faq">
+      <div>
+        <h2 class="h2" id="faq-title">Questions we hear <span class="highlight">first.</span></h2>
+        <div class="faq__list">
+          {
+            faqs.map((faq) => (
+              <details class="faq__item">
+                <summary class="faq__summary">
+                  <span class="faq__question">{faq.question}</span>
+                  <span class="faq__sign" aria-hidden="true" />
+                </summary>
+                <p class="faq__answer">{faq.answer}</p>
+              </details>
+            ))
+          }
+        </div>
       </div>
-      <dl class="terms">
-        {
-          terms.map((term) => (
-            <div class="terms__row">
-              <dt class="terms__title">{term.title}</dt>
-              <dd class="terms__text">{term.text}</dd>
-            </div>
-          ))
-        }
-      </dl>
+      <aside class="ask" aria-labelledby="ask-title">
+        <h3 class="ask__title" id="ask-title">Still have a question?</h3>
+        <p class="ask__text">Ask it on a free 30-minute call. You leave with a clear next step.</p>
+        <a href="/contact" class="btn btn--accent" data-book-call data-umami-event="Book a call" data-umami-event-from="services-faq">
+          Book a call<Icon name="arrow-right" />
+        </a>
+      </aside>
     </div>
   </section>
 
-  <section id="faq" class="anchor bg-paper">
-    <div class="container faq__inner">
-      <div class="section-head section-head--wide">
-        <h2 class="h2">Questions we hear first.</h2>
-      </div>
-      <div class="faq">
-        {
-          faqs.map((faq, i) => (
-            <details name="faq" class="faq__item" open={i === 0}>
-              <summary class="faq__summary">
-                <h3 class="faq__question">{faq.question}</h3>
-                <Icon name="plus" size={24} strokeWidth={2.4} />
-              </summary>
-              <p class="faq__answer">{faq.answer}</p>
-            </details>
-          ))
-        }
-      </div>
-    </div>
-  </section>
-
-  <CtaBand
-    title="Not sure which one fits?"
-    text="Tell us where you are. We will point you to the smallest scope that gets results."
-    pad="bottom"
-  />
+  <RibbonEnd from="services-end">Not sure which one <span class="highlight">fits?</span></RibbonEnd>
 </Base>
 
 <script>
-  // Phones: each "What you get" list starts closed and opens with a tap. Wider screens always
-  // show it. Without this script every list simply stays open.
-  const phone = window.matchMedia('(max-width: 639.98px)');
-  const groups = [...document.querySelectorAll<HTMLElement>('[data-get]')];
-  const setUp = () => {
-    for (const group of groups) {
-      const button = group.querySelector<HTMLButtonElement>('[data-get-toggle]');
-      group.toggleAttribute('data-collapsible', phone.matches);
-      group.toggleAttribute('data-open', false);
-      button?.setAttribute('aria-expanded', String(!phone.matches));
-    }
-  };
-  for (const group of groups) {
-    const button = group.querySelector<HTMLButtonElement>('[data-get-toggle]');
-    button?.addEventListener('click', () => {
-      const open = !group.hasAttribute('data-open');
-      group.toggleAttribute('data-open', open);
-      button.setAttribute('aria-expanded', String(open));
+  const root = document.querySelector<HTMLElement>('[data-services]');
+  const dialog = document.querySelector<HTMLDialogElement>('[data-open-dialog]');
+  if (root && dialog) {
+    const items = [...dialog.querySelectorAll<HTMLElement>('[data-item]')];
+    let at = 0;
+    let opener: HTMLElement | null = null;
+    const show = (i: number) => {
+      at = (i + items.length) % items.length;
+      items.forEach((item) => (item.hidden = Number(item.dataset.item) !== at));
+      dialog.setAttribute('aria-labelledby', `service-title-${at}`);
+    };
+    root.addEventListener('click', (event) => {
+      const button = (event.target as Element).closest<HTMLButtonElement>('[data-open]');
+      if (!button) return;
+      opener = button;
+      show(Number(button.dataset.open));
+      dialog.showModal();
     });
+    dialog.querySelectorAll<HTMLButtonElement>('[data-open-step]').forEach((button) =>
+      button.addEventListener('click', () => show(at + Number(button.dataset.openStep))),
+    );
+    dialog.querySelector('[data-open-close]')?.addEventListener('click', () => dialog.close());
+    // A click on the dimmed page around the card closes it.
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+    // Book a call opens its own dialog: close this one first so the two never stack.
+    dialog.querySelectorAll('[data-book-call]').forEach((link) => link.addEventListener('click', () => dialog.close()));
+    dialog.addEventListener('close', () => opener?.focus());
   }
-  phone.addEventListener('change', setUp);
-  setUp();
 </script>
 
 <style>
-  /* Anchored sections: keep the top edge off the viewport edge after a jump. */
   .anchor {
-    scroll-margin-top: 16px;
+    scroll-margin-top: 96px;
   }
 
   /* ---------- Hero ---------- */
-
   .hero {
-    position: relative;
-    overflow: hidden;
-  }
-  .hero__art {
-    position: absolute;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    width: max(0px, calc(100% - 900px));
-    max-width: 480px;
-  }
-  .hero__art svg {
-    display: block;
-    width: 100%;
-    height: 100%;
-  }
-  .hero__inner {
-    position: relative;
-    padding-top: 88px;
-    padding-bottom: 56px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+    padding-top: 72px;
+    padding-bottom: 40px;
   }
   .hero__title {
-    max-width: 820px;
+    max-width: 13em;
   }
   .hero__lede {
-    max-width: 640px;
+    max-width: 34em;
+    margin-top: 18px;
   }
 
-  .jump {
+  /* ---------- Six tiles ---------- */
+  .grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 40px 22px;
+  }
+  .tile__open {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-tile);
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    scroll-margin-top: 96px;
+  }
+  .tile__open:focus-visible {
+    outline: 3px solid var(--teal);
+    outline-offset: 4px;
+  }
+  .stage {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    place-items: end center;
+    overflow: hidden;
+  }
+  .tile .stage {
+    aspect-ratio: 1 / 0.86;
+    padding: 66px 24px 0;
+    border-radius: var(--radius-tile);
+    transition: box-shadow 300ms var(--ease-out);
+  }
+  .tile .stage::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 1px rgb(10 17 40 / 0.05);
+    pointer-events: none;
+  }
+  /* Arriving from Home or the footer at #ai-automation and the like: that tile is marked. */
+  .tile__open:target .stage {
+    box-shadow: 0 0 0 3px var(--teal);
+  }
+  .tint-cyan {
+    background: linear-gradient(160deg, #e3f8fb 0%, #bdeef5 100%);
+  }
+  .tint-blue {
+    background: linear-gradient(160deg, #e8f0ff 0%, #c6d9ff 100%);
+  }
+  .tint-violet {
+    background: linear-gradient(160deg, #efecfe 0%, #d6cefb 100%);
+  }
+  .tint-ink {
+    background: linear-gradient(160deg, #1b2547 0%, #0a1128 100%);
+  }
+  .ribbon {
+    position: absolute;
+    inset: auto -10% -18% -10%;
+    z-index: -1;
+    width: 120%;
+    height: 70%;
+  }
+  .ribbon path {
+    fill: none;
+    stroke: var(--white);
+    stroke-opacity: 0.75;
+    stroke-width: 46;
+    stroke-linecap: round;
+  }
+  .tint-ink .ribbon path {
+    stroke: #2f8cf6;
+    stroke-opacity: 0.35;
+  }
+  .callout {
+    position: absolute;
+    left: 22px;
+    top: 20px;
+    z-index: 3;
+    max-width: calc(100% - 44px);
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: var(--teal);
+    color: var(--white);
+    font: 700 15px/1.3 var(--font-display);
+    transform: rotate(-2deg);
+    transform-origin: left;
+    box-shadow: 0 6px 14px -8px rgb(8 159 179 / 0.7);
+  }
+  .tint-ink .callout {
+    background: var(--cyan);
+    color: var(--ink);
+  }
+  .tile__demo {
+    display: block;
+    width: 100%;
+    transform: translateY(16px);
+    transition: transform 500ms var(--ease-out);
+  }
+  .tile__meta {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 2px 16px;
+    padding: 16px 6px 0;
+  }
+  .tile__name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 22px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  .tile__line {
+    grid-column: 1;
+    font-size: 15px;
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+  .tile__go {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: var(--surface);
+    transition:
+      background-color 200ms var(--ease-out),
+      color 200ms var(--ease-out),
+      transform 300ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .tile__open:hover .tile__demo {
+      transform: translateY(6px);
+    }
+    .tile__open:hover .tile__go {
+      background: var(--ink);
+      color: var(--white);
+      transform: rotate(-45deg);
+    }
+  }
+
+  /* ---------- The opened service ---------- */
+  .open {
+    width: min(1040px, calc(100% - 32px));
+    max-width: none;
+    max-height: calc(100dvh - 32px);
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-tile);
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: 0 40px 90px -40px rgb(10 17 40 / 0.6);
+    overflow: auto;
+    overscroll-behavior: contain;
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+    transition:
+      opacity 260ms var(--ease-out),
+      transform 360ms var(--ease-out),
+      display 360ms allow-discrete,
+      overlay 360ms allow-discrete;
+  }
+  .open[open] {
+    opacity: 1;
+    transform: none;
+  }
+  @starting-style {
+    .open[open] {
+      opacity: 0;
+      transform: translateY(16px) scale(0.98);
+    }
+  }
+  .open::backdrop {
+    background: rgb(10 17 40 / 0.45);
+  }
+  .open__close {
+    position: sticky;
+    top: 14px;
+    z-index: 5;
+    float: right;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin: 14px 14px -58px 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: 0 4px 12px -6px rgb(10 17 40 / 0.4);
+    cursor: pointer;
+  }
+  .open__item[hidden] {
+    display: none;
+  }
+  .open__stage {
+    height: 300px;
+    padding: 64px 56px 0;
+  }
+  .open__demo {
+    display: block;
+    width: 100%;
+    transform: translateY(10px);
+  }
+  .open__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    gap: 36px;
+    padding: 32px 40px 8px;
+  }
+  .open__name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 34px;
+    line-height: 1.06;
+    letter-spacing: -0.02em;
+  }
+  .open__text {
+    margin: 12px 0 0;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+  .open__label {
+    margin: 0 0 6px;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 15px;
+    line-height: 1.3;
+  }
+  .open__label--built {
+    margin-top: 22px;
+  }
+  .open__pages {
+    list-style: none;
+    margin: 18px 0 0;
+    padding: 0;
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    padding-top: 8px;
   }
-  .jump__link {
+  .open__pages a {
     display: inline-flex;
     align-items: center;
-    min-height: 42px;
-    padding: 0 18px;
+    gap: 6px;
+    min-height: 44px;
+    padding: 0 16px;
     border: 1px solid var(--line);
     border-radius: 999px;
-    background: var(--surface);
-    font-weight: 600;
-    font-size: 15px;
-    text-decoration: none;
-    transition:
-      border-color 160ms var(--ease-out),
-      transform 160ms var(--ease-out);
-  }
-  .jump__link:hover {
     color: var(--ink);
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+  }
+  .open__pages a:hover {
     border-color: var(--ink);
   }
-  .jump__link:active {
-    transform: scale(0.97);
-  }
-
-  /* ---------- Shared: section heads and tiles ---------- */
-
-  .section-head {
+  .built {
+    list-style: none;
+    margin: 0;
+    padding: 0;
     display: flex;
-    flex-direction: column;
-    gap: 12px;
-    max-width: 760px;
+    gap: 10px;
   }
-  .section-head--wide {
-    max-width: none;
+  .built li {
+    flex: 1;
+    min-width: 0;
+    max-width: 180px;
   }
-  .section-head__text {
+  .built a {
+    display: block;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .built :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    object-position: top;
+    border: 1px solid var(--line-soft);
+    border-radius: 10px;
+  }
+  .built span {
+    display: block;
+    margin-top: 6px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .gets {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .gets li {
+    padding: 10px 0;
+    border-top: 1px solid var(--line-soft);
+    font-size: 15px;
+  }
+  .tools {
+    margin: 18px 0 0;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .open__foot {
+    padding: 24px 40px 0;
+  }
+  .open__nav {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 20px 40px 32px;
+  }
+
+  /* ---------- Terms ---------- */
+  .terms {
+    display: grid;
+    grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
+    gap: clamp(32px, 6vw, 88px);
+    align-items: start;
+    padding-top: 120px;
+  }
+  .terms__side {
+    position: sticky;
+    top: 120px;
+    display: grid;
+    gap: 16px;
+  }
+  .terms__intro {
     margin: 0;
     font-size: 18px;
     line-height: 1.6;
     color: var(--ink-2);
   }
-  .services__inner,
-  .stack__inner,
-  .pricing__inner,
-  .terms__inner,
-  .faq__inner {
-    padding-top: 64px;
-    padding-bottom: 64px;
-    display: flex;
-    flex-direction: column;
-    gap: 36px;
-  }
-  .service,
-  .stack,
-  .plan,
-  .terms,
+
+  /* ---------- FAQ, with a way to ask beside it ---------- */
   .faq {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 32px;
+    padding-top: 120px;
+  }
+  .faq__list {
+    margin-top: 24px;
+    padding: 4px 28px;
     background: var(--surface);
     border: 1px solid var(--line-soft);
     border-radius: var(--radius-tile);
     box-shadow: var(--shadow-tile);
-  }
-  .checks-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    font-size: 16px;
-    line-height: 1.5;
-  }
-  .checks-list li {
-    display: grid;
-    grid-template-columns: 16px 1fr;
-    gap: 12px;
-  }
-  .checks-list :global(svg) {
-    margin-top: 4px;
-    color: var(--teal);
-  }
-
-  /* ---------- Services: a tile each, two to a row ---------- */
-
-  .services__inner {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(460px, 100%), 1fr));
-    gap: 14px;
-    padding-top: 16px;
-  }
-  .service {
-    display: flex;
-    flex-direction: column;
-    gap: 22px;
-    padding: clamp(24px, 3vw, 36px);
-  }
-  .service__col {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  .service__col + .service__col {
-    padding-top: 20px;
-    border-top: 1px solid var(--line-soft);
-  }
-  .service__title {
-    margin: 0;
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: clamp(1.8rem, 2.6vw, 2.3rem);
-    line-height: 1.08;
-  }
-  .service__text {
-    margin: 0;
-    font-size: 17px;
-    line-height: 1.6;
-    color: var(--ink-2);
-  }
-  .service__label {
-    margin: 0;
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--muted);
-  }
-  .service__list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    font-size: 16px;
-    line-height: 1.5;
-  }
-  /* Plain rows on a hairline: no icons. */
-  .service__list li,
-  .plan__list li {
-    padding: 10px 0;
-    border-top: 1px solid var(--line-soft);
-  }
-  /* Links to the offer pages of a block (src/data/offers.ts), at the foot of its tile. */
-  .service__pages {
-    list-style: none;
-    margin: auto 0 0;
-    padding: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .service__page {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    min-height: 44px;
-    padding: 0 18px;
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    background: var(--surface);
-    font-weight: 600;
-    font-size: 15px;
-    text-decoration: none;
-    transition:
-      border-color 160ms var(--ease-out),
-      transform 160ms var(--ease-out);
-  }
-  .service__page:hover {
-    color: var(--ink);
-    border-color: var(--ink);
-  }
-  .service__page:active {
-    transform: scale(0.97);
-  }
-  .service__page :global(svg) {
-    transition: transform 200ms var(--ease-out);
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .service__page:hover :global(svg) {
-      transform: translateX(3px);
-    }
-  }
-
-  /* ---------- Stack ---------- */
-
-  .stack {
-    margin: 0;
-    padding: 6px clamp(20px, 3vw, 36px);
-  }
-  .stack__row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 12px 32px;
-    padding: 18px 0;
-  }
-  .stack__row + .stack__row {
-    border-top: 1px solid var(--line-soft);
-  }
-  .stack__label {
-    flex: 0 0 180px;
-    font-size: 16px;
-    font-weight: 700;
-  }
-  .stack__tools {
-    flex: 1 1 320px;
-    margin: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  /* ---------- Plans ---------- */
-
-  .plans {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
-    gap: 14px;
-    align-items: stretch;
-  }
-  .plan {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    padding: 32px;
-  }
-  .plan--featured {
-    border-color: var(--teal);
-    box-shadow: 0 0 0 1px var(--teal), var(--shadow-tile);
-  }
-  .plan__head {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .plan__name {
-    margin: 0;
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 28px;
-    line-height: 1.1;
-  }
-  .plan__summary {
-    margin: 0;
-    font-size: 16px;
-    line-height: 1.5;
-    color: var(--ink-2);
-  }
-  .plan__period {
-    align-self: flex-start;
-    margin: 0;
-    padding: 4px 12px;
-    border-radius: 999px;
-    background: var(--paper);
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--ink-2);
-  }
-  .plan__list {
-    flex: 1 1 auto;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    font-size: 16px;
-    line-height: 1.5;
-  }
-  .plan__cta {
-    align-self: flex-start;
-  }
-
-  /* ---------- Terms ---------- */
-
-  .terms {
-    margin: 0;
-    padding: 6px clamp(20px, 3vw, 36px);
-  }
-  .terms__row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px 40px;
-    padding: 20px 0;
-  }
-  .terms__row + .terms__row {
-    border-top: 1px solid var(--line-soft);
-  }
-  .terms__title {
-    flex: 1 1 260px;
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 20px;
-    line-height: 1.25;
-  }
-  .terms__text {
-    flex: 2 1 380px;
-    margin: 0;
-    font-size: 16px;
-    line-height: 1.6;
-    color: var(--ink-2);
-  }
-
-  /* ---------- FAQ ---------- */
-
-  .faq {
-    padding: 4px clamp(20px, 3vw, 36px);
   }
   .faq__item + .faq__item {
     border-top: 1px solid var(--line-soft);
@@ -832,177 +831,162 @@ const faqPageJsonLd: Record<string, unknown> = {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 24px;
-    min-height: 68px;
+    gap: 16px;
+    min-height: 64px;
     padding: 14px 0;
     list-style: none;
-    text-align: left;
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: clamp(1.1rem, 1.6vw, 1.35rem);
-    line-height: 1.25;
-    color: var(--ink);
     cursor: pointer;
   }
   .faq__summary::-webkit-details-marker {
     display: none;
   }
-  .faq__summary::marker {
-    content: '';
+  .faq__summary:focus-visible {
+    outline: 3px solid var(--teal);
+    outline-offset: 2px;
+    border-radius: 8px;
   }
   .faq__question {
-    margin: 0;
-    font: inherit;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 1.3;
   }
-  .faq__summary :global(svg) {
+  /* Plus that turns into a minus when the answer is open. */
+  .faq__sign {
+    position: relative;
     flex: none;
-    transition: transform 240ms var(--ease-out);
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
   }
-  .faq__item[open] > .faq__summary :global(svg) {
-    transform: rotate(45deg);
+  .faq__sign::before,
+  .faq__sign::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 12px;
+    height: 2px;
+    margin: -1px 0 0 -6px;
+    border-radius: 2px;
+    background: var(--ink);
+    transition: transform 260ms var(--ease-out);
   }
-  /* Answers open smoothly where the browser can animate <details>; elsewhere they simply appear. */
-  @supports selector(::details-content) {
-    .faq__item {
-      interpolate-size: allow-keywords;
-    }
-    .faq__item::details-content {
-      height: 0;
-      overflow: clip;
-      opacity: 0;
-      transition:
-        height 300ms var(--ease-out),
-        opacity 240ms var(--ease-out),
-        content-visibility 300ms allow-discrete;
-    }
-    .faq__item[open]::details-content {
-      height: auto;
-      opacity: 1;
-    }
+  .faq__sign::after {
+    transform: rotate(90deg);
+  }
+  .faq__item[open] .faq__sign::after {
+    transform: rotate(0deg);
   }
   .faq__answer {
-    margin: 0;
-    padding: 0 0 24px;
-    max-width: 68ch;
+    margin: 0 0 20px;
+    max-width: 62ch;
     font-size: 16px;
-    line-height: 1.65;
+    line-height: 1.6;
     color: var(--ink-2);
   }
+  .ask {
+    position: sticky;
+    top: 120px;
+    margin-top: 24px;
+    padding: 28px;
+    border-radius: var(--radius-tile);
+    background: var(--ink);
+    color: var(--white);
+  }
+  .ask__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 26px;
+    line-height: 1.1;
+  }
+  .ask__text {
+    margin: 10px 0 20px;
+    font-size: 16px;
+    line-height: 1.55;
+    color: var(--footer-text);
+  }
 
-  /* ---------- Phones: one rhythm, lists that open on tap, plans you swipe ---------- */
-  .service__toggle {
-    display: none;
+  /* ---------- Narrower screens ---------- */
+  @media (max-width: 1023.98px) {
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 899.98px) {
+    .open__stage {
+      height: 240px;
+      padding: 56px 20px 0;
+    }
+    .open__body {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 18px;
+      padding: 22px 22px 4px;
+    }
+    .open__foot {
+      padding: 18px 22px 0;
+    }
+    .open__nav {
+      padding: 16px 22px 24px;
+    }
+    .terms,
+    .faq {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .terms__side,
+    .ask {
+      position: static;
+    }
   }
   @media (max-width: 639.98px) {
-    .hero__inner {
+    .hero {
       padding-top: 40px;
-      padding-bottom: 0;
+      padding-bottom: 28px;
     }
-    .services__inner {
-      padding-top: 32px;
-      gap: 12px;
+    .grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 32px;
     }
-    .stack__inner,
-    .pricing__inner,
-    .terms__inner,
-    .faq__inner {
+    .tile .stage {
+      aspect-ratio: 1 / 0.92;
+      padding: 58px 20px 0;
+    }
+    .open {
+      width: 100%;
+      max-height: calc(100dvh - 12px);
+      margin: auto 0 0;
+      border-radius: var(--radius-tile) var(--radius-tile) 0 0;
+    }
+    .open__name {
+      font-size: 28px;
+    }
+    .open__foot .btn {
+      width: 100%;
+    }
+    .open__nav .btn {
+      flex: 1;
+    }
+    .terms,
+    .faq {
       padding-top: 64px;
-    }
-    .services__inner,
-    .stack__inner,
-    .pricing__inner,
-    .terms__inner,
-    .faq__inner {
-      padding-bottom: 0;
-    }
-    .stack__inner,
-    .pricing__inner,
-    .terms__inner,
-    .faq__inner {
       gap: 24px;
     }
-    .section-head__text {
-      font-size: 17px;
+    .faq__list {
+      padding: 4px 18px;
     }
-    .service {
-      gap: 16px;
-      padding: 20px;
+    .faq__question {
+      font-size: 16px;
     }
-    .service__title {
-      font-size: 24px;
-    }
-    .service__col + .service__col {
-      padding-top: 0;
-    }
-    [data-collapsible] .service__label {
-      display: none;
-    }
-    [data-collapsible] .service__toggle {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      width: 100%;
-      min-height: 52px;
-      padding: 0;
-      border: 0;
-      background: none;
-      color: var(--ink);
-      font: 700 16px/1.2 var(--font-body);
-      text-align: left;
-      cursor: pointer;
-    }
-    [data-collapsible]:not([data-open]) .service__list {
-      display: none;
-    }
-    /* Plus that turns into a minus when the list is open. */
-    .service__sign {
-      position: relative;
-      flex: none;
-      width: 30px;
-      height: 30px;
-      border: 1px solid var(--line);
-      border-radius: 50%;
-    }
-    .service__sign::before,
-    .service__sign::after {
-      content: '';
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 12px;
-      height: 2px;
-      margin: -1px 0 0 -6px;
-      border-radius: 2px;
-      background: var(--ink);
-      transition: transform 260ms var(--ease-out);
-    }
-    .service__sign::after {
-      transform: rotate(90deg);
-    }
-    [data-open] .service__sign::after {
-      transform: rotate(0deg);
-    }
-    .plans {
-      display: flex;
-      gap: 12px;
-      margin: 0 calc(-1 * var(--gutter));
-      padding: 4px var(--gutter) 20px;
-      overflow-x: auto;
-      overscroll-behavior-x: contain;
-      scroll-snap-type: x mandatory;
-      scroll-padding: 0 var(--gutter);
-      scrollbar-width: none;
-    }
-    .plans::-webkit-scrollbar {
-      display: none;
-    }
-    .plan {
-      flex: 0 0 86%;
-      padding: 24px;
-      scroll-snap-align: start;
-    }
-    .plan__period {
-      font-size: 14px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tile__demo,
+    .tile__go,
+    .open,
+    .faq__sign::before,
+    .faq__sign::after {
+      transition: none;
     }
   }
 </style>
