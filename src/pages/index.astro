@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
 import Workbench from '../components/Workbench.astro';
+import RibbonEnd from '../components/RibbonEnd.astro';
 import { Image } from 'astro:assets';
 import { filled, numbers, site } from '../data/site';
 import { clients, realProjects, projectUrl } from '../data/projects';
@@ -290,46 +291,7 @@ const log = [...realProjects.filter((project) => !project.own), ...realProjects.
   </section>
 
   <!-- Closing: the hero ribbons come back around the last question -->
-  <section class="end" aria-labelledby="end-title">
-    <div aria-hidden="true" class="end__art end__art--left">
-      <svg viewBox="0 0 400 640" preserveAspectRatio="xMaxYMid slice" fill="none">
-        <defs>
-          <linearGradient id="end-a" x1="0" y1="0" x2="400" y2="640" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stop-color="#22D3DD"></stop>
-            <stop offset="0.6" stop-color="#2FB4F0"></stop>
-            <stop offset="1" stop-color="#2F8CF6"></stop>
-          </linearGradient>
-          <linearGradient id="end-b" x1="0" y1="440" x2="220" y2="660" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stop-color="#2F8CF6"></stop>
-            <stop offset="1" stop-color="#5B4FE9"></stop>
-          </linearGradient>
-        </defs>
-        <path d={ribbonPath('left-blob')} fill="#DFF6F9"></path>
-        <path d={ribbonPath('left-ribbon')} stroke="url(#end-a)" stroke-width="78" stroke-linecap="round"></path>
-        <path d={ribbonPath('left-accent')} stroke="url(#end-b)" stroke-width="104" stroke-linecap="round"></path>
-      </svg>
-    </div>
-    <div aria-hidden="true" class="end__art end__art--right">
-      <svg viewBox="0 0 260 640" preserveAspectRatio="xMinYMid slice" fill="none">
-        <defs>
-          <linearGradient id="end-c" x1="260" y1="0" x2="60" y2="640" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stop-color="#2F8CF6"></stop>
-            <stop offset="0.5" stop-color="#2FB4F0"></stop>
-            <stop offset="1" stop-color="#22D3DD"></stop>
-          </linearGradient>
-        </defs>
-        <path d={ribbonPath('right-blob')} fill="#E4EEFF"></path>
-        <path d={ribbonPath('right-ribbon')} stroke="url(#end-c)" stroke-width="70" stroke-linecap="round"></path>
-      </svg>
-    </div>
-    <h2 class="end__title" id="end-title">Tell us what you want to <span class="highlight">launch.</span></h2>
-    <p class="end__text">
-      You talk to the people who will build it.{site.responseTime && ` We reply within ${site.responseTime}.`}
-    </p>
-    <a href="/contact" class="btn btn--primary btn--lg end__cta" data-book-call data-umami-event="Book a call" data-umami-event-from="home-end">
-      Book a call<Icon name="arrow-right" />
-    </a>
-  </section>
+  <RibbonEnd from="home-end">Tell us what you want to <span class="highlight">launch.</span></RibbonEnd>
 </Base>
 
 <script>
@@ -1084,96 +1046,6 @@ const log = [...realProjects.filter((project) => !project.own), ...realProjects.
     }
   }
 
-  /* ---------- Closing: the hero ribbons come back around the last question ---------- */
-
-  .end {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-    padding: 140px var(--gutter) 120px;
-    background: var(--paper);
-    text-align: center;
-  }
-  .end__art {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    z-index: -1;
-  }
-  /* The ribbons fade in at the top and out at the bottom, so the footer tiles below start clean. */
-  .end__art svg {
-    display: block;
-    width: 100%;
-    height: 100%;
-    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 24%, #000 70%, transparent);
-    mask-image: linear-gradient(to bottom, transparent, #000 24%, #000 70%, transparent);
-  }
-  .end__art--left {
-    left: -24px;
-    width: min(520px, max(0px, calc((100% - 860px) / 2 + 220px)));
-    -webkit-mask-image: linear-gradient(to right, #000 50%, transparent 96%);
-    mask-image: linear-gradient(to right, #000 50%, transparent 96%);
-  }
-  .end__art--right {
-    right: -24px;
-    width: min(460px, max(0px, calc((100% - 860px) / 2 + 180px)));
-    -webkit-mask-image: linear-gradient(to left, #000 50%, transparent 96%);
-    mask-image: linear-gradient(to left, #000 50%, transparent 96%);
-  }
-  .end__title {
-    max-width: 13ch;
-    margin: 0 auto;
-    font-family: var(--font-display);
-    font-weight: 800;
-    font-size: clamp(2.6rem, 6.4vw, 5.4rem);
-    line-height: 1.12;
-    letter-spacing: -0.035em;
-    text-wrap: balance;
-  }
-  .end__text {
-    max-width: 30em;
-    margin: 26px auto 0;
-    font-size: clamp(1.0625rem, 1.4vw, 1.25rem);
-    line-height: 1.55;
-    color: var(--ink-2);
-  }
-  .end__cta {
-    margin-top: 36px;
-  }
-  /* Phones: the ribbons become a band under the button that runs into the footer. */
-  @media (max-width: 799.98px) {
-    .end {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 104px var(--gutter) 0;
-    }
-    .end__art--left {
-      position: relative;
-      order: 9;
-      left: auto;
-      width: calc(100% + 2 * var(--gutter));
-      height: 200px;
-      margin: 56px calc(-1 * var(--gutter)) 0;
-      -webkit-mask-image: none;
-      mask-image: none;
-    }
-    .end__art--left svg {
-      transform: scaleX(-1);
-    }
-    .end__art--right {
-      display: none;
-    }
-    .end__title {
-      line-height: 1.2;
-    }
-    .end__title :global(.highlight) {
-      display: inline;
-      -webkit-box-decoration-break: clone;
-      box-decoration-break: clone;
-    }
-  }
-
   /* ---------- Phones: one rhythm. 64px above each section, 24px from its title to its content,
      and the "see all" link closes the section as a full-width button. ---------- */
   @media (max-width: 639.98px) {
@@ -1199,12 +1071,6 @@ const log = [...realProjects.filter((project) => !project.own), ...realProjects.
     }
     .terms__side .block__intro {
       margin-top: -12px;
-    }
-    .end {
-      padding-top: 72px;
-    }
-    .end__title {
-      font-size: 42px;
     }
   }
 </style>

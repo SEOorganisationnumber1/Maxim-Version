@@ -12,6 +12,9 @@ import sampleDanceClub from '../assets/work/samples/dance-club.png';
 export const samples: Seed[] = [
   {
     slug: 'sample-order-bot',
+    callout: 'Orders paid inside the chat',
+    tint: 'violet',
+    frame: { kind: 'phones', screens: [{ x: 618, y: 66, width: 404 }] },
     kind: 'Telegram bot',
     name: 'Burger Spot bot',
     services: ['Telegram Bots & Extensions'],
@@ -21,6 +24,9 @@ export const samples: Seed[] = [
   },
   {
     slug: 'sample-campus-app',
+    callout: 'Classes, grades and news',
+    tint: 'cyan',
+    frame: { kind: 'phones', screens: [{ x: 174, y: 100, width: 362 }, { x: 614, y: 26, width: 372 }] },
     kind: 'Mobile app',
     name: 'Campus app',
     services: ['Mobile & Desktop Apps'],
@@ -30,6 +36,8 @@ export const samples: Seed[] = [
   },
   {
     slug: 'sample-clinic',
+    callout: 'Reminders before every visit',
+    tint: 'cyan',
     kind: 'Web app',
     name: 'Smile Studio bookings',
     services: ['Web Apps & SaaS'],
@@ -39,6 +47,8 @@ export const samples: Seed[] = [
   },
   {
     slug: 'sample-dance-club',
+    callout: 'Sign up for a class online',
+    tint: 'blue',
     kind: 'Website',
     name: 'Pulse dance club',
     services: ['Websites & Landing Pages'],

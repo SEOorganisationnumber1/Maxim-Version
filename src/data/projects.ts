@@ -87,7 +87,18 @@ export type Project = {
   caseStudy: CaseStudy | null;
   /** Placeholder to see the Work page full while the real projects are on their way. Local only. */
   sample: boolean;
+  /** The one thing worth knowing about it, in a few words, shown in the teal box on its Work tile. True, never a result. */
+  callout: string | null;
+  /** The tint of its Work tile. */
+  tint: Tint;
+  /**
+   * How its screenshot is framed on Work: a browser for sites and web apps, phones for mobile apps
+   * and bots. `phones` lists where each phone screen sits inside the screenshot (in its pixels).
+   */
+  frame: { kind: 'browser' } | { kind: 'phones'; screens: { x: number; y: number; width: number }[] };
 };
+
+export type Tint = 'cyan' | 'blue' | 'violet' | 'ink';
 
 /** "Web apps & SaaS and AI & automation" from ['Web Apps & SaaS', 'AI & Automation']. */
 const toClientLine = (services: Service[]): string => {
@@ -105,7 +116,8 @@ const toClientLine = (services: Service[]): string => {
   return line.charAt(0).toUpperCase() + line.slice(1);
 };
 
-export type Seed = Pick<Project, 'slug' | 'name' | 'services' | 'kind'> & Partial<Pick<Project, 'summary' | 'plain' | 'site' | 'image' | 'own' | 'client' | 'caseStudy'>>;
+export type Seed = Pick<Project, 'slug' | 'name' | 'services' | 'kind'> &
+  Partial<Pick<Project, 'summary' | 'plain' | 'site' | 'image' | 'own' | 'client' | 'caseStudy' | 'callout' | 'tint' | 'frame'>>;
 
 // Real work only: every project here is shown on Home, Work and in llms.txt; clients (not `own`)
 // also on Clients. Add `summary` and `caseStudy` (shape: CaseStudy above) as they are written;
@@ -114,6 +126,8 @@ export type Seed = Pick<Project, 'slug' | 'name' | 'services' | 'kind'> & Partia
 const seeds: Seed[] = [
   {
     slug: 'leadity-io',
+    callout: 'Our own product',
+    tint: 'blue',
     kind: 'Web app',
     plain: 'Finds local businesses on Google Maps, with the owner behind each one.',
     name: 'Leadity',
@@ -128,6 +142,8 @@ const seeds: Seed[] = [
   // owner says whether each one was client work and whether it is live; summaries come from the code.
   {
     slug: 'car-parts-store',
+    callout: 'Search by year, make and model',
+    tint: 'cyan',
     kind: 'Website',
     plain: 'An online shop for car parts, from search to checkout.',
     name: 'Car parts store',
@@ -138,6 +154,8 @@ const seeds: Seed[] = [
   },
   {
     slug: 'crypto-exchange-platform',
+    callout: 'Crypto to a bank card',
+    tint: 'ink',
     kind: 'Web app',
     plain: 'People swap crypto for money sent straight to their bank card.',
     name: 'Crypto exchange platform',
@@ -148,6 +166,8 @@ const seeds: Seed[] = [
   },
   {
     slug: 'electronics-store',
+    callout: 'Catalog filled by our scripts',
+    tint: 'blue',
     kind: 'Website',
     plain: 'An online electronics shop in several languages.',
     name: 'Electronics store',
@@ -158,6 +178,8 @@ const seeds: Seed[] = [
   },
   {
     slug: 'reviews-site',
+    callout: 'Owner approves every review',
+    tint: 'violet',
     kind: 'Website',
     plain: 'Customers post star ratings with photos; the owner approves them.',
     name: 'Reviews site',
@@ -188,6 +210,9 @@ export const projects: Project[] = withSamples.map((seed, i) => ({
   look: looks[i % looks.length]!,
   caseStudy: seed.caseStudy ?? null,
   sample: seed.slug.startsWith('sample-'),
+  callout: seed.callout ?? null,
+  tint: seed.tint ?? (['cyan', 'blue', 'violet'] as const)[i % 3]!,
+  frame: seed.frame ?? { kind: 'browser' },
 }));
 
 /** Real projects only: Home, the menus and everything outside the Work page. */
