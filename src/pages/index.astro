@@ -4,6 +4,7 @@ import Icon from '../components/Icon.astro';
 import Workbench from '../components/Workbench.astro';
 import RibbonEnd from '../components/RibbonEnd.astro';
 import Agreement from '../components/Agreement.astro';
+import { keyTerms as terms, termsUrl } from '../data/terms';
 import { Image } from 'astro:assets';
 import { filled, numbers, site } from '../data/site';
 import { clients, realProjects, projectUrl } from '../data/projects';
@@ -21,13 +22,7 @@ const stats = filled([
   { value: numbers.retention, label: 'clients who stay past year one' },
 ]);
 
-/** The terms that matter most before a first call, written as the clauses of an agreement. The full list lives on Services. */
-const terms = [
-  { title: 'A fixed price, in writing.', text: 'Agreed before any work starts.' },
-  { title: 'Pay in stages.', text: 'Half to start, half at launch.' },
-  { title: 'Everything is yours.', text: 'Code, designs and accounts, in your name.' },
-  { title: '30 days of free fixes.', text: 'Any bug after launch, fixed at no cost.' },
-];
+
 
 // Recent work is a log of real, named projects: work we built for others first, our own product last.
 // Each row opens in place to the real screenshot and what we built. With a fine pointer, the
@@ -248,7 +243,7 @@ const log = [...realProjects.filter((project) => !project.own), ...realProjects.
       <div class="terms__side">
         <h2 class="h2" id="terms-title">What you get in writing.</h2>
         <p class="block__intro">How every project works, before you sign anything.</p>
-        <a href="/services#terms" class="text-link see-all">All terms<Icon name="arrow-right" /></a>
+        <a href={termsUrl} class="text-link see-all">All terms<Icon name="arrow-right" /></a>
       </div>
       <Agreement terms={terms} />
     </div>

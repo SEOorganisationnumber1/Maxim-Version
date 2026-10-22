@@ -56,7 +56,7 @@ export const numbers = {
 /** Client quotes on the Clients page, in the client's own words and with their permission. */
 export const testimonials: Testimonial[] = [];
 
-/** People on the Company page. */
+/** People behind the studio. Not shown anywhere while names stay off the site (owner's rule). */
 export const team: TeamMember[] = [];
 
 /** What we build, by kind of project. UI and UX design is part of every one of them. */
@@ -77,7 +77,7 @@ export const mainNav: NavItem[] = [
   { href: '/work', label: 'Work' },
   { href: '/services', label: 'Services' },
   ...(showClientsPage ? [{ href: '/clients', label: 'Clients' }] : []),
-  { href: '/company', label: 'Company' },
+  { href: '/how-we-work', label: 'How we work' },
 ];
 
 export const footerNav: NavItem[] = [...mainNav, { href: '/contact', label: 'Contact' }];

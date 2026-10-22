@@ -27,10 +27,10 @@ export const ogCards: Record<string, OgCard> = {
     title: [{ text: 'Design, code and growth.' }, { text: 'Built as one.', mark: 'highlight' }],
   },
   clients: { path: '/clients', tone: 'violet', title: [{ text: 'Teams we' }, { text: 'build with.', mark: 'highlight' }] },
-  company: {
-    path: '/company',
+  'how-we-work': {
+    path: '/how-we-work',
     tone: 'cyan',
-    title: [{ text: 'A product studio for design, engineering and' }, { text: 'launch.', mark: 'highlight' }],
+    title: [{ text: 'One team, from first call to' }, { text: 'launch.', mark: 'highlight' }],
   },
   contact: {
     path: '/contact',

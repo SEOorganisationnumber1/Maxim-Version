@@ -4,6 +4,7 @@ import CtaBand from '../../components/CtaBand.astro';
 import Icon from '../../components/Icon.astro';
 import OfferStage from '../../components/OfferStage.astro';
 import { offers, offerUrl, type Offer } from '../../data/offers';
+import { termsUrl } from '../../data/terms';
 
 // One page per offer in src/data/offers.ts: /services/telegram-bots and so on.
 export function getStaticPaths() {
@@ -130,7 +131,7 @@ const jsonLd: Record<string, unknown>[] = [
           <h2 class="h2">How a project runs.</h2>
           <p class="block__intro">{offer.steps.intro}</p>
         </div>
-        <a href="/services#terms" class="text-link see-all">All terms<Icon name="arrow-right" /></a>
+        <a href={termsUrl} class="text-link see-all">All terms<Icon name="arrow-right" /></a>
       </div>
       <ol class="steps">
         {

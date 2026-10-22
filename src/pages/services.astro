@@ -8,6 +8,7 @@ import { Image } from 'astro:assets';
 import { type Service } from '../data/site';
 import { offersFor, offerUrl } from '../data/offers';
 import { realProjects, type Tint } from '../data/projects';
+import { keyTerms, termsUrl } from '../data/terms';
 
 type ServiceBlock = {
   name: Service;
@@ -25,42 +26,6 @@ type ServiceBlock = {
   about: string;
 };
 type Faq = { question: string; answer: string };
-type Term = { title: string; text: string };
-
-// How every project works, approved by the owner on 2026-10-16. These are promises the studio
-// keeps: change them here first if the way of working changes.
-const terms: Term[] = [
-  {
-    title: 'Free estimate',
-    text: 'Book a call or send a brief, and within two business days you get our approach and a fixed price in writing. It costs nothing.',
-  },
-  {
-    title: 'Fixed price, written scope',
-    text: 'The price is fixed for the scope we agree in writing. Anything new gets its own price and timeline, and you approve it before we start.',
-  },
-  {
-    title: 'Pay in stages',
-    text: '50% to start and 50% at launch. Larger projects pay in three stages: 30% to start, 40% when the design is approved and 30% at launch.',
-  },
-  {
-    title: 'You own everything',
-    text: 'Code, design files and accounts are yours once the final payment is made. Domain, hosting and app store accounts are in your name from day one.',
-  },
-  { title: 'Two rounds of design changes', text: 'Two rounds of changes on the design are included in the price.' },
-  { title: '30 days of free fixes', text: 'For 30 days after launch, we fix any bug in what we built, free.' },
-  {
-    title: 'Support if you want it',
-    text: "Monthly care for websites and apps, optional. Cancel any time with 30 days' notice.",
-  },
-  {
-    title: 'No hidden costs',
-    text: 'Hosting, domains, AI and API usage and app store fees are paid by you directly, at cost.',
-  },
-  {
-    title: 'SEO month to month',
-    text: "No long contract: cancel with 30 days' notice. Nobody can guarantee rankings, so we don't.",
-  },
-];
 
 // One tile per kind of project. UI and UX design is in every one of them, so it has no tile of its own.
 const serviceBlocks: ServiceBlock[] = [
@@ -367,14 +332,15 @@ const faqPageJsonLd: Record<string, unknown> = {
     </div>
   </dialog>
 
-  <!-- Terms: the full written agreement -->
+  <!-- Terms: the four that matter most; the full agreement lives on How we work -->
   <section id="terms" class="anchor" aria-labelledby="terms-title">
     <div class="container terms">
       <div class="terms__side">
         <h2 class="h2" id="terms-title">What you get in <span class="highlight">writing.</span></h2>
         <p class="terms__intro">How every project works, before you sign anything.</p>
+        <a href={termsUrl} class="text-link see-all">All terms<Icon name="arrow-right" /></a>
       </div>
-      <Agreement terms={terms} />
+      <Agreement terms={keyTerms} />
     </div>
   </section>
 
@@ -799,6 +765,7 @@ const faqPageJsonLd: Record<string, unknown> = {
     position: sticky;
     top: 120px;
     display: grid;
+    justify-items: start;
     gap: 16px;
   }
   .terms__intro {

@@ -50,6 +50,8 @@ export default defineConfig({
   // link, the canonical tags and the sitemap. Pages build to work.html etc.
   trailingSlash: 'never',
   build: { format: 'file' },
+  // Company became How we work (2026-10-22): old links and search results keep working.
+  redirects: { '/company': '/how-we-work' },
   // Every page stays prerendered static HTML. Only the brief API and /admin opt into
   // on-demand rendering (export const prerender = false), served by a Netlify Function.
   // staticHeaders: the CSP of static pages is sent as an HTTP header (so frame-ancestors works),

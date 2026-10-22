@@ -23,12 +23,12 @@ const serviceAnchor = (name: string) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
 
-/** Where to go from here: Home leads to Work, Work to Services, Services to Company, the rest to Work. */
+/** Where to go from here: Home leads to Work, Work to Services, Services to How we work, the rest to Work. */
 type Next = { href: string; label: string; text: string; look: 'shot' | 'bento' | 'ribbon' };
 const work: Next = { href: '/work', label: 'Work', text: 'Real projects, with screenshots.', look: 'shot' };
 const nextFor: Record<string, Next> = {
   '/work': { href: '/services', label: 'Services', text: 'What we build, and how each project runs.', look: 'bento' },
-  '/services': { href: '/company', label: 'Company', text: 'How we work, in plain words.', look: 'ribbon' },
+  '/services': { href: '/how-we-work', label: 'How we work', text: 'A project week by week, and the terms we sign.', look: 'ribbon' },
 };
 const next = (current && nextFor[current]) || work;
 const workShot = realProjects.find((project) => !project.own && project.image)?.image ?? null;
