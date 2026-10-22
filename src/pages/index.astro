@@ -200,6 +200,7 @@ const log = [...projects.filter((project) => !project.own), ...projects.filter((
                           )}
                           <div class="log__about">
                             {project.summary && <p class="log__summary">{project.summary}</p>}
+                            {project.screensNote && <p class="log__summary log__note">{project.screensNote}</p>}
                             {url && (
                               <a href={url} class="text-link">
                                 Read the case
@@ -749,6 +750,10 @@ const log = [...projects.filter((project) => !project.own), ...projects.filter((
     font-size: 16px;
     line-height: 1.6;
     color: var(--ink-2);
+  }
+  .log__note {
+    font-weight: 600;
+    color: var(--ink);
   }
   /* The glance: the hovered row's screenshot trails the pointer (fine pointers only). */
   .peek {

@@ -87,6 +87,10 @@ export type Project = {
   look: Look;
   /** Null until the case study is written: no page is built for it and cards do not link. */
   caseStudy: CaseStudy | null;
+  /** A short tag after the kind wherever the project is listed on Work, such as 'Redesign concept'. */
+  label: string | null;
+  /** One line under the summary when the screenshot is not the live product as it is today. */
+  screensNote: string | null;
   /** The one thing worth knowing about it, in a few words, shown in the teal box on its Work tile. True, never a result. */
   callout: string | null;
   /** The tint of its Work tile. */
@@ -127,7 +131,7 @@ const toClientLine = (services: Service[]): string => {
 };
 
 export type Seed = Pick<Project, 'slug' | 'name' | 'services' | 'kind'> &
-  Partial<Pick<Project, 'summary' | 'plain' | 'site' | 'image' | 'own' | 'client' | 'caseStudy' | 'callout' | 'tint' | 'frame'>>;
+  Partial<Pick<Project, 'summary' | 'plain' | 'site' | 'image' | 'own' | 'client' | 'caseStudy' | 'callout' | 'tint' | 'frame' | 'label' | 'screensNote'>>;
 
 // Real work only: every project here is shown on Home, Work and in llms.txt; clients (not `own`)
 // also on Clients. Add `summary` and `caseStudy` (shape: CaseStudy above) as they are written;
@@ -181,8 +185,9 @@ const seeds: Seed[] = [
       'An online store for car parts and performance accessories: shop, product pages, cart, checkout and customer account. React and TypeScript, with automated tests, shipped in Docker.',
     image: { src: carPartsShot, alt: 'The car parts store home page: "Premium car parts for your vehicle" with a wheel, a brake disc and a search by year, make and model' },
   },
-  // From the owner's app archive (2026-10-22). Shown without the college's name; the screens are
-  // the real app run with a made-up student, tasks and teachers.
+  // From the owner's app archive (2026-10-22). Shown without the college's name. The screens are our
+  // redesign concept for it (direction C, chosen 2026-10-22, .temp/college-app-v2/c.html) with a
+  // made-up student, so the project says so; the live app still has its original design.
   {
     slug: 'college-student-app',
     callout: 'Classes, tasks and grades',
@@ -190,13 +195,15 @@ const seeds: Seed[] = [
     frame: threePhones,
     kind: 'Mobile app',
     plain: "Classes, tasks and grades for a college's students, on their phones.",
+    label: 'Redesign concept',
+    screensNote: 'These screens are a redesign concept. The live app still uses its original design.',
     name: 'College student app',
     services: ['Mobile & Desktop Apps'],
     summary:
-      "An iOS and Android app for a college's students: the day's classes and the week's schedule, tasks with priorities and deadlines, grades from the college's own system, and a profile, in light and dark mode. React Native, Expo and Supabase.",
+      "An iOS and Android app for students at one college: today's classes, the weekly schedule, tasks with priorities and deadlines, and grades from the college's system, in light and dark mode. Built with React Native, Expo and Supabase.",
     image: {
       src: collegeAppShot,
-      alt: "Three screens of the student app with a demo student: the home screen with the week's progress, the day's classes and the task list",
+      alt: 'College student app, redesign concept: the Schedule, Today and Tasks screens with a demo student',
     },
   },
   {
@@ -252,6 +259,8 @@ export const projects: Project[] = seeds.map((seed, i) => ({
   look: looks[i % looks.length]!,
   caseStudy: seed.caseStudy ?? null,
   callout: seed.callout ?? null,
+  label: seed.label ?? null,
+  screensNote: seed.screensNote ?? null,
   tint: seed.tint ?? (['cyan', 'blue', 'violet'] as const)[i % 3]!,
   frame: seed.frame ?? { kind: 'browser' },
 }));

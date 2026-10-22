@@ -16,7 +16,7 @@ const kindSlug = (kind: string) => kind.toLowerCase().replace(/[^a-z0-9]+/g, '-'
 /** "Website" to "Websites" for the filter buttons. */
 const plural = (kind: string) => (kind.endsWith('s') ? kind : `${kind}s`);
 const kinds = [...new Set(log.map((p) => p.kind))].map((kind) => ({ kind, count: log.filter((p) => p.kind === kind).length }));
-const kindLine = (p: Project) => (p.own ? `${p.kind} · Our own product` : p.kind);
+const kindLine = (p: Project) => [p.kind, p.own ? 'Our own product' : null, p.label].filter(Boolean).join(' · ');
 /** How many columns the last tile takes so the grid ends on a full row: 1 when it already does. */
 const lastSpan = (cols: number) => cols - ((log.length - 1) % cols);
 const span3 = lastSpan(3) > 1 ? lastSpan(3) : undefined;
@@ -188,6 +188,7 @@ const phoneStyle = (p: Project, screen: { x: number; y: number; width: number })
               </div>
               <div>
                 {p.summary && <p class="open__text">{p.summary}</p>}
+                {p.screensNote && <p class="open__note">{p.screensNote}</p>}
                 {(url || p.site) && (
                   <div class="open__links">
                     {url && (
@@ -747,6 +748,13 @@ const phoneStyle = (p: Project, screen: { x: number; y: number; width: number })
     font-size: 17px;
     line-height: 1.6;
     color: var(--ink-2);
+  }
+  .open__note {
+    margin: 10px 0 0;
+    font-size: 17px;
+    line-height: 1.6;
+    font-weight: 600;
+    color: var(--ink);
   }
   .open__links {
     display: flex;
