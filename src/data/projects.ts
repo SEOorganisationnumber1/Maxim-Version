@@ -5,6 +5,8 @@ import cryptoExchangeShot from '../assets/work/crypto-exchange-platform.webp';
 import carPartsShot from '../assets/work/car-parts-store.webp';
 import electronicsShot from '../assets/work/electronics-store.webp';
 import reviewsShot from '../assets/work/reviews-site.webp';
+import collegeAppShot from '../assets/work/college-app.webp';
+import leadityBotsShot from '../assets/work/leadity-bots.webp';
 
 // Card art. Each project cycles through these three looks, in order,
 // exactly as the Work page in the design does.
@@ -85,8 +87,6 @@ export type Project = {
   look: Look;
   /** Null until the case study is written: no page is built for it and cards do not link. */
   caseStudy: CaseStudy | null;
-  /** Placeholder to see the Work page full while the real projects are on their way. Local only. */
-  sample: boolean;
   /** The one thing worth knowing about it, in a few words, shown in the teal box on its Work tile. True, never a result. */
   callout: string | null;
   /** The tint of its Work tile. */
@@ -99,6 +99,16 @@ export type Project = {
 };
 
 export type Tint = 'cyan' | 'blue' | 'violet' | 'ink';
+
+/** Where the screens sit in our 1600x1000 phone screenshots. A Work tile frames the first two. */
+const threePhones: Project['frame'] = {
+  kind: 'phones',
+  screens: [
+    { x: 110, y: 110, width: 360 },
+    { x: 620, y: 110, width: 360 },
+    { x: 1130, y: 110, width: 360 },
+  ],
+};
 
 /** "Web apps & SaaS and AI & automation" from ['Web Apps & SaaS', 'AI & Automation']. */
 const toClientLine = (services: Service[]): string => {
@@ -138,6 +148,25 @@ const seeds: Seed[] = [
     image: { src: leadityShot, alt: 'The leadity.io home page: a lead search with a map of the US and sample business owners' },
     own: true,
   },
+  // The bots from the owner's BotFather list, screens drawn from the messages in their code with
+  // made-up names. Hermes (Nous Research's open-source agent) is not ours and is left out.
+  {
+    slug: 'leadity-telegram-bots',
+    callout: 'A ping for every payment',
+    tint: 'ink',
+    frame: threePhones,
+    kind: 'Telegram bot',
+    plain: 'Telegram bots that tell our team about payments, sign-ups and support, and share out the work.',
+    name: 'Leadity bots',
+    services: ['Telegram Bots & Extensions'],
+    summary:
+      'The Telegram bots behind Leadity. They ping the team on every payment, new sign-up and support message, run a shared task board with Claim and Done buttons, post a live feed of lead searches and keep a calendar of yearly milestones.',
+    image: {
+      src: leadityBotsShot,
+      alt: 'Three Telegram chats: a payment received with Customer and Payments buttons, a new task with a Claim this button, and a customer support message',
+    },
+    own: true,
+  },
   // From the owner's own repositories (2026-10-19). Shown without product names or links until the
   // owner says whether each one was client work and whether it is live; summaries come from the code.
   {
@@ -151,6 +180,24 @@ const seeds: Seed[] = [
     summary:
       'An online store for car parts and performance accessories: shop, product pages, cart, checkout and customer account. React and TypeScript, with automated tests, shipped in Docker.',
     image: { src: carPartsShot, alt: 'The car parts store home page: "Premium car parts for your vehicle" with a wheel, a brake disc and a search by year, make and model' },
+  },
+  // From the owner's app archive (2026-10-22). Shown without the college's name; the screens are
+  // the real app run with a made-up student, tasks and teachers.
+  {
+    slug: 'college-student-app',
+    callout: 'Classes, tasks and grades',
+    tint: 'violet',
+    frame: threePhones,
+    kind: 'Mobile app',
+    plain: "Classes, tasks and grades for a college's students, on their phones.",
+    name: 'College student app',
+    services: ['Mobile & Desktop Apps'],
+    summary:
+      "An iOS and Android app for a college's students: the day's classes and the week's schedule, tasks with priorities and deadlines, grades from the college's own system, and a profile, in light and dark mode. React Native, Expo and Supabase.",
+    image: {
+      src: collegeAppShot,
+      alt: "Three screens of the student app with a demo student: the home screen with the week's progress, the day's classes and the task list",
+    },
   },
   {
     slug: 'crypto-exchange-platform',
@@ -190,12 +237,7 @@ const seeds: Seed[] = [
   },
 ];
 
-// SAMPLES, NOT REAL WORK: placeholder projects that fill the Work page on localhost only
-// (src/data/samples.ts). Production builds never load that file, its text or its images.
-const samples: Seed[] = import.meta.env.DEV ? (await import('./samples')).samples : [];
-const withSamples = import.meta.env.DEV ? [...seeds, ...samples] : seeds;
-
-export const projects: Project[] = withSamples.map((seed, i) => ({
+export const projects: Project[] = seeds.map((seed, i) => ({
   slug: seed.slug,
   name: seed.name,
   kind: seed.kind,
@@ -209,14 +251,10 @@ export const projects: Project[] = withSamples.map((seed, i) => ({
   clientLine: toClientLine(seed.services),
   look: looks[i % looks.length]!,
   caseStudy: seed.caseStudy ?? null,
-  sample: seed.slug.startsWith('sample-'),
   callout: seed.callout ?? null,
   tint: seed.tint ?? (['cyan', 'blue', 'violet'] as const)[i % 3]!,
   frame: seed.frame ?? { kind: 'browser' },
 }));
-
-/** Real projects only: Home, the menus and everything outside the Work page. */
-export const realProjects: Project[] = projects.filter((p) => !p.sample);
 
 export type PublishedProject = Project & { caseStudy: CaseStudy };
 
@@ -232,7 +270,7 @@ export const projectUrl = (p: Project): string | null => (p.caseStudy ? `/work/$
  */
 export const CLIENTS_PAGE_MIN = 3;
 /** Confirmed client work only: our own products and unattributed work are never shown as clients. */
-export const clients: Project[] = realProjects.filter((p) => p.client && !p.own);
+export const clients: Project[] = projects.filter((p) => p.client && !p.own);
 export const showClientsPage = clients.length >= CLIENTS_PAGE_MIN;
 
 /** The small line above a card's name: "Our own product", or the services we delivered. */

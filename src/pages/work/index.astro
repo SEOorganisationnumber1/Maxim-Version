@@ -8,15 +8,19 @@ import { projects, projectUrl, type Project } from '../../data/projects';
 // Work is one page: a grid of project tiles, each on its own tint with the real screens in the
 // frame that fits the kind (a browser for sites and web apps, phones for apps and bots) and one
 // true line in our highlight box. A tile opens the project large, on the same page.
-// Work we built for others first, our own product next, local samples last.
-const log = [...projects.filter((p) => !p.own && !p.sample), ...projects.filter((p) => p.own), ...projects.filter((p) => p.sample)];
-const fan = projects.filter((p) => !p.own && !p.sample && p.image).slice(0, 3);
+// Work we built for others first, our own products next.
+const log = [...projects.filter((p) => !p.own), ...projects.filter((p) => p.own)];
+const fan = projects.filter((p) => !p.own && p.image && p.frame.kind === 'browser').slice(0, 3);
 
 const kindSlug = (kind: string) => kind.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 /** "Website" to "Websites" for the filter buttons. */
 const plural = (kind: string) => (kind.endsWith('s') ? kind : `${kind}s`);
 const kinds = [...new Set(log.map((p) => p.kind))].map((kind) => ({ kind, count: log.filter((p) => p.kind === kind).length }));
 const kindLine = (p: Project) => (p.own ? `${p.kind} · Our own product` : p.kind);
+/** How many columns the last tile takes so the grid ends on a full row: 1 when it already does. */
+const lastSpan = (cols: number) => cols - ((log.length - 1) % cols);
+const span3 = lastSpan(3) > 1 ? lastSpan(3) : undefined;
+const span2 = lastSpan(2) > 1 ? lastSpan(2) : undefined;
 
 /**
  * Phone frames show one screen cut from the screenshot. The crop is set in percentages, so it holds
@@ -87,7 +91,12 @@ const phoneStyle = (p: Project, screen: { x: number; y: number; width: number })
     <ul class="grid" role="list">
       {
         log.map((p, i) => (
-          <li class="project" data-kind={kindSlug(p.kind)}>
+          <li
+            class="project"
+            data-kind={kindSlug(p.kind)}
+            data-span3={i === log.length - 1 ? span3 : undefined}
+            data-span2={i === log.length - 1 ? span2 : undefined}
+          >
             <button type="button" class="project__open" data-open={i} aria-haspopup="dialog" aria-controls="work-open">
               <span class:list={['project__stage', `tint-${p.tint}`]}>
                 <svg class="project__ribbon" aria-hidden="true" viewBox="0 0 400 200" preserveAspectRatio="none">
@@ -120,7 +129,6 @@ const phoneStyle = (p: Project, screen: { x: number; y: number; width: number })
               <span class="project__meta">
                 <span class="project__name">
                   {p.name}
-                  {p.sample && <span class="sample">Sample</span>}
                 </span>
                 <span class="project__kind">{kindLine(p)}</span>
                 <span class="project__go" aria-hidden="true">
@@ -176,7 +184,6 @@ const phoneStyle = (p: Project, screen: { x: number; y: number; width: number })
                 <h2 class="open__name" id={`open-title-${i}`}>{p.name}</h2>
                 <p class="open__kind">
                   {kindLine(p)}
-                  {p.sample && <span class="sample">Sample, local only</span>}
                 </p>
               </div>
               <div>
@@ -256,6 +263,7 @@ const phoneStyle = (p: Project, screen: { x: number; y: number; width: number })
     const apply = (filter: string, updateUrl: boolean) => {
       buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filter === filter)));
       tiles.forEach((tile) => (tile.hidden = !(filter === 'all' || tile.dataset.kind === filter)));
+      tiles[0]?.parentElement?.toggleAttribute('data-filtered', filter !== 'all');
       if (updateUrl) {
         const url = new URL(window.location.href);
         if (filter === 'all') url.searchParams.delete('kind');
@@ -435,6 +443,9 @@ const phoneStyle = (p: Project, screen: { x: number; y: number; width: number })
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 40px 22px;
   }
+  .project {
+    container-type: inline-size;
+  }
   .project[hidden] {
     display: none;
   }
@@ -459,7 +470,8 @@ const phoneStyle = (p: Project, screen: { x: number; y: number; width: number })
     overflow: hidden;
   }
   .project__stage {
-    aspect-ratio: 1 / 0.86;
+    aspect-ratio: var(--stage-ratio, 1 / 0.86);
+    height: var(--stage-h, auto);
     padding: 66px 24px 0;
     border-radius: var(--radius-tile);
   }
@@ -503,19 +515,63 @@ const phoneStyle = (p: Project, screen: { x: number; y: number; width: number })
     stroke-opacity: 0.35;
   }
   .project__stage .browser {
-    width: 100%;
+    width: var(--browser-w, 100%);
     align-self: end;
     border-radius: 12px 12px 0 0;
     transform: translateY(18px);
     transition: transform 500ms var(--ease-out);
   }
   .project__stage .phone {
+    width: var(--phone-w, 46%);
     align-self: end;
     transform: translateY(26px);
   }
   .project__stage .phone + .phone {
-    margin-left: -14%;
-    transform: translateY(46px) rotate(5deg);
+    margin-left: var(--phone-gap, -14%);
+    transform: translateY(var(--phone-drop, 46px)) rotate(var(--phone-tilt, 5deg));
+  }
+  .project__stage .phone:nth-child(n + 3) {
+    display: var(--phone-more, none);
+  }
+  /*
+   * The grid never ends on a lone tile or a gap: the last tile takes the rest of its row (data-span3
+   * at three columns, data-span2 at two), at the height of the others, and shows more of the
+   * project: every phone screen, a wider page. --col is one column; cqw is the tile's own width.
+   * Not while a filter is on.
+   */
+  @media (min-width: 1024px) {
+    .grid:not([data-filtered]) [data-span3='3'] {
+      grid-column: 1 / -1;
+      --col: calc((100cqw - 44px) / 3);
+    }
+    .grid:not([data-filtered]) [data-span3='2'] {
+      grid-column: span 2;
+      --col: calc((100cqw - 22px) / 2);
+    }
+    .grid:not([data-filtered]) [data-span3] {
+      --stage-ratio: auto;
+      --stage-h: calc(0.86 * var(--col));
+      --browser-w: calc(1.7 * var(--col));
+      --phone-w: calc(0.46 * (var(--col) - 48px));
+      --phone-gap: 5%;
+      --phone-drop: 26px;
+      --phone-tilt: 0deg;
+      --phone-more: block;
+    }
+  }
+  @media (min-width: 640px) and (max-width: 1023.98px) {
+    .grid:not([data-filtered]) [data-span2] {
+      grid-column: 1 / -1;
+      --col: calc((100cqw - 22px) / 2);
+      --stage-ratio: auto;
+      --stage-h: calc(0.86 * var(--col));
+      --browser-w: calc(1.7 * var(--col));
+      --phone-w: calc(0.46 * (var(--col) - 48px));
+      --phone-gap: 5%;
+      --phone-drop: 26px;
+      --phone-tilt: 0deg;
+      --phone-more: block;
+    }
   }
   /* The one thing worth knowing, in our highlight box. */
   .callout {
@@ -571,16 +627,6 @@ const phoneStyle = (p: Project, screen: { x: number; y: number; width: number })
       background-color 200ms var(--ease-out),
       color 200ms var(--ease-out),
       transform 300ms var(--ease-out);
-  }
-  /* Samples exist on localhost only; the tag keeps them from being mistaken for real work. */
-  .sample {
-    margin-left: 6px;
-    padding: 1px 8px;
-    border: 1px dashed #c8a24a;
-    border-radius: 999px;
-    color: #7a4a00;
-    font: 700 11px/1.5 var(--font-body);
-    vertical-align: middle;
   }
   .project__open:focus-visible {
     outline: 3px solid var(--teal);

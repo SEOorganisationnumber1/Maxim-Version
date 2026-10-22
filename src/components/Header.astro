@@ -3,7 +3,7 @@ import { Image } from 'astro:assets';
 import Logo from './Logo.astro';
 import Icon from './Icon.astro';
 import { mainNav, site } from '../data/site';
-import { realProjects } from '../data/projects';
+import { projects } from '../data/projects';
 
 interface Props {
   /** href of the nav item to mark as the current page, e.g. '/work'. */
@@ -17,7 +17,7 @@ const isCurrent = (href: string) => (href === current ? 'page' : undefined);
 const CURVE = 'M3 8 C 22 2, 38 2, 52 6.5 S 80 11, 97 4';
 
 /** The phone menu shows a small picture next to each page: real work for Work. */
-const workShot = realProjects.find((project) => !project.own && project.image)?.image ?? null;
+const workShot = projects.find((project) => !project.own && project.image)?.image ?? null;
 ---
 
 {/*

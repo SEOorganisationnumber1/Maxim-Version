@@ -7,7 +7,7 @@ import ServiceDemo, { type DemoKind } from '../components/ServiceDemo.astro';
 import { Image } from 'astro:assets';
 import { type Service } from '../data/site';
 import { offersFor, offerUrl } from '../data/offers';
-import { realProjects, type Tint } from '../data/projects';
+import { projects, type Tint } from '../data/projects';
 import { keyTerms, termsUrl } from '../data/terms';
 
 type ServiceBlock = {
@@ -141,7 +141,7 @@ const anchor = (name: string) =>
 const kindSlug = (kind: string) => kind.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 /** Real projects that used this service, with a screenshot, our own product last. */
 const builtWith = (service: Service) =>
-  realProjects
+  projects
     .filter((p) => p.services.includes(service) && p.image)
     .sort((a, b) => Number(a.own) - Number(b.own))
     .slice(0, 3);

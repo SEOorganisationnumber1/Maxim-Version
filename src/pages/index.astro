@@ -7,7 +7,7 @@ import Agreement from '../components/Agreement.astro';
 import { keyTerms as terms, termsUrl } from '../data/terms';
 import { Image } from 'astro:assets';
 import { filled, numbers, site } from '../data/site';
-import { clients, realProjects, projectUrl } from '../data/projects';
+import { clients, projects, projectUrl } from '../data/projects';
 import { ribbonPath } from '../scripts/hero-ribbons';
 
 /** "Trusted by:" chips, clients only (never our own products). Past CHIP_LIMIT the rest are behind "+ more brands". */
@@ -27,7 +27,7 @@ const stats = filled([
 // Recent work is a log of real, named projects: work we built for others first, our own product last.
 // Each row opens in place to the real screenshot and what we built. With a fine pointer, the
 // screenshot also trails the pointer down the list.
-const log = [...realProjects.filter((project) => !project.own), ...realProjects.filter((project) => project.own)];
+const log = [...projects.filter((project) => !project.own), ...projects.filter((project) => project.own)];
 
 ---
 

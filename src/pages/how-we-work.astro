@@ -4,14 +4,16 @@ import Icon from '../components/Icon.astro';
 import Agreement from '../components/Agreement.astro';
 import RibbonEnd from '../components/RibbonEnd.astro';
 import { Image } from 'astro:assets';
-import { realProjects } from '../data/projects';
+import { projects } from '../data/projects';
 import { terms } from '../data/terms';
 
 // How we work replaced the Company page (2026-10-22): who we are, shown through what we build
 // (our own product first), how a project runs week by week, one team with its tools, and the
 // full signed agreement. /company redirects here (astro.config.mjs).
 
-const own = realProjects.find((p) => p.own && p.site && p.image);
+const own = projects.find((p) => p.own && p.site && p.image);
+/** Our other own products, such as the bots that run Leadity: one line each under it. */
+const ownMore = projects.filter((p) => p.own && p !== own && p.plain);
 
 /** "A car parts store", "An electronics store": names read as part of the sentence. */
 const withArticle = (name: string) => {
@@ -30,8 +32,8 @@ const sentence = (items: string[]) => {
 /** What we have built, one plain sentence per kind of project, each with small real screens. */
 const kindSlug = (kind: string) => kind.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 const plural = (kind: string) => (kind.endsWith('s') ? kind : `${kind}s`).toLowerCase();
-const built = [...new Set(realProjects.filter((p) => !p.own).map((p) => p.kind))].map((kind) => {
-  const items = realProjects.filter((p) => !p.own && p.kind === kind);
+const built = [...new Set(projects.filter((p) => !p.own).map((p) => p.kind))].map((kind) => {
+  const items = projects.filter((p) => !p.own && p.kind === kind);
   return {
     kind,
     names: items.map((p) => withArticle(p.name)),
@@ -132,6 +134,11 @@ const jump = [
           <div>
             <h3 class="own__name">{own.name}</h3>
             <p class="own__text">{own.summary}</p>
+            {ownMore.map((p) => (
+              <p class="own__also">
+                <strong>{p.name}.</strong> {p.plain}
+              </p>
+            ))}
             <a href={own.site!} class="btn btn--primary" target="_blank" rel="noopener">
               Visit {new URL(own.site!).hostname}
               <span class="visually-hidden"> (opens in a new tab)</span>
@@ -397,6 +404,17 @@ const jump = [
     font-size: 17px;
     line-height: 1.6;
     color: var(--ink-2);
+  }
+  .own__also {
+    margin: -8px 0 22px;
+    padding-left: 14px;
+    border-left: 3px solid var(--teal);
+    font-size: 16px;
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+  .own__also strong {
+    color: var(--ink);
   }
   .built {
     list-style: none;
