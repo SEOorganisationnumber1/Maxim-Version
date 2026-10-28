@@ -356,9 +356,9 @@ const built = [...new Set(projects.filter((p) => !p.own).map((p) => p.kind))].ma
               A lead generation platform that finds local businesses on Google Maps. We co-founded it and built the first
               version, then its website, user area and SEO.
             </p>
-            {bots && (
+            {bots?.plain && (
               <p class="own__also">
-                <b>{bots.name}.</b> They tell our team about every payment, sign-up and support message, and hand out the tasks.
+                <b>{bots.name}.</b> {bots.plain}
               </p>
             )}
             <a href={own.site} class="btn btn--primary" target="_blank" rel="noopener">

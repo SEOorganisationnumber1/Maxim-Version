@@ -160,11 +160,11 @@ const seeds: Seed[] = [
     tint: 'ink',
     frame: threePhones,
     kind: 'Telegram bot',
-    plain: 'Telegram bots that tell our team about payments, sign-ups and support, and share out the work.',
+    plain: 'Our secure internal management system on Telegram: notifications, payments, passwords and team tasks.',
     name: 'Leadity bots',
     services: ['Telegram Bots & Extensions'],
     summary:
-      'The Telegram bots behind Leadity. They ping the team on every payment, new sign-up and support message, run a shared task board with Claim and Done buttons, post a live feed of lead searches and keep a calendar of yearly milestones.',
+      'A secure, internal management system for our team, built on Telegram. Its bots send a notification for every payment, sign-up and support message, manage payments and passwords, and run a shared task board with Claim and Done buttons.',
     image: {
       src: leadityBotsShot,
       alt: 'Three Telegram chats: a payment received with Customer and Payments buttons, a new task with a Claim this button, and a customer support message',
@@ -228,7 +228,7 @@ const seeds: Seed[] = [
     services: ['Websites & Landing Pages', 'Web Apps & SaaS'],
     summary:
       'An online electronics store in several languages: catalog, product pages, favorites, cart, accounts, orders and an admin page, with the catalog filled by import scripts we wrote. React and Supabase.',
-    image: { src: electronicsShot, alt: 'The electronics store: search, catalog categories, brand logos and product tabs' },
+    image: { src: electronicsShot, alt: "The electronics store home page: a Women's Day sale bar, the search and a hero banner for RGB PC cables and controllers" },
   },
   {
     slug: 'reviews-site',

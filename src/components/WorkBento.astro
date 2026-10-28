@@ -22,8 +22,9 @@ type Tile = {
   tint: Tint;
   /** The sticker, only where it says something the screens do not show. */
   callout?: string;
-  /** What it is, in one line: shown on the phone rows, read out everywhere. */
+  /** What it is, in one line: shown on the phone rows (and always with `lineShown`), read out everywhere. */
   line: string;
+  lineShown?: boolean;
   tags: { text: string; concept?: boolean }[];
   /** How wide the desktop screenshot is drawn at each screen size (the `sizes` attribute). */
   sizes?: string;
@@ -52,17 +53,9 @@ const tiles: Tile[] = [
     slug: 'leadity-telegram-bots',
     key: 'bots',
     tint: 'ink',
-    line: 'Telegram bots that tell our team about payments and hand out tasks',
-    tags: [{ text: 'Telegram bot' }, { text: 'Our own product' }],
-  },
-  {
-    slug: 'car-parts-store',
-    key: 'cars',
-    tint: 'cyan',
-    line: 'Search by year, make and model',
-    tags: [{ text: 'Website' }],
-    sizes: '(max-width: 719.98px) 1px, (max-width: 1099.98px) 36vw, (max-width: 1239.98px) 23vw, 290px',
-    phone: { src: carPartsPhone, alt: 'The car parts store on a phone', sizes: '(max-width: 719.98px) 200px, (max-width: 1099.98px) 15vw, 120px' },
+    line: 'Our secure internal management system on Telegram: notifications, payments, passwords and team tasks.',
+    lineShown: true,
+    tags: [{ text: 'Telegram bots' }, { text: 'Our own product' }],
   },
   {
     slug: 'college-student-app',
@@ -71,16 +64,17 @@ const tiles: Tile[] = [
     line: 'Classes, tasks and grades',
     tags: [{ text: 'Mobile app' }, { text: 'Redesign concept', concept: true }],
   },
+  // Desktop only: a phone beside the store's page crowded this narrow tile.
   {
-    slug: 'crypto-exchange-platform',
-    key: 'crypto',
-    tint: 'ink',
-    line: 'Web app · crypto to a bank card',
-    tags: [{ text: 'Web app' }],
-    sizes: '(max-width: 719.98px) 84px, (max-width: 1099.98px) 64vw, (max-width: 1239.98px) 30vw, 380px',
-    phone: { src: cryptoPhone, alt: 'The exchange home page on a phone', sizes: '(max-width: 719.98px) 1px, (max-width: 1099.98px) 18vw, 115px' },
-    row: true,
+    slug: 'car-parts-store',
+    key: 'cars',
+    tint: 'cyan',
+    line: 'Search by year, make and model',
+    tags: [{ text: 'Website' }],
+    sizes: '(max-width: 719.98px) 1px, (max-width: 1099.98px) 38vw, (max-width: 1239.98px) 23vw, 300px',
+    phone: { src: carPartsPhone, alt: 'The car parts store on a phone', sizes: '(max-width: 719.98px) 200px, 1px' },
   },
+  // The store's real home page: its sale bar and its hero banner, wide.
   {
     slug: 'electronics-store',
     key: 'elec',
@@ -88,7 +82,7 @@ const tiles: Tile[] = [
     callout: 'Catalog imported automatically',
     line: 'Website · catalog imported automatically',
     tags: [{ text: 'Website' }],
-    sizes: '(max-width: 719.98px) 84px, (max-width: 1099.98px) 39vw, (max-width: 1239.98px) 17vw, 230px',
+    sizes: '(max-width: 719.98px) 84px, (max-width: 1099.98px) 78vw, (max-width: 1239.98px) 51vw, 640px',
     row: true,
   },
   {
@@ -98,7 +92,17 @@ const tiles: Tile[] = [
     callout: 'Owner approves every review',
     line: 'Website · owner approves every review',
     tags: [{ text: 'Website' }],
-    sizes: '(max-width: 719.98px) 84px, (max-width: 1099.98px) 39vw, (max-width: 1239.98px) 17vw, 230px',
+    sizes: '(max-width: 719.98px) 84px, (max-width: 1239.98px) 37vw, 470px',
+    row: true,
+  },
+  {
+    slug: 'crypto-exchange-platform',
+    key: 'crypto',
+    tint: 'ink',
+    line: 'Web app · crypto to a bank card',
+    tags: [{ text: 'Web app' }],
+    sizes: '(max-width: 719.98px) 84px, (max-width: 1099.98px) 38vw, (max-width: 1239.98px) 30vw, 380px',
+    phone: { src: cryptoPhone, alt: 'The exchange home page on a phone', sizes: '(max-width: 1099.98px) 1px, 115px' },
     row: true,
   },
 ];
@@ -114,7 +118,7 @@ const PHONE_WIDTHS = [200, 300, 400, 600];
 
 // The college app: three real screens of the redesign concept, one at a time. The first loads with
 // the page; the other two only once someone reaches for the tabs.
-const COLLEGE_SIZES = '(max-width: 719.98px) 200px, (max-width: 1099.98px) 21vw, 165px';
+const COLLEGE_SIZES = '(max-width: 719.98px) 200px, (max-width: 1099.98px) 21vw, 312px';
 const college = await Promise.all(
   [
     { src: collegeToday, label: 'Today', alt: "The college app's Today screen: the next class with a countdown, and the tasks due" },
@@ -146,7 +150,7 @@ const BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAA
                 {project.name}
               </a>
             </h3>
-            <p class="pt__line">{tile.line}</p>
+            <p class:list={['pt__line', tile.lineShown && 'pt__line--shown']}>{tile.line}</p>
             <ul class="pt__tags" aria-label="What we built">
               {tile.tags.map((tag) => (
                 <li class:list={[tag.concept && 'is-concept']}>{tag.text}</li>
@@ -392,10 +396,11 @@ const BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAA
 
 <style>
   /* ---------- The grid: twelve columns, the tiles sized by what they show ---------- */
+  /* The two tall tiles (the bot, the app) sit on opposite sides; the sites get wide tiles. */
   .pb {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
-    grid-template-rows: 400px 380px 330px;
+    grid-template-rows: 400px 360px 430px 360px;
     gap: 16px;
   }
   .pt--leadity {
@@ -406,25 +411,25 @@ const BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAA
     grid-column: 9 / 13;
     grid-row: 1 / 3;
   }
-  .pt--cars {
-    grid-column: 1 / 5;
-    grid-row: 2;
-  }
   .pt--college {
+    grid-column: 1 / 5;
+    grid-row: 2 / 4;
+  }
+  .pt--cars {
     grid-column: 5 / 9;
     grid-row: 2;
   }
-  .pt--crypto {
-    grid-column: 1 / 7;
-    grid-row: 3;
-  }
   .pt--elec {
-    grid-column: 7 / 10;
+    grid-column: 5 / 13;
     grid-row: 3;
   }
   .pt--rev {
-    grid-column: 10 / 13;
-    grid-row: 3;
+    grid-column: 1 / 7;
+    grid-row: 4;
+  }
+  .pt--crypto {
+    grid-column: 7 / 13;
+    grid-row: 4;
   }
 
   /* ---------- A tile ---------- */
@@ -597,20 +602,15 @@ const BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAA
     width: 19%;
   }
   .pt--cars,
-  .pt--crypto,
-  .pt--elec {
+  .pt--crypto {
     --pos: left top;
   }
+  /* The car parts store shows its desktop page only; its phone screen is for the phone layout. */
   .pt--cars .frame--browser {
-    width: 84%;
-    margin-right: 14%;
+    width: 88%;
   }
   .pt--cars .frame--phone {
-    position: absolute;
-    right: 16px;
-    top: 62px;
-    z-index: 2;
-    width: 30%;
+    display: none;
   }
   .pt--crypto .frame--browser {
     width: 70%;
@@ -623,15 +623,21 @@ const BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAA
     z-index: 2;
     width: 19%;
   }
+  /* The two sites with a sticker: it sits on the screenshot's corner, so the page gets the height. */
+  .pt--elec .pt__stage,
+  .pt--rev .pt__stage {
+    padding-top: 28px;
+  }
   .pt--elec .frame--browser,
   .pt--rev .frame--browser {
-    width: 92%;
+    width: 86%;
   }
+  /* The app's tile is tall: one large phone that still runs off the bottom edge. */
   .pt--college .pt__stage {
     padding-top: 72px;
   }
   .pt--college .frame--phone {
-    width: 48%;
+    width: min(312px, 100%);
   }
   .pt--college .frame--phone :global(img) {
     opacity: 0;
@@ -715,6 +721,15 @@ const BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAA
     white-space: nowrap;
     font-size: 14px;
     color: var(--muted);
+  }
+  .pt__line--shown {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+    line-height: 1.45;
   }
   .pt__go {
     grid-column: 2;
@@ -947,7 +962,7 @@ const BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAA
   @media (max-width: 1099.98px) {
     .pb {
       grid-template-columns: repeat(6, minmax(0, 1fr));
-      grid-template-rows: 380px 360px 360px 330px 300px;
+      grid-template-rows: 380px 360px 360px 380px 340px;
     }
     .pt--leadity {
       grid-column: 1 / 7;
@@ -957,25 +972,38 @@ const BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAA
       grid-column: 1 / 4;
       grid-row: 2 / 4;
     }
-    .pt--cars {
+    .pt--college {
       grid-column: 4 / 7;
       grid-row: 2;
     }
-    .pt--college {
+    .pt--cars {
       grid-column: 4 / 7;
       grid-row: 3;
     }
-    .pt--crypto {
+    .pt--elec {
       grid-column: 1 / 7;
       grid-row: 4;
+      /* Wide and short here: the hero banner matters more than the sale bar above it. */
+      --pos: center 30%;
     }
-    .pt--elec {
+    .pt--rev {
       grid-column: 1 / 4;
       grid-row: 5;
     }
-    .pt--rev {
+    .pt--crypto {
       grid-column: 4 / 7;
       grid-row: 5;
+    }
+    .pt--college .frame--phone {
+      width: 48%;
+    }
+    /* Half a tablet is too narrow for a phone beside the page. */
+    .pt--crypto .frame--phone {
+      display: none;
+    }
+    .pt--crypto .frame--browser {
+      width: 88%;
+      margin-right: 0;
     }
   }
 
@@ -1014,6 +1042,7 @@ const BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAA
     }
     .pt--leadity .frame--phone,
     .pt--cars .frame--phone {
+      display: block;
       position: relative;
       top: auto;
       right: auto;
