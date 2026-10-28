@@ -1,6 +1,7 @@
 // How every project works, approved by the owner on 2026-10-16. These are promises the studio keeps:
-// change them here first if the way of working changes. How we work shows all of them as the signed
-// agreement; Home and Services show the four that matter most and link there.
+// change them here first if the way of working changes, in all three lists. `terms` holds the full
+// wording; How we work shows all nine said short (`coverTerms`); Home and Services show the four that
+// matter most (`keyTerms`) and link there.
 
 export type Term = { title: string; text: string };
 
@@ -44,6 +45,24 @@ export const keyTerms: Term[] = [
   { title: 'Everything is yours.', text: 'Code, designs and accounts, in your name.' },
   { title: '30 days of free fixes.', text: 'Any bug after launch, fixed at no cost.' },
 ];
+
+/**
+ * All nine, one line each, in the order the cover of the agreement on How we work lists them. The
+ * first COVER_AT_REST are the ones its "what arrives" list has not already said; the rest open
+ * behind "Show all".
+ */
+export const coverTerms: Term[] = [
+  { title: 'No hidden costs', text: 'Hosting, domains, AI usage and app store fees: you pay them directly, at cost.' },
+  { title: 'Two rounds of design changes', text: 'Included in the price.' },
+  { title: 'Care, if you want it', text: "Optional monthly care for sites and apps. Cancel with 30 days' notice." },
+  { title: 'Free estimate', text: 'Our approach and a fixed price in writing, within two business days.' },
+  { title: 'Fixed price', text: 'For the scope we agree in writing. Anything new gets its own price, and you approve it first.' },
+  { title: 'Pay in stages', text: 'Half to start, half at launch. Larger projects pay in three stages.' },
+  { title: 'You own everything', text: 'Code and designs once paid in full; accounts in your name from day one.' },
+  { title: '30 days of free fixes', text: 'Any bug in what we built, fixed free after launch.' },
+  { title: 'SEO month to month', text: "No long contract: cancel with 30 days' notice. No ranking guarantees." },
+];
+export const COVER_AT_REST = 3;
 
 /** Where the full agreement lives. */
 export const termsUrl = '/how-we-work#terms';

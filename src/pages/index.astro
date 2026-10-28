@@ -1,13 +1,12 @@
 ---
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
-import Workbench from '../components/Workbench.astro';
+import WorkBento from '../components/WorkBento.astro';
 import RibbonEnd from '../components/RibbonEnd.astro';
 import Agreement from '../components/Agreement.astro';
 import { keyTerms as terms, termsUrl } from '../data/terms';
-import { Image } from 'astro:assets';
 import { filled, numbers, site } from '../data/site';
-import { clients, projects, projectUrl } from '../data/projects';
+import { clients } from '../data/projects';
 import { ribbonPath } from '../scripts/hero-ribbons';
 
 /** "Trusted by:" chips, clients only (never our own products). Past CHIP_LIMIT the rest are behind "+ more brands". */
@@ -21,14 +20,6 @@ const stats = filled([
   { value: numbers.marketsServed, label: 'markets served' },
   { value: numbers.retention, label: 'clients who stay past year one' },
 ]);
-
-
-
-// Recent work is a log of real, named projects: work we built for others first, our own product last.
-// Each row opens in place to the real screenshot and what we built. With a fine pointer, the
-// screenshot also trails the pointer down the list.
-const log = [...projects.filter((project) => !project.own), ...projects.filter((project) => project.own)];
-
 ---
 
 <Base
@@ -131,16 +122,16 @@ const log = [...projects.filter((project) => !project.own), ...projects.filter((
     </button>
   </section>
 
-  <!-- What we build: a working piece of each kind of project -->
-  <section id="what-we-do" class="bg-paper">
+  <!-- What we build: the real work, one tile per project. "All work" sits in the head on wide
+       screens; on phones it closes the section instead, in reading order. -->
+  <section id="what-we-do" class="bg-paper" aria-labelledby="build-title">
     <div class="container block block--bench">
       <div class="block__head">
-        <div class="block__title">
-          <h2 class="h2">What we build.</h2>
-        </div>
-        <a href="/services" class="text-link see-all">All services<Icon name="arrow-right" /></a>
+        <h2 class="h2" id="build-title">What we build.</h2>
+        <a href="/work" class="text-link see-all see-all--top">All work<Icon name="arrow-right" /></a>
       </div>
-      <Workbench />
+      <WorkBento />
+      <a href="/work" class="text-link see-all see-all--end">All work<Icon name="arrow-right" /></a>
     </div>
   </section>
 
@@ -156,84 +147,6 @@ const log = [...projects.filter((project) => !project.own), ...projects.filter((
             </div>
           ))}
         </dl>
-      </section>
-    )
-  }
-
-  <!-- Recent work: a log of real, named projects -->
-  {
-    log.length > 0 && (
-      <section class="bg-paper" aria-labelledby="work-title">
-        <div class="container block">
-          <div class="block__head">
-            <h2 class="h2" id="work-title">Recent work.</h2>
-            <a href="/work" class="text-link see-all">All work<Icon name="arrow-right" /></a>
-          </div>
-          <div class="log-wrap" data-log-wrap>
-            <ol class="log" data-log>
-              {log.map((project) => {
-                const url = projectUrl(project);
-                const id = `log-${project.slug}`;
-                return (
-                  <li class="log__row" data-log-row={project.slug}>
-                    <button type="button" class="log__toggle" aria-expanded="false" aria-controls={id}>
-                      <span class="log__name">
-                        {project.name}
-                      </span>
-                      <span class="log__what">{project.own ? `Our own product. ${project.plain ?? ''}` : project.plain}</span>
-                      <span class="log__kind">{project.kind}</span>
-                      <span class="log__plus" aria-hidden="true" />
-                    </button>
-                    <div class="log__open" id={id} inert>
-                      <div class="log__inner">
-                        <div class="log__detail">
-                          {project.image && (
-                            <div class="log__shot">
-                              <Image
-                                src={project.image.src}
-                                alt={project.image.alt}
-                                widths={[640, 960, 1280]}
-                                sizes="(min-width: 1240px) 620px, (min-width: 800px) 52vw, 92vw"
-                                loading="lazy"
-                              />
-                            </div>
-                          )}
-                          <div class="log__about">
-                            {project.summary && <p class="log__summary">{project.summary}</p>}
-                            {project.screensNote && <p class="log__summary log__note">{project.screensNote}</p>}
-                            {url && (
-                              <a href={url} class="text-link">
-                                Read the case
-                                <Icon name="arrow-right" />
-                              </a>
-                            )}
-                            {project.site && (
-                              <a href={project.site} class="text-link" target="_blank" rel="noopener">
-                                Visit {new URL(project.site).hostname}
-                                <span class="visually-hidden"> (opens in a new tab)</span>
-                                <Icon name="arrow-up-right" />
-                              </a>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                );
-              })}
-            </ol>
-            <div class="peek" aria-hidden="true" data-peek>
-              <div class="peek__card">
-                {log.map(
-                  (project) =>
-                    project.image && (
-                      <Image src={project.image.src} alt="" widths={[400, 800]} sizes="320px" loading="lazy" class="peek__img" data-peek-for={project.slug} />
-                    ),
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
       </section>
     )
   }
@@ -284,74 +197,6 @@ const log = [...projects.filter((project) => !project.own), ...projects.filter((
       hero.style.setProperty('--hx', '0');
       hero.style.setProperty('--hy', '0');
     });
-  }
-
-  // ---------- Recent work: rows open in place; a glance trails the pointer down the list.
-  const wrap = document.querySelector<HTMLElement>('[data-log-wrap]');
-  if (wrap) {
-    const still = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const fine = window.matchMedia('(hover: hover) and (pointer: fine)');
-    const peek = wrap.querySelector<HTMLElement>('[data-peek]');
-    wrap.querySelectorAll<HTMLButtonElement>('.log__toggle').forEach((button) => {
-      const row = button.closest<HTMLElement>('.log__row');
-      const panel = document.getElementById(button.getAttribute('aria-controls') ?? '');
-      if (!row || !panel) return;
-      button.addEventListener('click', () => {
-        const open = button.getAttribute('aria-expanded') !== 'true';
-        button.setAttribute('aria-expanded', String(open));
-        row.classList.toggle('is-open', open);
-        panel.inert = !open;
-        if (open) peek?.classList.remove('is-on');
-      });
-    });
-
-    const shots = new Map<string, HTMLElement>();
-    peek?.querySelectorAll<HTMLElement>('[data-peek-for]').forEach((img) => shots.set(img.dataset.peekFor ?? '', img));
-    if (peek && shots.size > 0) {
-      const W = 320;
-      const H = 200;
-      let x = 0;
-      let y = 0;
-      let tx = 0;
-      let ty = 0;
-      let raf = 0;
-      let active: HTMLElement | null = null;
-      // A little lag and a tilt in the direction of travel, settling when the pointer rests.
-      const frame = () => {
-        const dx = tx - x;
-        x += dx * 0.16;
-        y += (ty - y) * 0.16;
-        peek.style.setProperty('--px', `${x.toFixed(1)}px`);
-        peek.style.setProperty('--py', `${y.toFixed(1)}px`);
-        peek.style.setProperty('--pr', `${Math.max(-6, Math.min(6, dx * 0.04)).toFixed(2)}deg`);
-        raf = Math.abs(dx) + Math.abs(ty - y) > 0.3 ? requestAnimationFrame(frame) : 0;
-      };
-      const hide = () => {
-        peek.classList.remove('is-on');
-        active = null;
-      };
-      wrap.addEventListener('pointermove', (event) => {
-        if (!fine.matches || still.matches) return;
-        const row = (event.target as Element).closest<HTMLElement>('.log__row');
-        const img = row ? shots.get(row.dataset.logRow ?? '') : undefined;
-        // No glance over an opened row: its screenshot is already on the page.
-        if (!row || !img || row.classList.contains('is-open')) return hide();
-        const r = wrap.getBoundingClientRect();
-        tx = Math.min(event.clientX - r.left + 28, r.width - W);
-        ty = event.clientY - r.top - H / 2;
-        if (active !== row) {
-          if (!active) {
-            x = tx;
-            y = ty;
-          }
-          shots.forEach((el) => el.classList.toggle('is-on', el === img));
-          active = row;
-        }
-        peek.classList.add('is-on');
-        if (!raf) raf = requestAnimationFrame(frame);
-      });
-      wrap.addEventListener('pointerleave', hide);
-    }
   }
 </script>
 
@@ -585,259 +430,16 @@ const log = [...projects.filter((project) => !project.own), ...projects.filter((
   .block--bench {
     padding-top: 40px;
   }
+  /* "All work": in the head on wide screens, closing the section on phones (see the phone rules below). */
+  .see-all--end {
+    display: none;
+  }
   .block__head {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
     justify-content: space-between;
     gap: 16px 40px;
-  }
-  .block__title {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  /* ---------- Recent work: a log of real projects ---------- */
-
-  .log-wrap {
-    position: relative;
-  }
-  .log {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    border-top: 1px solid var(--line);
-  }
-  .log__row {
-    border-bottom: 1px solid var(--line);
-  }
-  .log__toggle {
-    width: 100%;
-    display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.5fr) minmax(0, 0.6fr) 30px;
-    align-items: center;
-    gap: 24px;
-    padding: 26px 10px;
-    border: 0;
-    border-radius: 0;
-    background: none;
-    color: inherit;
-    font: inherit;
-    text-align: left;
-    cursor: pointer;
-    transition: background-color 240ms var(--ease-out);
-  }
-  .log__toggle:focus-visible {
-    outline: 3px solid var(--teal);
-    outline-offset: -3px;
-    border-radius: 14px;
-  }
-  .log__name {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px 12px;
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: clamp(1.375rem, 2.2vw, 1.85rem);
-    line-height: 1.1;
-    letter-spacing: -0.01em;
-    transition: transform 320ms var(--ease-out);
-  }
-  .log__what {
-    font-size: 16px;
-    line-height: 1.45;
-    color: var(--ink-2);
-  }
-  .log__kind {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--muted);
-  }
-  /* Plus that turns into a minus when the row is open. */
-  .log__plus {
-    position: relative;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    border: 1px solid var(--line);
-    transition:
-      background-color 200ms var(--ease-out),
-      border-color 200ms var(--ease-out);
-  }
-  .log__plus::before,
-  .log__plus::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 12px;
-    height: 2px;
-    margin: -1px 0 0 -6px;
-    border-radius: 2px;
-    background: var(--ink);
-    transition:
-      transform 320ms var(--ease-out),
-      background-color 200ms var(--ease-out);
-  }
-  .log__plus::after {
-    transform: rotate(90deg);
-  }
-  .log__toggle[aria-expanded='true'] .log__plus {
-    background: var(--ink);
-    border-color: var(--ink);
-  }
-  .log__toggle[aria-expanded='true'] .log__plus::before,
-  .log__toggle[aria-expanded='true'] .log__plus::after {
-    background: var(--white);
-  }
-  .log__toggle[aria-expanded='true'] .log__plus::after {
-    transform: rotate(0deg);
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .log__toggle:hover {
-      background: var(--surface);
-    }
-    .log__toggle:hover .log__name {
-      transform: translateX(6px);
-    }
-  }
-  /* An opened row: the real screenshot and what we built. */
-  .log__open {
-    display: grid;
-    grid-template-rows: 0fr;
-    transition: grid-template-rows 420ms var(--ease-out);
-  }
-  .log__row.is-open .log__open {
-    grid-template-rows: 1fr;
-  }
-  .log__inner {
-    min-height: 0;
-    overflow: hidden;
-  }
-  .log__detail {
-    display: grid;
-    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
-    gap: 32px;
-    align-items: start;
-    padding: 4px 10px 34px;
-  }
-  .log__shot {
-    aspect-ratio: 16 / 10;
-    overflow: hidden;
-    border-radius: 18px;
-    border: 1px solid var(--line-soft);
-    background: var(--tint-cyan);
-    box-shadow: var(--shadow-tile);
-  }
-  .log__shot :global(img) {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: top;
-  }
-  .log__about {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-  .log__summary {
-    margin: 0 0 6px;
-    max-width: 34em;
-    font-size: 16px;
-    line-height: 1.6;
-    color: var(--ink-2);
-  }
-  .log__note {
-    font-weight: 600;
-    color: var(--ink);
-  }
-  /* The glance: the hovered row's screenshot trails the pointer (fine pointers only). */
-  .peek {
-    position: absolute;
-    left: 0;
-    top: 0;
-    z-index: 5;
-    width: 320px;
-    aspect-ratio: 16 / 10;
-    pointer-events: none;
-    transform: translate3d(var(--px, 0), var(--py, 0), 0) rotate(var(--pr, 0deg));
-    will-change: transform;
-  }
-  .peek__card {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-    border-radius: 16px;
-    background: var(--tint-cyan);
-    box-shadow:
-      0 30px 60px -28px rgb(10 17 40 / 0.45),
-      0 0 0 1px rgb(10 17 40 / 0.06);
-    opacity: 0;
-    transform: scale(0.9);
-    transform-origin: 0 50%;
-    transition:
-      opacity 200ms var(--ease-out),
-      transform 260ms var(--ease-out);
-  }
-  .peek.is-on .peek__card {
-    opacity: 1;
-    transform: none;
-  }
-  .peek__card :global(.peek__img) {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: top;
-    opacity: 0;
-    transition: opacity 260ms var(--ease-out);
-  }
-  .peek__card :global(.peek__img.is-on) {
-    opacity: 1;
-  }
-  @media (max-width: 799.98px) {
-    .log__toggle {
-      grid-template-columns: minmax(0, 1fr) 30px;
-      gap: 6px 16px;
-      padding: 20px 4px;
-    }
-    .log__name,
-    .log__what {
-      grid-column: 1;
-    }
-    .log__what {
-      font-size: 15px;
-    }
-    .log__kind {
-      display: none;
-    }
-    .log__plus {
-      grid-column: 2;
-      grid-row: 1 / span 2;
-    }
-    .log__detail {
-      grid-template-columns: minmax(0, 1fr);
-      gap: 18px;
-      padding: 0 4px 26px;
-    }
-  }
-  @media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
-    .peek {
-      display: none;
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .log__open,
-    .log__name,
-    .log__plus::before,
-    .log__plus::after {
-      transition: none;
-    }
   }
 
   /* ---------- Checks on this site ---------- */
@@ -890,6 +492,12 @@ const log = [...projects.filter((project) => !project.own), ...projects.filter((
     }
     .block__head {
       display: contents;
+    }
+    .see-all--top {
+      display: none;
+    }
+    .see-all--end {
+      display: inline-flex;
     }
     .terms {
       gap: 24px;

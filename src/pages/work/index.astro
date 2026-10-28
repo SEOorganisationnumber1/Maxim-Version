@@ -93,6 +93,7 @@ const phoneStyle = (p: Project, screen: { x: number; y: number; width: number })
         log.map((p, i) => (
           <li
             class="project"
+            id={p.slug}
             data-kind={kindSlug(p.kind)}
             data-span3={i === log.length - 1 ? span3 : undefined}
             data-span2={i === log.length - 1 ? span2 : undefined}
@@ -107,7 +108,7 @@ const phoneStyle = (p: Project, screen: { x: number; y: number; width: number })
                   <span class="phones" aria-hidden="true">
                     {p.frame.screens.map((screen) => (
                       <span class="phone">
-                        <span class="phone__screen" style={phoneStyle(p, screen)} />
+                        <span class="phone__screen" data-crop={phoneStyle(p, screen)} />
                       </span>
                     ))}
                   </span>
@@ -160,7 +161,7 @@ const phoneStyle = (p: Project, screen: { x: number; y: number; width: number })
                 <span class="phones phones--big" aria-hidden="true">
                   {p.frame.screens.map((screen) => (
                     <span class="phone">
-                      <span class="phone__screen" style={phoneStyle(p, screen)} />
+                      <span class="phone__screen" data-crop={phoneStyle(p, screen)} />
                     </span>
                   ))}
                 </span>
@@ -222,6 +223,12 @@ const phoneStyle = (p: Project, screen: { x: number; y: number; width: number })
 </Base>
 
 <script>
+  // The phone screens are cut from one screenshot. The script applies each cut: the site's
+  // Content-Security-Policy blocks style attributes written in the HTML, not styles set by a script.
+  document.querySelectorAll<HTMLElement>('[data-crop]').forEach((screen) => {
+    screen.style.cssText = screen.dataset.crop ?? '';
+  });
+
   const work = document.querySelector<HTMLElement>('[data-work]');
   const dialog = document.querySelector<HTMLDialogElement>('[data-open-dialog]');
   if (work && dialog) {
@@ -229,6 +236,8 @@ const phoneStyle = (p: Project, screen: { x: number; y: number; width: number })
     const tiles = [...work.querySelectorAll<HTMLElement>('.project')];
     let at = 0;
     let opener: HTMLElement | null = null;
+    /** Opened from a /work#<slug> link: the address loses the #slug again on close. */
+    let fromLink = false;
 
     /** Shows project i in the dialog; Previous and Next only step through the tiles in view. */
     const show = (i: number) => {
@@ -257,7 +266,13 @@ const phoneStyle = (p: Project, screen: { x: number; y: number; width: number })
     dialog.addEventListener('click', (event) => {
       if (event.target === dialog) dialog.close();
     });
-    dialog.addEventListener('close', () => opener?.focus());
+    dialog.addEventListener('close', () => {
+      opener?.focus();
+      if (fromLink) {
+        fromLink = false;
+        history.replaceState(history.state, '', window.location.pathname + window.location.search);
+      }
+    });
 
     // Filters by kind. A ?kind= link opens the page filtered.
     const buttons = [...work.querySelectorAll<HTMLButtonElement>('[data-filter]')];
@@ -275,6 +290,26 @@ const phoneStyle = (p: Project, screen: { x: number; y: number; width: number })
     buttons.forEach((b) => b.addEventListener('click', () => apply(b.dataset.filter ?? 'all', true)));
     const initial = new URLSearchParams(window.location.search).get('kind');
     if (initial && buttons.some((b) => b.dataset.filter === initial)) apply(initial, false);
+
+    // A link to /work#<slug> (from Home and How we work) opens that project. Without the script,
+    // the same link still lands on its tile.
+    const openFromHash = () => {
+      let slug = '';
+      try {
+        slug = decodeURIComponent(window.location.hash.slice(1));
+      } catch {
+        return; // a malformed #... is not one of ours
+      }
+      const tile = slug ? tiles.find((t) => t.id === slug && !t.hidden) : undefined;
+      const button = tile?.querySelector<HTMLButtonElement>('[data-open]');
+      if (!button || dialog.open) return;
+      opener = button;
+      fromLink = true;
+      show(Number(button.dataset.open));
+      dialog.showModal();
+    };
+    openFromHash();
+    window.addEventListener('hashchange', openFromHash);
   }
 </script>
 
@@ -446,6 +481,7 @@ const phoneStyle = (p: Project, screen: { x: number; y: number; width: number })
   }
   .project {
     container-type: inline-size;
+    scroll-margin-top: 96px;
   }
   .project[hidden] {
     display: none;
@@ -630,7 +666,7 @@ const phoneStyle = (p: Project, screen: { x: number; y: number; width: number })
       transform 300ms var(--ease-out);
   }
   .project__open:focus-visible {
-    outline: 3px solid var(--teal);
+    outline: 3px solid var(--teal-ink);
     outline-offset: 4px;
   }
   @media (hover: hover) and (pointer: fine) {

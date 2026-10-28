@@ -1,0 +1,1135 @@
+---
+// What we build, on Home: one tile per real project, with its real screens in the frame that fits
+// it (a browser for sites, a phone for phone screens), as on Work. The name's link covers the tile
+// and opens the project on Work; the Leadity bot and the college app's tabs work in place, above it.
+// Phones get their own layout: one column, real phone screens first, the last three as compact rows.
+import type { ImageMetadata } from 'astro';
+import { Picture, getImage } from 'astro:assets';
+import Icon from './Icon.astro';
+import { projects, projectUrl, type Project, type Tint } from '../data/projects';
+import leadityPhone from '../assets/work/leadity-phone.webp';
+import carPartsPhone from '../assets/work/car-parts-phone.webp';
+import cryptoPhone from '../assets/work/crypto-phone.webp';
+import collegeToday from '../assets/work/college-today.webp';
+import collegeSchedule from '../assets/work/college-schedule.webp';
+import collegeTasks from '../assets/work/college-tasks.webp';
+
+type Tile = {
+  /** The project: its name, link and desktop screenshot come from src/data/projects.ts. */
+  slug: string;
+  /** Its place in the grid (.pt--<key>). */
+  key: 'leadity' | 'bots' | 'cars' | 'college' | 'crypto' | 'elec' | 'rev';
+  tint: Tint;
+  /** The sticker, only where it says something the screens do not show. */
+  callout?: string;
+  /** What it is, in one line: shown on the phone rows, read out everywhere. */
+  line: string;
+  tags: { text: string; concept?: boolean }[];
+  /** How wide the desktop screenshot is drawn at each screen size (the `sizes` attribute). */
+  sizes?: string;
+  /** The same site on a phone, beside its desktop screenshot. */
+  phone?: { src: ImageMetadata; alt: string; sizes: string };
+  /** On phones: a compact row, with the screen as a thumbnail. */
+  row?: boolean;
+};
+
+const tiles: Tile[] = [
+  {
+    slug: 'leadity-io',
+    key: 'leadity',
+    tint: 'blue',
+    callout: 'Our own product',
+    line: 'Our own product',
+    tags: [{ text: 'Web app' }, { text: 'Website' }, { text: 'SEO' }],
+    sizes: '(max-width: 719.98px) 1px, (max-width: 1099.98px) 70vw, (max-width: 1239.98px) 45vw, 570px',
+    phone: {
+      src: leadityPhone,
+      alt: 'The leadity.io home page on a phone',
+      sizes: '(max-width: 719.98px) 200px, (max-width: 1099.98px) 18vw, (max-width: 1239.98px) 12vw, 150px',
+    },
+  },
+  {
+    slug: 'leadity-telegram-bots',
+    key: 'bots',
+    tint: 'ink',
+    line: 'Telegram bots that tell our team about payments and hand out tasks',
+    tags: [{ text: 'Telegram bot' }, { text: 'Our own product' }],
+  },
+  {
+    slug: 'car-parts-store',
+    key: 'cars',
+    tint: 'cyan',
+    line: 'Search by year, make and model',
+    tags: [{ text: 'Website' }],
+    sizes: '(max-width: 719.98px) 1px, (max-width: 1099.98px) 36vw, (max-width: 1239.98px) 23vw, 290px',
+    phone: { src: carPartsPhone, alt: 'The car parts store on a phone', sizes: '(max-width: 719.98px) 200px, (max-width: 1099.98px) 15vw, 120px' },
+  },
+  {
+    slug: 'college-student-app',
+    key: 'college',
+    tint: 'violet',
+    line: 'Classes, tasks and grades',
+    tags: [{ text: 'Mobile app' }, { text: 'Redesign concept', concept: true }],
+  },
+  {
+    slug: 'crypto-exchange-platform',
+    key: 'crypto',
+    tint: 'ink',
+    line: 'Web app · crypto to a bank card',
+    tags: [{ text: 'Web app' }],
+    sizes: '(max-width: 719.98px) 84px, (max-width: 1099.98px) 64vw, (max-width: 1239.98px) 30vw, 380px',
+    phone: { src: cryptoPhone, alt: 'The exchange home page on a phone', sizes: '(max-width: 719.98px) 1px, (max-width: 1099.98px) 18vw, 115px' },
+    row: true,
+  },
+  {
+    slug: 'electronics-store',
+    key: 'elec',
+    tint: 'blue',
+    callout: 'Catalog imported automatically',
+    line: 'Website · catalog imported automatically',
+    tags: [{ text: 'Website' }],
+    sizes: '(max-width: 719.98px) 84px, (max-width: 1099.98px) 39vw, (max-width: 1239.98px) 17vw, 230px',
+    row: true,
+  },
+  {
+    slug: 'reviews-site',
+    key: 'rev',
+    tint: 'violet',
+    callout: 'Owner approves every review',
+    line: 'Website · owner approves every review',
+    tags: [{ text: 'Website' }],
+    sizes: '(max-width: 719.98px) 84px, (max-width: 1099.98px) 39vw, (max-width: 1239.98px) 17vw, 230px',
+    row: true,
+  },
+];
+
+const bySlug = (slug: string): Project => {
+  const project = projects.find((p) => p.slug === slug);
+  if (!project) throw new Error(`WorkBento: no project "${slug}" in src/data/projects.ts`);
+  return project;
+};
+
+const DESKTOP_WIDTHS = [240, 400, 640, 960, 1280];
+const PHONE_WIDTHS = [200, 300, 400, 600];
+
+// The college app: three real screens of the redesign concept, one at a time. The first loads with
+// the page; the other two only once someone reaches for the tabs.
+const COLLEGE_SIZES = '(max-width: 719.98px) 200px, (max-width: 1099.98px) 21vw, 165px';
+const college = await Promise.all(
+  [
+    { src: collegeToday, label: 'Today', alt: "The college app's Today screen: the next class with a countdown, and the tasks due" },
+    { src: collegeSchedule, label: 'Schedule', alt: "The Schedule screen: the day's classes on a timeline" },
+    { src: collegeTasks, label: 'Tasks', alt: 'The Tasks screen, grouped by when each task is due' },
+  ].map(async (screen) => {
+    const image = await getImage({ src: screen.src, widths: PHONE_WIDTHS, format: 'webp' });
+    return { ...screen, url: image.src, srcset: image.srcSet.attribute, width: screen.src.width, height: screen.src.height };
+  }),
+);
+/** A transparent pixel holds the place of a screen that has not loaded yet. */
+const BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+---
+
+<div class="pb">
+  {
+    tiles.map((tile) => {
+      const project = bySlug(tile.slug);
+      const id = `pt-${tile.key}`;
+      return (
+        <article
+          class:list={['pt', `pt--${tile.key}`, tile.row && 'pt--row']}
+          aria-labelledby={id}
+          data-app={tile.key === 'college' ? '' : undefined}
+        >
+          <div class="pt__meta">
+            <h3 class="pt__name" id={id}>
+              <a class="pt__link" href={projectUrl(project) ?? `/work#${project.slug}`}>
+                {project.name}
+              </a>
+            </h3>
+            <p class="pt__line">{tile.line}</p>
+            <ul class="pt__tags" aria-label="What we built">
+              {tile.tags.map((tag) => (
+                <li class:list={[tag.concept && 'is-concept']}>{tag.text}</li>
+              ))}
+            </ul>
+            <span class="pt__go" aria-hidden="true">
+              <Icon name="arrow-right" />
+            </span>
+          </div>
+          <div class:list={['pt__stage', `tint-${tile.tint}`, !tile.callout && 'pt__stage--bare']}>
+            <svg class="pt__ribbon" aria-hidden="true" viewBox="0 0 400 200" preserveAspectRatio="none">
+              <path d="M-20 170 C 80 40, 180 200, 280 90 S 400 10, 440 40" />
+            </svg>
+            {tile.callout && (
+              <span class="pt__callout" aria-hidden="true">
+                {tile.callout}
+              </span>
+            )}
+
+            {tile.key === 'bots' && (
+              // The real task board bot, drawn from the messages in its code with made-up names.
+              // "Claim this" works and posts the bot's real reply.
+              <div class="tg" role="group" aria-label="A chat with the Leadity-tasks bot" data-bot>
+                <div class="tg__head">
+                  <span class="tg__av" aria-hidden="true">
+                    T
+                  </span>
+                  <span>
+                    <b>Leadity-tasks</b>
+                    <small>bot</small>
+                  </span>
+                </div>
+                <div class="tg__log" data-bot-log>
+                  <p class="tg__day" aria-hidden="true">
+                    Today
+                  </p>
+                  <p class="tg__m">
+                    <span aria-hidden="true">✔️ </span>sam finished <b>Fix Austin ZIP import</b>
+                    <small>9:12</small>
+                  </p>
+                  <p class="tg__m">
+                    <span aria-hidden="true">🆕 </span>
+                    <b>New task</b> (unclaimed, anyone can grab it) · <span aria-hidden="true">🔴 </span>High
+                    <br />
+                    <b>Refresh the Texas plumber list</b>
+                    <small>9:20</small>
+                  </p>
+                  <button type="button" class="tg__btn" data-claim>
+                    <span aria-hidden="true">✋ </span>Claim this
+                  </button>
+                  <p class="tg__m tg__m--me">
+                    <span class="tg__cmd">/list</span>
+                    <small>9:40</small>
+                  </p>
+                  <p class="tg__m tg__m--list">
+                    <span aria-hidden="true">🗂 </span>
+                    <b>Open tasks</b>: 3, one unclaimed
+                    <br />
+                    <span role="img" aria-label="High priority:">
+                      🔴
+                    </span>{' '}
+                    Refresh the Texas plumber list · unclaimed
+                    <br />
+                    <span role="img" aria-label="Medium priority:">
+                      🟡
+                    </span>{' '}
+                    Reply to the partner email · sam
+                    <br />
+                    <span role="img" aria-label="Low priority:">
+                      ⚪
+                    </span>{' '}
+                    Update the help page · alex
+                    <small>9:40</small>
+                  </p>
+                </div>
+                <p class="visually-hidden" role="status" data-bot-status />
+              </div>
+            )}
+
+            {tile.key === 'college' && (
+              <>
+                <div class="seg pt__control" role="group" aria-label="Show a screen of the app" data-seg>
+                  {college.map((screen, i) => (
+                    <button type="button" aria-pressed={i === 0 ? 'true' : 'false'} data-screen={i}>
+                      {screen.label}
+                    </button>
+                  ))}
+                </div>
+                <span class="frame frame--phone" data-screens>
+                  {college.map((screen, i) =>
+                    i === 0 ? (
+                      <img
+                        class="is-on"
+                        src={screen.url}
+                        srcset={screen.srcset}
+                        sizes={COLLEGE_SIZES}
+                        alt={screen.alt}
+                        width={screen.width}
+                        height={screen.height}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    ) : (
+                      <img
+                        src={BLANK}
+                        data-src={screen.url}
+                        data-srcset={screen.srcset}
+                        sizes={COLLEGE_SIZES}
+                        alt={screen.alt}
+                        width={screen.width}
+                        height={screen.height}
+                        decoding="async"
+                        aria-hidden="true"
+                      />
+                    ),
+                  )}
+                </span>
+              </>
+            )}
+
+            {project.image && tile.sizes && (
+              <span class="frame frame--browser">
+                <span class="frame__bar" aria-hidden="true">
+                  <i />
+                  <i />
+                  <i />
+                </span>
+                <span class="frame__shot">
+                  <Picture
+                    src={project.image.src}
+                    alt={project.image.alt}
+                    formats={['avif']}
+                    fallbackFormat="webp"
+                    widths={DESKTOP_WIDTHS}
+                    sizes={tile.sizes}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </span>
+              </span>
+            )}
+            {tile.phone && (
+              <span class="frame frame--phone is-site">
+                <Picture
+                  src={tile.phone.src}
+                  alt={tile.phone.alt}
+                  formats={['avif']}
+                  fallbackFormat="webp"
+                  widths={PHONE_WIDTHS}
+                  sizes={tile.phone.sizes}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </span>
+            )}
+          </div>
+        </article>
+      );
+    })
+  }
+</div>
+<p class="pb__also">We also build desktop apps, browser extensions, AI assistants and automations. <a href="/services">All services</a></p>
+
+<script>
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  // The bot: its log rests at the newest message, as in Telegram; claiming the task posts the
+  // bot's real reply, once.
+  document.querySelectorAll<HTMLElement>('[data-bot]').forEach((chat) => {
+    const log = chat.querySelector<HTMLElement>('[data-bot-log]');
+    const status = chat.querySelector<HTMLElement>('[data-bot-status]');
+    const claim = chat.querySelector<HTMLButtonElement>('[data-claim]');
+    if (!log || !status || !claim) return;
+    const toEnd = (smooth: boolean) =>
+      log.scrollTo({ top: log.scrollHeight, behavior: smooth && !reduce.matches ? 'smooth' : 'auto' });
+    // A log longer than its window scrolls, so the keyboard has to be able to reach it too.
+    const fit = () => {
+      if (log.scrollHeight > log.clientHeight + 1) {
+        log.tabIndex = 0;
+        log.setAttribute('aria-label', 'Chat messages');
+      } else {
+        log.removeAttribute('tabindex');
+        log.removeAttribute('aria-label');
+      }
+      toEnd(false);
+    };
+    fit();
+    new ResizeObserver(fit).observe(log);
+    claim.addEventListener('click', () => {
+      if (claim.getAttribute('aria-disabled') === 'true') return;
+      claim.setAttribute('aria-disabled', 'true');
+      claim.innerHTML = '<span aria-hidden="true">✋ </span>Claimed';
+      const reply = document.createElement('p');
+      reply.className = 'tg__m tg__new';
+      reply.innerHTML = '<span aria-hidden="true">✅ </span>You claimed <b>Refresh the Texas plumber list</b>.<small>now</small>';
+      log.append(reply);
+      status.textContent = 'The bot replied: You claimed Refresh the Texas plumber list.';
+      fit();
+      toEnd(true);
+    });
+  });
+
+  // The college app: three real screens. The other two load on first use; a tab shows its screen
+  // once it is ready, so the phone never flashes empty.
+  document.querySelectorAll<HTMLElement>('[data-app]').forEach((tile) => {
+    const buttons = [...tile.querySelectorAll<HTMLButtonElement>('[data-screen]')];
+    const shots = [...tile.querySelectorAll<HTMLImageElement>('[data-screens] img')];
+    const seg = tile.querySelector<HTMLElement>('[data-seg]');
+    const load = () =>
+      shots.forEach((img) => {
+        if (img.dataset.srcset) {
+          img.srcset = img.dataset.srcset;
+          delete img.dataset.srcset;
+        }
+        if (img.dataset.src) {
+          img.src = img.dataset.src;
+          delete img.dataset.src;
+        }
+      });
+    seg?.addEventListener('pointerenter', load, { once: true });
+    seg?.addEventListener('focusin', load, { once: true });
+    let wanted = 0;
+    buttons.forEach((button) =>
+      button.addEventListener('click', () => {
+        load();
+        const i = Number(button.dataset.screen);
+        wanted = i;
+        buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === button)));
+        const swap = () => {
+          if (wanted !== i) return;
+          shots.forEach((img, k) => {
+            img.classList.toggle('is-on', k === i);
+            img.setAttribute('aria-hidden', String(k !== i));
+          });
+        };
+        const img = shots[i];
+        if (!img || (img.complete && img.naturalWidth > 1)) swap();
+        else img.decode().then(swap, swap);
+      }),
+    );
+  });
+</script>
+
+<style>
+  /* ---------- The grid: twelve columns, the tiles sized by what they show ---------- */
+  .pb {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-rows: 400px 380px 330px;
+    gap: 16px;
+  }
+  .pt--leadity {
+    grid-column: 1 / 9;
+    grid-row: 1;
+  }
+  .pt--bots {
+    grid-column: 9 / 13;
+    grid-row: 1 / 3;
+  }
+  .pt--cars {
+    grid-column: 1 / 5;
+    grid-row: 2;
+  }
+  .pt--college {
+    grid-column: 5 / 9;
+    grid-row: 2;
+  }
+  .pt--crypto {
+    grid-column: 1 / 7;
+    grid-row: 3;
+  }
+  .pt--elec {
+    grid-column: 7 / 10;
+    grid-row: 3;
+  }
+  .pt--rev {
+    grid-column: 10 / 13;
+    grid-row: 3;
+  }
+
+  /* ---------- A tile ---------- */
+  /* The name comes first in the HTML, so screen readers hear what a tile is before its controls;
+     the stage is drawn above it, sits at the top and runs off the bottom edge, as on Work. */
+  .pt {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+    border-radius: var(--radius-tile);
+    background: var(--surface);
+    box-shadow: var(--shadow-tile);
+    transition: box-shadow 300ms var(--ease-out);
+  }
+  /* The stage sits above the name's link (which covers the tile) but lets clicks through to it;
+     only the bot and the app's tabs take clicks of their own. */
+  .pt__stage {
+    order: -1;
+    position: relative;
+    z-index: 5;
+    isolation: isolate;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    overflow: hidden;
+    padding: 60px 24px 0;
+    pointer-events: none;
+  }
+  .pt__stage--bare {
+    padding-top: 28px;
+  }
+  .tint-cyan {
+    background: linear-gradient(160deg, #e3f8fb 0%, #bdeef5 100%);
+  }
+  .tint-blue {
+    background: linear-gradient(160deg, #e8f0ff 0%, #c6d9ff 100%);
+  }
+  .tint-violet {
+    background: linear-gradient(160deg, #efecfe 0%, #d6cefb 100%);
+  }
+  .tint-ink {
+    background: linear-gradient(160deg, #1b2547 0%, #0a1128 100%);
+  }
+  /* A ribbon from the hero runs behind every frame. */
+  .pt__ribbon {
+    position: absolute;
+    inset: auto -10% -18% -10%;
+    z-index: -1;
+    width: 120%;
+    height: 70%;
+  }
+  .pt__ribbon path {
+    fill: none;
+    stroke: var(--white);
+    stroke-opacity: 0.75;
+    stroke-width: 46;
+    stroke-linecap: round;
+  }
+  .tint-ink .pt__ribbon path {
+    stroke: #2f8cf6;
+    stroke-opacity: 0.35;
+  }
+  /* The one thing worth knowing, in our highlight box. */
+  .pt__callout {
+    position: absolute;
+    left: 20px;
+    top: 18px;
+    z-index: 3;
+    max-width: calc(100% - 40px);
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: var(--teal-ink); /* 5.05:1 for the white text; --teal is 3.17:1 */
+    color: var(--white);
+    font: 700 15px/1.3 var(--font-display);
+    transform: rotate(-2deg);
+    transform-origin: left;
+    box-shadow: 0 6px 14px -8px rgb(7 122 138 / 0.7);
+  }
+
+  /* ---------- Frames: a browser for sites, a phone for phone screens ---------- */
+  .frame {
+    position: relative;
+    display: block;
+    flex: none;
+    overflow: hidden;
+    background: var(--white);
+  }
+  .frame :global(picture) {
+    display: contents;
+  }
+  .frame :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: var(--pos, center top);
+    transition:
+      transform 1600ms var(--ease-out),
+      opacity 300ms var(--ease-out);
+  }
+  /* A browser frame is always a little taller than its stage, so it runs off the tile's bottom edge. */
+  .frame--browser {
+    align-self: stretch;
+    height: calc(100% + 28px);
+    border-radius: 12px 12px 0 0;
+    box-shadow: 0 18px 40px -22px rgb(10 17 40 / 0.45);
+  }
+  .frame__bar {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    height: 22px;
+    padding: 0 10px;
+    background: #f1f4f8;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .frame__bar i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #cfd8e3;
+  }
+  .frame__shot {
+    display: block;
+    height: calc(100% - 22px);
+    overflow: hidden;
+  }
+  .frame--phone {
+    aspect-ratio: 9 / 19.5;
+    border: 6px solid var(--ink);
+    border-radius: 30px;
+    box-shadow: 0 22px 40px -22px rgb(10 17 40 / 0.55);
+  }
+  .frame--phone :global(img) {
+    position: absolute;
+    inset: 0;
+  }
+  /* The island; sites captured without one get a status band, so nothing sits under the round corner. */
+  .frame--phone::after {
+    content: '';
+    position: absolute;
+    z-index: 2;
+    top: 1.4%;
+    left: 50%;
+    width: 30%;
+    height: 2.6%;
+    border-radius: 999px;
+    background: var(--ink);
+    transform: translateX(-50%);
+  }
+  .frame--phone.is-site :global(img) {
+    top: 6%;
+    height: 94%;
+  }
+
+  /* Where the frames sit in each tile */
+  .pt--leadity .frame--browser {
+    width: 76%;
+    margin-right: 14%;
+  }
+  .pt--leadity .frame--phone {
+    position: absolute;
+    right: 7%;
+    top: 92px;
+    z-index: 2;
+    width: 19%;
+  }
+  .pt--cars,
+  .pt--crypto,
+  .pt--elec {
+    --pos: left top;
+  }
+  .pt--cars .frame--browser {
+    width: 84%;
+    margin-right: 14%;
+  }
+  .pt--cars .frame--phone {
+    position: absolute;
+    right: 16px;
+    top: 62px;
+    z-index: 2;
+    width: 30%;
+  }
+  .pt--crypto .frame--browser {
+    width: 70%;
+    margin-right: 22%;
+  }
+  .pt--crypto .frame--phone {
+    position: absolute;
+    right: 7%;
+    top: 58px;
+    z-index: 2;
+    width: 19%;
+  }
+  .pt--elec .frame--browser,
+  .pt--rev .frame--browser {
+    width: 92%;
+  }
+  .pt--college .pt__stage {
+    padding-top: 72px;
+  }
+  .pt--college .frame--phone {
+    width: 48%;
+  }
+  .pt--college .frame--phone :global(img) {
+    opacity: 0;
+  }
+  .pt--college .frame--phone :global(img.is-on) {
+    opacity: 1;
+  }
+  .pt--bots .pt__stage {
+    align-items: stretch;
+    padding: 16px;
+  }
+
+  /* ---------- Name, what it is, a go arrow. The name's link covers the whole tile. ---------- */
+  .pt__meta {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 4px 14px;
+    padding: 14px 18px 16px;
+  }
+  .pt__name {
+    grid-column: 1;
+    margin: 0;
+    font: 700 21px/1.2 var(--font-display);
+    letter-spacing: -0.01em;
+  }
+  .pt__link {
+    color: inherit;
+    text-decoration: none;
+  }
+  .pt__link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    border-radius: inherit;
+  }
+  /* The focus ring goes around the whole tile, the size of what the link opens. */
+  @supports selector(:has(*)) {
+    .pt__link:focus-visible {
+      outline: none;
+    }
+    .pt:has(.pt__link:focus-visible) {
+      outline: 3px solid var(--teal-ink);
+      outline-offset: 4px;
+    }
+  }
+  .pt__tags {
+    grid-column: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pt__tags li {
+    padding: 2px 10px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--ink-2);
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .pt__tags .is-concept {
+    border-color: #d9d0fb;
+    background: #f4f1ff;
+    color: #45369e;
+  }
+  /* Read out everywhere; shown only on the phone rows, where the screen is too small to say it. */
+  .pt__line {
+    grid-column: 1;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .pt__go {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: var(--surface);
+    color: var(--ink);
+    transition:
+      background-color 200ms var(--ease-out),
+      color 200ms var(--ease-out),
+      transform 300ms var(--ease-out);
+  }
+  .pt__control,
+  .tg {
+    position: relative;
+    z-index: 5;
+    pointer-events: auto;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .pt:hover {
+      box-shadow: var(--shadow-lift);
+    }
+    .pt:hover .frame--browser :global(img) {
+      transform: translateY(-6%);
+    }
+    .pt:hover .pt__go {
+      background: var(--ink);
+      color: var(--white);
+      transform: rotate(-45deg);
+    }
+  }
+
+  /* ---------- The bot ---------- */
+  /* The log keeps its newest message at the bottom; when it is longer than the window, older
+     messages scroll up under the header, as in Telegram. Messages the script adds are styled too. */
+  .tg {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: 0;
+    overflow: hidden;
+    border-radius: 18px;
+    background: #cfe1c2;
+    color: #0f1419;
+    font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif;
+  }
+  .tg__head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--white);
+    border-bottom: 1px solid #e3e6ea;
+  }
+  .tg__av {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4b3fd6, #2563eb);
+    color: var(--white);
+    font-weight: 700;
+    font-size: 15px;
+  }
+  .tg__head b {
+    display: block;
+    font-size: 15px;
+    line-height: 1.2;
+  }
+  .tg__head small {
+    font-size: 12.5px;
+    color: #5f6b78;
+  }
+  .tg__log {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    padding: 12px 10px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+  }
+  .tg__log::-webkit-scrollbar {
+    display: none;
+  }
+  .tg__log > :first-child {
+    margin-top: auto;
+  }
+  .tg__log:focus-visible {
+    outline-offset: -3px;
+  }
+  .tg__day {
+    align-self: center;
+    margin: 0 0 2px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: rgb(60 92 56 / 0.8);
+    color: var(--white);
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .tg__log :global(.tg__m) {
+    align-self: flex-start;
+    max-width: 90%;
+    margin: 0;
+    padding: 8px 11px 7px;
+    border-radius: 14px 14px 14px 4px;
+    background: var(--white);
+    font-size: 14px;
+    line-height: 1.4;
+    box-shadow: 0 1px 1px rgb(0 0 0 / 0.08);
+  }
+  .tg__log :global(.tg__m small) {
+    float: right;
+    margin: 6px 0 -4px 10px;
+    color: #687380;
+    font-size: 11px;
+    line-height: 1;
+  }
+  .tg__log .tg__m--me {
+    align-self: flex-end;
+    border-radius: 14px 14px 4px 14px;
+    background: #e1fec6;
+  }
+  .tg__log .tg__m--me small {
+    color: #38742b;
+  }
+  .tg__cmd {
+    color: #1f6fd1;
+  }
+  .tg__btn {
+    align-self: flex-start;
+    width: 90%;
+    min-height: 44px;
+    margin-top: -2px;
+    padding: 0 16px;
+    border: 0;
+    border-radius: 12px;
+    background: rgb(60 92 56 / 0.86); /* 5.6:1 for the white text */
+    color: var(--white);
+    font: 600 14.5px/1 -apple-system, 'SF Pro Text', system-ui, sans-serif;
+    cursor: pointer;
+    transition:
+      transform 160ms var(--ease-out),
+      background-color 200ms var(--ease-out);
+  }
+  .tg__btn:hover {
+    background: rgb(60 92 56 / 0.95);
+  }
+  .tg__btn:active {
+    transform: scale(0.97);
+  }
+  .tg__btn:focus-visible {
+    outline: 3px solid var(--white);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 6px var(--teal-ink);
+  }
+  .tg__btn[aria-disabled='true'] {
+    background: rgb(60 92 56 / 0.4);
+    cursor: default;
+    transform: none;
+  }
+  .tg__log :global(.tg__new) {
+    animation: tg-in 420ms var(--ease-pop);
+  }
+  @keyframes tg-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px) scale(0.96);
+    }
+  }
+
+  /* ---------- The college app's tabs ---------- */
+  .seg {
+    position: absolute;
+    left: 16px;
+    top: 16px;
+    display: inline-grid;
+    grid-auto-flow: column;
+    padding: 3px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.82);
+    box-shadow: 0 1px 2px rgb(10 17 40 / 0.08);
+  }
+  .seg button {
+    min-height: 38px;
+    padding: 0 13px;
+    border: 0;
+    border-radius: 999px;
+    background: none;
+    color: var(--ink-2);
+    font: 700 13.5px/1 var(--font-body);
+    cursor: pointer;
+    transition:
+      background-color 200ms var(--ease-out),
+      color 200ms var(--ease-out);
+  }
+  .seg button[aria-pressed='true'] {
+    background: var(--ink);
+    color: var(--white);
+  }
+  .seg button:focus-visible {
+    outline-offset: 0;
+  }
+  @media (pointer: coarse) {
+    .seg button {
+      min-height: 44px;
+    }
+  }
+
+  .pb__also {
+    margin: -24px 0 0;
+    font-size: 16px;
+    color: var(--ink-2);
+  }
+  .pb__also a {
+    font-weight: 700;
+  }
+
+  /* ---------- Tablets: six columns ---------- */
+  @media (max-width: 1099.98px) {
+    .pb {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      grid-template-rows: 380px 360px 360px 330px 300px;
+    }
+    .pt--leadity {
+      grid-column: 1 / 7;
+      grid-row: 1;
+    }
+    .pt--bots {
+      grid-column: 1 / 4;
+      grid-row: 2 / 4;
+    }
+    .pt--cars {
+      grid-column: 4 / 7;
+      grid-row: 2;
+    }
+    .pt--college {
+      grid-column: 4 / 7;
+      grid-row: 3;
+    }
+    .pt--crypto {
+      grid-column: 1 / 7;
+      grid-row: 4;
+    }
+    .pt--elec {
+      grid-column: 1 / 4;
+      grid-row: 5;
+    }
+    .pt--rev {
+      grid-column: 4 / 7;
+      grid-row: 5;
+    }
+  }
+
+  /* ---------- Phones: their own layout. Real phone screens first, one column, the last three as rows. ---------- */
+  @media (max-width: 719.98px) {
+    .pb {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .pt {
+      border-radius: 24px;
+    }
+    .pt__stage {
+      flex: none;
+      height: 300px;
+      padding: 58px 20px 0;
+    }
+    .pt__stage--bare {
+      padding-top: 28px;
+    }
+    .pt__callout {
+      left: 16px;
+      top: 16px;
+      font-size: 14px;
+    }
+    .pt__meta {
+      padding: 14px 16px 16px;
+    }
+    .pt__name {
+      font-size: 20px;
+    }
+    .pt--leadity .frame--browser,
+    .pt--cars .frame--browser {
+      display: none;
+    }
+    .pt--leadity .frame--phone,
+    .pt--cars .frame--phone {
+      position: relative;
+      top: auto;
+      right: auto;
+      width: min(52%, 200px);
+    }
+    .pt--college .pt__stage {
+      height: 340px;
+      padding-top: 74px;
+    }
+    .pt--college .frame--phone {
+      width: min(52%, 200px);
+    }
+    .pt--bots .pt__stage {
+      height: auto;
+      padding: 12px;
+    }
+    /* On a phone the chat stops at the task to claim. */
+    .tg__m--me,
+    .tg__m--list {
+      display: none;
+    }
+    .seg button {
+      min-height: 44px;
+    }
+    /* Crypto, electronics and reviews: compact rows, the screen as a thumbnail. */
+    .pt--row {
+      display: grid;
+      grid-template-columns: 84px minmax(0, 1fr);
+      align-items: center;
+      gap: 0 14px;
+      padding: 12px 14px 12px 12px;
+      border-radius: 22px;
+    }
+    .pt--row .pt__stage {
+      grid-column: 1;
+      grid-row: 1;
+      height: 64px;
+      padding: 0;
+      border-radius: 14px;
+    }
+    .pt--row .pt__stage > :not(.frame--browser) {
+      display: none;
+    }
+    .pt--row .frame--browser {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      border-radius: 0;
+      box-shadow: none;
+    }
+    .pt--row .frame__bar,
+    .pt--row .pt__tags {
+      display: none;
+    }
+    .pt--row .frame__shot {
+      height: 100%;
+    }
+    .pt--row .frame :global(img) {
+      object-position: left top;
+    }
+    .pt--row .pt__meta {
+      grid-column: 2;
+      grid-row: 1;
+      gap: 2px 10px;
+      padding: 0;
+    }
+    .pt--row .pt__name {
+      font-size: 18px;
+    }
+    .pt--row .pt__line {
+      position: static;
+      width: auto;
+      height: auto;
+      overflow: visible;
+      clip: auto;
+      white-space: normal;
+    }
+    .pt--row .pt__go {
+      width: 40px;
+      height: 40px;
+    }
+    .pb__also {
+      margin: 4px 0 0;
+      font-size: 15px;
+    }
+  }
+  @media (max-width: 359.98px) {
+    .seg button {
+      padding: 0 10px;
+      font-size: 12.5px;
+    }
+    .pt--row {
+      grid-template-columns: 64px minmax(0, 1fr);
+      gap: 0 12px;
+    }
+    .pt--row .pt__stage {
+      height: 52px;
+      border-radius: 12px;
+    }
+    .pt--row .pt__go {
+      display: none;
+    }
+    .pt--row .pt__name {
+      font-size: 17px;
+    }
+    .pt--row .pt__line {
+      font-size: 13.5px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tg__log :global(.tg__new) {
+      animation: none;
+    }
+    .pt:hover .frame--browser :global(img) {
+      transform: none;
+    }
+  }
+</style>

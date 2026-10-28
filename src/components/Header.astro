@@ -458,6 +458,15 @@ const workShot = projects.find((project) => !project.own && project.image)?.imag
       display: none;
     }
   }
+  /* 320px phones: a little less air, so the bar fits the screen without a sideways scroll. */
+  @media (max-width: 359.98px) {
+    .header__inner {
+      gap: 8px;
+    }
+    .header__cta--phone {
+      padding: 0 12px;
+    }
+  }
   @media (max-width: 899.98px) {
     .header__inner {
       flex-wrap: nowrap;

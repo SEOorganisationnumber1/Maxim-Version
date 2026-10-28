@@ -29,7 +29,7 @@ const { terms, id = 'agreement-title' } = Astro.props;
   </dl>
   <div class="sign" aria-hidden="true">
     <div class="sign__line">
-      <svg style="--w: 190px" viewBox="0 0 190 56" fill="none">
+      <svg class="sign__mark sign__mark--us" viewBox="0 0 190 56" fill="none">
         <path
           class="sign__ink sign__ink--us"
           pathLength="1"
@@ -39,7 +39,7 @@ const { terms, id = 'agreement-title' } = Astro.props;
       For {site.name}
     </div>
     <div class="sign__line">
-      <svg style="--w: 130px" viewBox="0 0 130 56" fill="none">
+      <svg class="sign__mark sign__mark--you" viewBox="0 0 130 56" fill="none">
         <path
           class="sign__ink sign__ink--you"
           pathLength="1"
@@ -142,9 +142,15 @@ const { terms, id = 'agreement-title' } = Astro.props;
     left: 0;
     bottom: calc(100% + 2px);
     width: 100%;
-    max-width: var(--w);
     height: auto;
     overflow: visible;
+  }
+  /* Set here, not in a style attribute: the site's Content-Security-Policy blocks those. */
+  .sign__mark--us {
+    max-width: 190px;
+  }
+  .sign__mark--you {
+    max-width: 130px;
   }
   .sign__ink {
     stroke-width: 2.4;

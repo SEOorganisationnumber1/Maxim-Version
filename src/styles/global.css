@@ -35,7 +35,7 @@
 
   --error: #B42318;
 
-  /* Workbench surfaces: soft white tiles on paper. The ink borders of V1 are kept for frames only. */
+  /* Surfaces: soft white tiles on paper. The ink borders of V1 are kept for frames only. */
   --surface: #FFFFFF;
   --line-soft: #E3E8EF;
   --muted: #5F6984;
@@ -96,8 +96,9 @@ a:hover { color: var(--teal-ink); }
 html { scrollbar-color: #b9c4d3 transparent; accent-color: var(--teal); }
 input, textarea { caret-color: var(--teal); }
 
+/* The darker teal: 4.6:1 or more on paper, white and the tinted tiles (the bright teal is about 3:1). */
 :focus-visible {
-  outline: 3px solid var(--teal);
+  outline: 3px solid var(--teal-ink);
   outline-offset: 2px;
 }
 
